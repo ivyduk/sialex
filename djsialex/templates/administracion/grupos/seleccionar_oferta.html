@@ -1,0 +1,220 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks  profile_tags %}
+
+{% block content %}
+{% block administration-title %}
+    <h2 class="title-project">Seleccionar Oferta</h2>
+{% endblock %}
+{% block form %}
+        <div class="form-group">
+            <form action="{% url 'seleccion_oferta' %}" method="get">
+                <label for="oferta" class="col-sm-2 control-label">Oferta Académica</label>
+                <div class="col-sm-6">
+                    <select class="form-control" name="oferta">
+                    {% for oferta in ofertas %}
+                        <option value="{{ oferta.id }}" {% if oferta.id|stringformat:"s" == current_oferta %} selected="True"{% endif %}>{{ oferta.nombre }}</option>
+                    {% endfor %}
+                </select>
+                </div>
+            {% csrf_token %}
+                <input class="btn btn-primary" type="submit" name="filtrar" value="Filtrar">
+            </form>
+
+        </div>
+
+{% endblock %}
+
+        <div class="col-sm-9 col-md-9">
+            <div class="alert alert-info">
+                Recuerde que sólo las personas inscritas sin matrícula serán asignadas a un grupo nuevo.
+                <br>No olvide dejar los valores en 0 o en blanco los horarios que no desea asignar salón.
+                <br>Cuando esté seguro de todos los valores, oprima el botón <b>Asignar grupos</b>
+            </div>
+
+        <div class="table-responsive">
+                <table class="table table-striped table-border">
+                        <thead class="table-head">
+                            <tr>
+                              <th width="20%">horario</th>
+                              <th width="10%">Total Inscritos</th>
+                              <th width="10%">Inscritos sin matrícula</th>
+                              <th width="10%"># de Grupos</th>
+                              <th width="30">Grupos <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> Matrículas</th>
+                              <th width="20%">Acciones</th>
+                            </tr>
+                          </thead>
+                        <tbody>
+                        {% for curso, horario_cursos in niveles_curso.items %}
+                            <tr class="col-nivel">
+                                <td colspan="5">
+                                    <span class="alert-success">{{ curso.nivel.nombre }}</span>
+                                </td>
+                                <td>
+                                    <a href="{% url "cambiar_grupos"  curso.nivel.id %}">
+                                            <button class="btn btn-success">
+                                            <span class="glyphicon glyphicon-transfer">Mover Estudiantes
+                                                </span>
+                                            </button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% for horario_curso, info_horario_curso in horario_cursos.items %}
+                            <tr class="col-grupo">
+                                <td>{{ horario_curso.horario.nombre }}</td>
+                                <td class="table-info">{{ info_horario_curso.0 }}
+                                 <a href="{% url 'horario-curso-preinscritos' horario_curso.id %}" target="_blank">
+                                        <button class="btn btn-primary btn-xs">
+                                            <span class="glyphicon glyphicon-eye-open">
+                                            </span>
+                                        </button>
+                                        </a></td>
+                                <td class="table-info">{{ info_horario_curso.1 }}
+                                     <a href="{% url 'preinscritos-sin-matricula' horario_curso.id %}" target="_blank">
+                                        <button class="btn btn-primary btn-xs">
+                                            <span class="glyphicon glyphicon-eye-open">
+                                            </span>
+                                        </button>
+                                        </a>
+                                </td>
+                                <td><input type="text" placeholder="Grupos" name="grupo" class="numero-grupo" size="6">
+                                    <input type="hidden" id="horarioCursoId" name="horarioCursoId" value="{{ horario_curso.id }}" class="horarioCurso">
+                                </td>
+                                <td>
+                                    <table>
+                                        {% for grupo in info_horario_curso.2 %}
+                                        <tr>
+                                            <td>
+                                                {% if grupo.codigo %}
+                                                    {{ grupo.codigo }}
+                                                {% endif %}
+
+                                            </td>
+                                          <td>
+                                              <a href="{% url 'grupo-detail' grupo.id %}" target="_blank">
+                                                  {{ grupo.nombre }}</a>
+                                          </td>
+                                            <td><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> MAT: {{ grupos_matriculas|get_item:grupo }}</td>
+                                          <td>
+                                              {% if grupos_matriculas|get_item:grupo == 0 %}
+                                            <button class="btn btn-danger btn-xs js-delete-grupo" data-id="{% url 'grupo_delete' grupo.id %}">
+                                                <span class="glyphicon glyphicon-remove">
+                                                </span>
+                                            </button>
+                                              {% endif %}
+                                          </td>
+                                          <td>
+                                              {% if grupo.estado == 0 %}
+                                              <a class="btn btn-warning btn-xs " href="{% url 'aplazar-grupo' grupo.id %}">
+                                                <span class="glyphicon glyphicon-share">Aplazar
+                                                </span>
+                                            </a>
+                                                  {% else %}
+                                                  <span class="label-info">Aplazado
+                                                </span>
+                                              {% endif %}
+                                          </td>
+                                        </tr>
+
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                                <td>
+
+                                        <button class="js-create-grupo btn btn-primary" type="button" data-id="{% url 'grupo_create' horario_curso.id %}" name="button_grupo">
+                                            <span class="glyphicon glyphicon-plus">Nuevo
+                                                </span>
+                                        </button>
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                        </tbody>
+                </table>
+        </div>
+        <button type="button" class="btn btn-danger pull-right" id="submit-btn">
+            <span class="glyphicon glyphicon-ok"></span> Asignar grupos</button>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+            </div>
+          </div>
+        </div>
+
+<script type="text/javascript">
+
+    function checkInteger(texto) {
+        var integer = /^[0-9]+$/;
+        return texto.match(integer);
+    }
+
+        $(document).ready(function() {
+            $(function () {
+               $(".js-delete-grupo").each(function () {
+              $(this).modalForm({formURL: $(this).data('id')});
+            });
+            });
+
+            $(function () {
+                $(".js-create-grupo").click(function () {
+                    $.ajax({
+                        url: $(this).data("id"),
+                        type: 'get',
+                        dataType: 'json',
+                        beforeSend: function () {
+                            $("#modal").modal("show");
+                        },
+                            success: function (data) {
+                            $("#modal .modal-content").html(data.html_form);
+                        }
+                    });
+                });
+            });
+        });
+
+    $(document).on('click', '#submit-btn', function(event){
+
+        var response_data = []
+        var grupos_objs = $('.col-grupo');
+
+        for(i=0;i<grupos_objs.length;i++){
+            var inputs = $(grupos_objs[i]).find(':input');
+            var numero_grupos, horario_curso;
+            inputs.each(function() {
+                var input = $(this); // This is the jquery object of the input, do what you will
+                if (input.attr("class") == "numero-grupo") numero_grupos = input.val();
+                if (input.attr("class") == "horarioCurso") horario_curso = input.val();
+            });
+
+            if(numero_grupos != '' && !checkInteger(numero_grupos)) {
+                alert('Todo los valores deben ser números enteros');
+                return false;
+            }
+
+            if(numero_grupos != '' && checkInteger(numero_grupos) && !isNaN(numero_grupos)) {
+                var horario_grupos = {
+                    "horario_curso": horario_curso,
+                    "numero_grupos": numero_grupos
+                }
+
+                response_data.push(horario_grupos);
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "{% url 'asignar_grupos' %}",
+            data: {json_data: JSON.stringify(response_data)},
+            success: function(response){
+                alert("Se han creado y asignado nuevos grupos");
+                location.reload();
+            },
+            error : function(xhr,errmsg,err) {
+                alert(xhr.status + ": " + xhr.responseText);
+            }
+        });
+    });
+</script>
+{% endblock %}

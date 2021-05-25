@@ -1,0 +1,34 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'seleccion_oferta' %}">Volver a Grupos</a>
+    <div class="col-sm-9 col-md-9">
+
+<h1>Cancelar Grupo</h1>
+
+<h3>Grupo Academico: {{ grupo.nombre }}</h3>
+<h3>¿Está Seguro de cancelar este grupo Academico?</h3>
+        <div class="alert alert-warning">Las siguientes acciones se llevaran a cabo una vez cancele el grupo para cada matriculado:
+            <ol class="center">
+                <li>Se cambiará el estado de la preinscripcion que haya hecho para el presente periodo y nivel</li>
+                <li>Se le cargará un saldo a favor al estudiante por el total del valor pagado de su parte</li>
+                <li>Se le cambiará el estado de la matrícula a "aplazado por departamento"</li>
+            </ol>
+        </div>
+        <b>Matriculas actuales a aplazar</b>
+            <ul>
+                {% for matricula in matriculas %}
+                    <div class="p-3 mb-2 bg-info text-white"><li>{{ matricula }}</li></div>
+                {% endfor %}
+            </ul>
+        <br>
+<h2 class="bg-danger text-white"><strong>Atención!</strong> Esta acción no será reversible</h2>
+
+<form action="{% url 'aplazar-grupo' grupo.id %}" method="POST">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-danger" value="SI, Cancelar.">
+</form>
+    </div>
+{% endblock %}

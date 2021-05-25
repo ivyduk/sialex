@@ -1,0 +1,14 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+
+<h1>Cancelar Preinscripción</h1>
+
+<h3>¿Está Seguro de cancelar esta preincripción: {{ preinscripcionexamen.examen.nombre }}?</h3>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-danger" value="SI, Cancelar.">
+</form>
+
+{% endblock %}

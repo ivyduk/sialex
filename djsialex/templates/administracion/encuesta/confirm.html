@@ -1,0 +1,18 @@
+{% extends 'administracion/encuesta/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Encuesta Enviada" %}{% endblock title %}
+
+{% block body %}
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'survey-list' %}">Volver a mis encuestas</a>
+<h1>{% trans "Encuesta Enviada"%}</h1>
+<p>
+    <div class="alert alert-success">
+       {% trans "¡Gracias! Sus respuestas han sido guardadas" %}
+    </div>
+    <div class="alert alert-info">
+       {% trans "Ud puede volver y editarlas mientras esté en las fechas permitidas." %}
+    </div>
+</p>
+{% endblock %}

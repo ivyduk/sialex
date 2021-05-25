@@ -1,0 +1,18 @@
+---------------------------Global----------------------------------
+1. Crear periodicidad
+2. Crear Periodo
+3. Crear Idioma(s)
+4. Crear Contenido_nivel (Sujeto a cambios)
+5. Crear Nivel(es)
+6. Crear Escala de Notas
+7. Crear Programa(s) Académico(s)
+8. Crear Franjas
+9. Crear Horarios
+10. Crear Documentos Requeridos
+11. Crear Descuentos
+12. Crear Conjunto de Notas
+12. Crear Notas parciales al conjunto de notas
+----------------------------Cada Periodo----------------------------
+13. Crear Oferta(s) Académica(s)
+14. Crear Curso(s) para las Ofertas Académicas
+15. Crear los Horario(s) cupo(s) para cad curso

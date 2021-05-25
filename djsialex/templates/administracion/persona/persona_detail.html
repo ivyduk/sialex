@@ -1,0 +1,60 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administrador de personas</h1>
+
+    <div class="row">
+        <div class="col-md-9">
+        <ul class="list-group">
+            <li class="list-group-item">Tipo Documento Identidad: {{ profile.tipo_documento.nombre }}</li>
+            <li class="list-group-item">Documento Identidad: {{ profile.numero_documento}}</li>
+            <li class="list-group-item">Nombres: {{ profile.getNombres }}</li>
+            <li class="list-group-item">Apellidos: {{ profile.getApellidos }}</li>
+            <li class="list-group-item">Correo electrónico: {{ profile.usuario.email }}</li>
+            <li class="list-group-item">Fecha Nacimiento: {{ profile.getFechaNacimiento }}</li>
+            <li class="list-group-item">Género: {{ profile.get_genero_sexual_display }}</li>
+            <li class="list-group-item">Ciudad Nacimiento: {{ profile.ciudad_nacimiento.nombre }}</li>
+            <li class="list-group-item">Ciudad Residencia: {{ profile.ciudad_residencia.nombre }}</li>
+            <li class="list-group-item">Teléfono fijo: {{ profile.getTelefonoFijo }}</li>
+            <li class="list-group-item">Teléfono celular: {{ profile.getTelefonoCelular }}</li>
+            <li class="list-group-item">Tipo Sangre: {{ profile.get_tipo_sangre_display }}</li>
+            <li class="list-group-item">Eps: {{ profile.eps.nombre }}</li>
+
+        </ul>
+        </div>
+        <div class="col-md-3 well">
+            <p>Acciones</p>
+            <a href="{% url 'persona-detail-update' profile.id %}" class="btn btn-default">Editar</a>
+
+        </div>
+    </div>
+
+
+
+    <h2 class="title-project">Personas de contacto</h2>
+
+     <div class="table-responsive">
+        <table class="table table-striped table-border" style="table-layout: fixed;">
+            <thead class="table-head">
+            <tr>
+                <th scope="col" width="25%">Nombres</th>
+                <th scope="col" width="25%">Apellidos</th>
+                <th scope="col" width="25%">Teléfono celular</th>
+                <th scope="col" width="25%">Correo electrónico</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for contacto in personas_contacto %}
+            <tr>
+                <td width="25%">{{ contacto.nombres }}</td>
+                <td width="25%">{{ contacto.apellidos }}</td>
+                <td width="25%">{{ contacto.numero_celular }}</td>
+                <td width="25%">{{ contacto.correo_electronico }}</td>
+              <td width="25%"></td>
+            {% endfor %}
+        </table>
+        </div>
+    </div>
+
+{% endblock %}

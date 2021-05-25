@@ -1,0 +1,26 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Documento requerido: {{ documentorequerido.nombre }}</h1>
+
+    <div class="row">
+        <div class="col-md-9">
+        <ul class="list-group">
+            <li class="list-group-item">Nombre: {{ documentorequerido.nombre }}</li>
+            <li class="list-group-item">Activo: {%  if documentorequerido.activo %} Sí {% else %} No {% endif %}</li>
+            <li class="list-group-item">Única entrega: {%  if documentorequerido.unica_entrega %} Sí {% else %} No {% endif %}</li>
+        </ul>
+        </div>
+
+        <div class="col-md-3">
+            <div class="well">
+                <h3>Acciones</h3>
+                <a href="{% url 'documento-requerido_update' documentorequerido.id %}" class="btn btn-default">Editar</a>
+                <a href="{% url 'documento-requerido_delete' documentorequerido.id %}" class="btn btn-default">Borrar</a>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+

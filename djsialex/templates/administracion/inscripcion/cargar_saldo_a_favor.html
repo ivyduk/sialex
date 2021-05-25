@@ -1,0 +1,14 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+
+<h1>Cargar Saldo a favor</h1>
+
+<h3>¿Está Seguro de cargar este Saldo: {{ sobrante }}?</h3>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-danger" value="SI, Cargar.">
+</form>
+
+{% endblock %}

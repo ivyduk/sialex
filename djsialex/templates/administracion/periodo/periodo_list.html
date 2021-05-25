@@ -1,0 +1,77 @@
+{% extends "administracion/home.html" %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración » <a href="{% url 'periodos' %}">Periodo</a>
+{% endblock %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administración de periodos</h1>
+
+    {% if periodo_list %}
+       <div class="table-responsive">
+       <table class="table table-striped table-border">
+          <thead class="table-head">
+          <tr>
+              <th scope="col">Alias</th>
+              <th scope="col">Secuencia</th>
+              <th scope="col">Periodicidad</th>
+              <th scope="col">Año</th>
+              <th scope="col">Activo</th>
+              <th scope="col">Editar</th>
+              <th scope="col">Borrar</th>
+          </tr>
+          </thead>
+           <tbody>
+          {% for periodo in periodo_list %}
+            <tr>
+                <td><a href="{{ periodo.get_absolute_url }}">{{ periodo.alias}}</a></td>
+              <td>{{ periodo.secuencia }}</td>
+                <td>{{ periodo.periodicidad }}</td>
+                <td>{{ periodo.anio }}</td>
+                <td>{% if periodo.activo %}
+                    Sí
+                    {% else %}
+                    No
+                    {% endif %}
+                </td>
+                <td>
+                    <p>
+                        <a href="{% url 'periodo_update' periodo.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'periodo_delete' periodo.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+                </table>
+                </div>
+
+    {% else %}
+       <div class="alert alert-warning" role="alert">
+            No hay periodos creados
+        </div>
+    {% endif %}
+
+        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'periodo_create' %}'">
+             <span class="glyphicon glyphicon-plus-sign"></span> Nuevo periodo</button>
+
+    </div>
+
+
+
+{% endblock %}

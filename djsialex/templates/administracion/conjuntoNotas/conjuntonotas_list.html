@@ -1,0 +1,52 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+    {% if FULL_DATA.available %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administración de Conjuntos de Notas</h1>
+
+    {%  if conjuntonotas_list %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+              <th scope="col">Nombre</th>
+                <th scope="col">Editar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for conjunto in conjuntonotas_list %}
+            <tr>
+                <td><a href="{{ conjunto.get_absolute_url }}">{{ conjunto.nombre}}</a></td>
+                <td>
+                    <p>
+                        <a href="{% url 'conjuntonotas_update' conjunto.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay conjuntos de notas creados
+        </div>
+
+    {% endif %}
+            <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'conjuntonotas_create' %}'">
+             <span class="glyphicon glyphicon-plus-sign"></span> Nuevo Conjunto</button>
+    </div>
+
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+{% endblock %}
+

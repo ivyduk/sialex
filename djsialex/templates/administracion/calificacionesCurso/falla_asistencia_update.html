@@ -1,0 +1,64 @@
+{% load widget_tweaks %}
+{% block form %}
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <div class="modal-header">
+        <div class="modal-header" id="header">
+            <h2 class="modal-title align-center" id="titulo">Actualización de inasistencia</h2>
+            <div class="alert alert-info">Recuerde que el número de inasistencias corresponde al número de horas que no asistió el estudiante en la fecha dada</div>
+        </div>
+
+      </div>
+
+      <div class="modal-body">
+
+        <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
+          {% for error in form.non_field_errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% render_field field class="form-control" placeholder=field.label %}
+            <div class="{% if field.errors %} invalid{% endif %}">
+              {% for error in field.errors %}
+                <p class="help-block">{{ error }}</p>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="submit-btn btn btn-primary" id="actualizar">Actualizar</button>
+      </div>
+
+    </form>
+
+    <script>
+
+        $("#actualizar").click(function (e) {
+            e.preventDefault();
+            header = $("#header")
+
+            var hoy = new Date();
+            var fecha_falla = Date.parse($("#id_fecha").val());
+            fallas = $("#id_cantidad_fallas").val();
+
+            if(fecha_falla > hoy || fecha_falla == ""){
+                header.append('<div class="alert alert-danger">La fecha de las inasistencias no puede ser posteriores a la fecha actual</div>');
+                return false;
+            }else if(fallas < 1){
+                header.append('<div class="alert alert-danger">El número de inasistencias debe ser mayor a 0</div>');
+                return false;
+            }
+            return true;
+            });
+
+        </script>
+
+{% endblock %}

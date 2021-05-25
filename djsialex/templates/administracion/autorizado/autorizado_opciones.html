@@ -1,0 +1,43 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+{% load profile_tags %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración 
+{% endblock %}
+
+{% block administration-title %}
+    <h2 class="title-project">Administrar Autorizados a pre-inscripción</h2>
+{% endblock %}
+
+{% block form %}
+    <div class="alert alert-info"><h4>Escoja una de las siguientes opciones</h4></div>
+
+    <div class="list-group" id="list-tab" role="tablist">
+        <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" role="tab"><h4>Cursos</h4></a>
+        <a href="{% url 'autorizados' %}" class="list-group-item">
+            <h4 class="list-group-item-heading">Ver personas autorizadas en periodos activos</h4>
+        </a>
+        {% if user|has_group:'Administrador' %}
+        <a href="{% url 'autorizado_create' %}" class="list-group-item">
+            <h4 class="list-group-item-heading">Agregar persona autorizada a curso</h4>
+        </a>
+        <a href="{% url 'autorizado_lote' %}" class="list-group-item">
+            <h4 class="list-group-item-heading">Agregar personas autorizadas a curso en lote</h4>
+        </a>
+        {% endif %}
+        <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" role="tab"><h4>Exámenes de clasificación</h4></a>
+        <a href="{% url 'autorizados-examen' %}" class="list-group-item">
+            <h4 class="list-group-item-heading">Ver personas autorizadas en periodos activos</h4>
+        </a>
+        {% if user|has_group:'Administrador' %}
+        <a href="{% url 'autorizado_examen_create' %}" class="list-group-item">
+            <h4 class="list-group-item-heading">Agregar persona autorizada a examen</h4>
+        </a>
+        <a href="{% url 'autorizado-examen-lote' %}" class="list-group-item">
+            <h4 class="list-group-item-heading">Agregar personas autorizadas a examen en lote</h4>
+        </a>
+        {% endif %}
+    </div>
+
+{% endblock %}

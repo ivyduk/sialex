@@ -1,0 +1,84 @@
+
+
+{% block form %}
+
+    <div class="row card">
+    <form class="form-horizontal" method="post" enctype="multipart/form-data" id="modal-form" onSubmit="return validate();" action="{% url 'contenidonivelversion_create' contenidonivel %}" class="js-create-contenido-nivel-version">
+    {% csrf_token %}
+         <div class="modal-header">
+            <h2 class="modal-title align-center" id="titulo">Subir nuevo contenido</h2>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            {% for field in form %}
+              <div class="form-group{% if field.errors %} invalid{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                  <p class="help-block">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+
+        <div class="alert alert-warning" id="file_error" style="display: none;">
+        </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <button type="submit" class="submit-btn btn btn-primary">Subir</button>
+          </div>
+
+    </form>
+    </div>
+    <script>
+        $( document ).ready(function() {
+            var link = $("#modal-form").find('a').first()
+            if (link.length){
+                link.attr("href", "{% if contenidonivelversion %}{% url 'archivos-show' contenidonivelversion.id %}{% endif %}");
+                link.attr("target", "_blank");
+                link.text("{% if contenidonivelversion.alias%}{{ contenidonivelversion.alias }}{% endif %}");
+                $('#documento-clear_id').hide();
+                $('#documento-clear_id').next('label').hide();
+                $("#id_alias").hide();
+                $("#id_alias").prev('label').hide();
+                $("#titulo").text('Actualizar' +
+                    ' contenido');
+            }
+            else{
+                $('#id_documento').prop('required',true);
+                $("#id_alias").prev('label').append('<span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Este alias no es modificable luego de crearse"></i></span>');
+            }
+        });
+    function validate() {
+        if ($('#id_documento')[0].files[0]) {
+            var file_size = $('#id_documento')[0].files[0].size;
+            var file_type = $('#id_documento')[0].files[0].name.split('.').pop();
+            if (file_size > 2097152) {
+                $("#file_error").show();
+                $("#file_error").html("<strong>Atención!</strong> No se permiten archivos de tamaño superior a 2MB.");
+                return false;
+            } else {
+                $("#file_error").hide();
+            }
+            if (file_type != 'pdf' && file_type != 'doc' && file_type != 'docx') {
+                $("#file_error").show();
+                $("#file_error").html("<strong>Atención!</strong> Solo se permiten archivos de tipo pdf, doc y docx.");
+                return false;
+            } else {
+                $("#file_error").hide();
+            }
+            return true;
+        }
+        else{
+             $("#file_error").show();
+                $("#file_error").html("<strong>Atención!</strong> Seleccione archivo a subir.");
+                return false;
+            }
+    }
+    </script>
+
+{% endblock %}

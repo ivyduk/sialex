@@ -1,0 +1,14 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+
+<h1>Borrar Documento Requerido</h1>
+
+<p>Esta seguro de borrar este contenido: {{ documentorequerido }}?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="SI, Borrar.">
+</form>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+ <div class="col-sm-9 col-md-9">
+<h1>Aplazar Preinscripción</h1>
+
+<h3>¿Está Seguro de cancelar esta preincripción: {{ preinscripcionhorariocurso.horario_cupo.nombre}} para el usuario {{ preinscripcionhorariocurso.persona.primer_nombre}}  {{ preinscripcionhorariocurso.persona.primer_apellido}}?</h3>
+
+    <h3 class="alert-info"> valor pagado por el usuario $ {{ pagado }}</h3>
+
+    {% if form %}
+        <div class="col-sm-6">
+        <form action={% url 'aplazar-curso' preinscripcionhorariocurso.id %} method="post">
+            {{ form }}
+            <input type="submit" class="btn btn-primary" value="Guardar" id="aplazar">
+         {% csrf_token %}
+        </form>
+        </div>
+    {% endif %}
+
+    <script type="text/javascript">
+    $(document).on('click', '#aplazar', function(){
+        return confirm('¿Está seguro de aplicar esta cancelación?');
+    })
+    </script>
+ </div>
+{% endblock %}

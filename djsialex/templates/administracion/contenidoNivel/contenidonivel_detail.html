@@ -1,0 +1,101 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Contenido Nivel: {{ contenidonivel.alias }}</h1>
+
+    <div class="row">
+        <div class="col-md-9">
+        <ul class="list-group">
+            <li class="list-group-item">Nombre: {{ contenidonivel.alias }}</li>
+            <li class="list-group-item">Versión Actual: {{ contenidonivel.version_actual }}</li>
+        </ul>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Create book button -->
+        <button class="js-create-contenido-nivel-version btn btn-primary" type="button" name="button">Subir nuevo contenido</button>
+
+        <h2 class="title-project">Versiones</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-border" style="table-layout: fixed;">
+                    <thead class="table-head">
+                    <tr>
+                        <th scope="col" width="25%">Alias</th>
+                        <th scope="col" width="25%">Version</th>
+                        <th scope="col" width="25%">Documento</th>
+                        <th scope="col" width="25%">Fecha Creación</th>
+                        <th scope="col" width="25%">Fecha modificación</th>
+                        <th scope="col" width="25%">opciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {% for nivelversion in contenidonivel.contenidonivelversion_set.all %}
+                    <tr>
+                        <td width="25%">{{ nivelversion.alias }}</td>
+                        <td width="25%">{{ nivelversion.version }}</td>
+                        <td width="25%">{% if nivelversion.documento%}<a class="iframe" href="{% url 'archivos-show' nivelversion.id %}">{{ nivelversion.alias }}</a>
+                        {% else %} No tiene contenido asociado
+                        {% endif %}
+                        </td>
+                        <td width="25%">{{ nivelversion.created_date }}</td>
+                        <td width="25%">{{ nivelversion.modified_date }}</td>
+                        <td width="25%">
+                        <button class="contenidonivelversion_update btn btn-primary btn-xs" data-id="{% url 'contenidonivelversion_update' nivelversion.id %}">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+            <div class="well">
+                <h3>Acciones</h3>
+                <a href="{% url 'contenido-nivel_update' contenidonivel.id %}" class="btn btn-default">Editar</a>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $(function () {
+                $(".js-create-contenido-nivel-version").click(function () {
+                    $.ajax({
+                        url: "{% url 'contenidonivelversion_create' contenidonivel.id %}",
+                        type: 'get',
+                        dataType: 'json',
+                        beforeSend: function () {
+                            $("#modal").modal("show");
+                        },
+                            success: function (data) {
+                            $("#modal .modal-content").html(data.html_form);
+                        }
+                    });
+                });
+            });
+
+
+        $(".contenidonivelversion_update").each(function () {
+            $(this).modalForm({formURL: $(this).data('id')});
+        });
+
+    });
+    </script>
+
+{% endblock %}
+

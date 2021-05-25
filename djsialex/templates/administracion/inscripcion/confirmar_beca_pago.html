@@ -1,0 +1,17 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+    {% if beca %}
+        <h1>Aplicar  Beca del periodo {{ beca.periodo_generado }} como pago</h1>
+
+        <p>Esta seguro de aplicar este valor de beca como pago: <h3>$ {{ beca.valor }}?</h3></p>
+
+        <form action="" method="POST">
+          {% csrf_token %}
+          <input type="submit" class="btn btn-primary" value="SI, Aplicar.">
+        </form>
+    {% else %}
+        <h3>No hay beca asociada en esta preinscripcion</h3>
+    {% endif %}
+
+{% endblock %}

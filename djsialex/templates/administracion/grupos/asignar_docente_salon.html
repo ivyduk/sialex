@@ -1,0 +1,166 @@
+{% extends 'administracion/home.html' %}
+{% load widget_tweaks  profile_tags %}
+{% block content %}
+
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'grupo-detail' grupo.id %}">Volver a Grupo</a>
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Asignar Docentes y Salones al grupo
+        <br>{{ grupo.nombre }} </h1>
+
+    {% block form %}
+        <div class="row well">
+            <div class="col-sm-6">
+            <h3 class="title-project">Docentes asignados actualmente</h3>
+            <h4 class="title-project">Docentes generales asignados:</h4>
+            <ul class="list-group">
+                {% for docente_grupo in docentes_generales_actual %}
+                    <li class="list-group-item">{{ docente_grupo.docente.persona.getNombreCompleto }}
+                        <a href="{% url 'eliminar-docente-grupo' grupoacademico=grupo.id docente=docente_grupo.id %}">
+                        <button class="btn btn-danger btn-xs pull-right">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <h4 class="title-project">Docentes especializados asignados:</h4>
+            <ul class="list-group">
+                {% for docente_grupo in docentes_especializados_actual %}
+                    <li class="list-group-item">{{ docente_grupo.docente.persona.getNombreCompleto }}
+                        <a href="{% url 'eliminar-docente-grupo' grupoacademico=grupo.id docente=docente_grupo.id %}">
+                        <button class="btn btn-danger btn-xs pull-right">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-sm-6">
+            <h3 class="title-project">Salones asignados actualmente </h3>
+            <ul class="list-group">
+                {% for salon in salones_asignados %}
+                    <li class="list-group-item">{{ salon.edificio.nombre }} : {{ salon.nombre }}
+                        <a href="{% url 'eliminar-salon-grupo' grupoacademico=grupo.id salon=salon.id %}">
+                        <button class="btn btn-danger btn-xs pull-right">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <h3 class="title-project">Observaciones: </h3>
+            {% if observaciones %}
+                {{ observaciones }}
+            {% endif %}
+        </div>
+        </div>
+
+    {% if form %}
+        <div class="row">
+        {% if form.errors %}
+            {% for message in form.errors %}
+                <div class="alert alert-warning alert-dismissible fade in" style="text-align: center">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong> {{ message }} </strong>
+                    </div>
+            {% endfor %}
+            {% endif %}
+        <form action="{% url 'docente-salon' grupo.id %}" method="post">
+            {% csrf_token %}
+
+            <div class="col-sm-6">
+                <h3 class="title-project">{{ form.docentes_generales.label }}</h3>
+                    {{ form.docentes_generales}}
+                <h3 class="title-project">{{ form.docentes_especializados.label }}</h3>
+                    {{ form.docentes_especializados}}
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group" id="id_edificio">
+                 <h3 class="title-project">{{ form.edificio.label }}</h3>
+                    {{ form.edificio|add_class:'form-control cascadeDropDown'|attr:"nextfield:#id_salones"|attr:"nextblock:#bloque_salon"|attr:"dataurl:/webservices/private/webservice_salones_edificio/"|attr:"parametro:edificio"|attr:"datafield:0" }}
+
+                </div>
+                <div class="form-group" id="bloque_salon">
+                    <h3 class="title-project">{{ form.salones.label }}</h3>
+                    {{ form.salones }}
+                </div>
+                <div class="form-group">
+                    <h3 class="title-project">{{ form.observaciones.label }}</h3>
+                    {{ form.observaciones|add_class:"form-control" }}
+                </div>
+
+            </div>
+            <div class="form-group">
+                    <button type="submit" class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-ok-sign"></span> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+
+    <script>
+        document.getElementsByClassName("ms-list").id = 'id_niveles_select'
+
+        var dependenceCascade = {}
+        var skipElement=false
+        dependenceCascade["id_edificio"] ="";
+        dependenceCascade["id_salones"] ="bloque_salon";
+
+        $(".cascadeDropDown").change(function () {
+            var url = $(this).attr("dataurl");
+            var parametro = $(this).attr("parametro");
+            var id= $(this).prop("value")
+
+            nextblock = $(this).attr("nextblock")
+            nextfield = $(this).attr("nextfield")
+            var dataObject = {
+                "randomval": Math.random(),
+            };
+            var list = $(nextfield);
+            for (var key in dependenceCascade) {
+                if(key==$(this).attr("id")||skipElement){
+                    if(key!=$(this).attr("id")){
+                        $("#"+dependenceCascade[key]).hide()
+                    }
+                    skipElement=true
+                }
+            }
+            list.empty()
+
+            if($(this).attr("datafield")!="0"){
+                datafield=$(this).attr("datafield")
+                id=$(datafield).prop("value")
+            }
+            dataObject[parametro] = id;
+            skipElement=false
+            $.getJSON(url, dataObject, function(data) {
+                $.each(data, function(index, label) {
+                    list.append('<option value=' + index + '>' + label + '</option>');
+                });
+                $(nextblock).show("fast");
+                $("#id_salones").multiSelect("refresh")
+            })
+            $("#id_salones").multiSelect("refresh")
+            if(url==''){
+                $(nextblock).show("fast");
+                $("#id_salones").multiSelect("refresh")
+            }
+        });
+    </script>
+
+    {% endblock %}
+    </div>
+
+{% endblock %}
+
+
+
+

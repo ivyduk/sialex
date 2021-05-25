@@ -1,0 +1,30 @@
+{% extends 'administracion/encuesta/base.html' %}
+{% load i18n %}
+
+{% block body %}
+<div id="intro">
+
+    {% if FULL_DATA.available %}
+        {% if FULL_DATA.periodo_nulo %}
+            <div class="alert alert-warning" role="alert">
+                <strong>¡Periodo sin contextualizar!</strong> Recuerde seleccionar un periodo en la esquina superior derecha
+            </div>
+        {% else %}
+            <h1>{% trans "Bienvenido al sistema de evaluación de cursos de SIALEX"%}</h1>
+
+            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+            <a href="{% url 'home' %}">Volver a Home</a>
+
+	    <ul>
+		{% for survey in surveys %}
+		    <li><a href="{{ survey.get_absolute_url }}">{% trans "Entrar a la encuestas"%} {{survey.name}}</a></li>
+		{% endfor %}
+        </ul>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+
+<h1>Aplicar  saldo como pago</h1>
+
+<p>Esta seguro de aplicar este saldo como pago: <h3>$ {{ reserva.valor }}?</h3></p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-primary" value="SI, Aplicar.">
+</form>
+
+{% endblock %}

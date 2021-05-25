@@ -1,0 +1,13 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#userCollapse"><i class="fas fa-user"></i> Usuario</a>
+        </h4>
+    </div>
+    <div id="userCollapse" class="panel-collapse">
+        <ul class="list-group">
+            <li class="list-group-item"><a href="{% url 'complete-profile' %}">Mis datos personales</a></li>
+            <li class="list-group-item"><a href="{% url 'change_password' %}">Cambiar contraseña</a></li>
+        </ul>
+    </div>
+</div>

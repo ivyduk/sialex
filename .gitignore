@@ -1,0 +1,11 @@
+*.pyc
+__ pycache __
+ve-sialex
+DS_Store
+djsialex/db.sqlite3
+./.idea/*
+.idea/*
+/venv/
+./.idea/*
+*.DS_Store
+djsialex/administracion/migrations/*

@@ -1,0 +1,143 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+
+{% block administration-title %}
+    <h2 class="title-project">Administrar Programa académico</h2>
+{% endblock %}
+{% block form %}
+    <div class="row card">
+
+    <form class="form-horizontal" method="post">
+    {% csrf_token %}
+        {{ form.errors }}
+        <div class="form-group" id="id_nombre">
+            <label class="col-md-3 control-label">{{ form.nombre.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Ayuda SiALEX" data-content="{{ form.nombre.help_text }}" ></i></span>
+            </label>
+            <div class="col-md-9">
+                {{ form.nombre|add_class:'form-control' }}
+            </div>
+        </div>
+
+        <div class="form-group" id="id_idioma">
+            <label class="col-md-3 control-label">{{ form.idioma.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Ayuda SiALEX" data-content="{{ form.idioma.help_text }}" ></i></span>
+            </label>
+            <div class="col-md-9">
+                {{ form.idioma|add_class:'form-control cascadeDropDown'|attr:"nextfield:#id_nivel"|attr:"nextblock:#bloque_nivel"|attr:"dataurl:/webservices/private/webservice_niveles_idioma/"|attr:"parametro:idioma"|attr:"datafield:0" }}
+
+            </div>
+        </div>
+
+        <div class="form-group" id="id_escala_nota">
+            <label class="col-md-3 control-label">{{ form.escala_nota.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Ayuda SiALEX" data-content="{{ form.escala_nota.help_text }}" ></i></span>
+            </label>
+            <div class="col-md-9">
+                {{ form.escala_nota|add_class:'form-control' }}
+            </div>
+        </div>
+
+        <div class="form-group" id="id_edad_minima">
+            <label class="col-md-3 control-label">{{ form.edad_minima.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Ayuda SiALEX" data-content="{{ form.edad_minima.help_text }}" ></i></span>
+            </label>
+            <div class="col-md-9">
+                {{ form.edad_minima|add_class:'form-control' }}
+            </div>
+        </div>
+
+        <div class="form-group" id="id_edad_maxima">
+            <label class="col-md-3 control-label">{{ form.edad_maxima.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Ayuda SiALEX" data-content="{{ form.edad_maxima.help_text }}" ></i></span>
+            </label>
+            <div class="col-md-9">
+                {{ form.edad_maxima|add_class:'form-control' }}
+            </div>
+        </div>
+        <br>
+        <div class="form-group" id="bloque_nivel">
+            <label class="col-md-3 control-label">{{ form.nivel.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Ayuda SiALEX" data-content="{{ form.nivel.help_text }}" ></i></span>
+            </label>
+            <div class="col-md-9">
+                {{ form.nivel|add_class:'form-control'}}
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="form-group" id="activo">
+            <label class="col-md-3 control-label">{{ form.activo.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Ayuda SiALEX" data-content="{{ form.activo.help_text }}" ></i></span>
+            </label>
+            <div class="col-md-9">
+                {{ form.activo|add_class:'form-control' }}
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-ok-sign"></span> Guardar
+            </button>
+        </div>
+    </form>
+    </div>
+
+
+    <script>
+        document.getElementsByClassName("ms-list").id = 'id_niveles_select'
+
+        var dependenceCascade = {}
+        var skipElement=false
+        dependenceCascade["id_idioma"] ="";
+        dependenceCascade["id_nivel"] ="bloque_nivel";
+
+        $(".cascadeDropDown").change(function () {
+            var url = $(this).attr("dataurl");
+            var parametro = $(this).attr("parametro");
+            var id= $(this).prop("value")
+
+            nextblock = $(this).attr("nextblock")
+            nextfield = $(this).attr("nextfield")
+            var dataObject = {
+                "randomval": Math.random(),
+            };
+            var list = $(nextfield);
+            for (var key in dependenceCascade) {
+                if(key==$(this).attr("id")||skipElement){
+                    if(key!=$(this).attr("id")){
+                        $("#"+dependenceCascade[key]).hide()
+                    }
+                    skipElement=true
+                }
+            }
+            list.empty()
+
+            if($(this).attr("datafield")!="0"){
+                datafield=$(this).attr("datafield")
+                id=$(datafield).prop("value")
+            }
+            dataObject[parametro] = id;
+            skipElement=false
+            $.getJSON(url, dataObject, function(data) {
+                $.each(data, function(index, label) {
+                    list.append('<option value=' + index + '>' + label + '</option>');
+                });
+                $(nextblock).show("fast");
+                $("#id_nivel").multiSelect("refresh")
+            })
+            $("#id_nivel").multiSelect("refresh")
+            if(url==''){
+                $(nextblock).show("fast");
+                $("#id_nivel").multiSelect("refresh")
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block actions %}
+    <div class="well">
+        <p>Acciones</p>
+    </div>
+{% endblock %}

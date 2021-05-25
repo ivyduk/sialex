@@ -1,0 +1,319 @@
+{% extends 'administracion/base_form.html' %}
+{% load widget_tweaks %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "css/base_preinscripcion.css" %}">
+{% block form %}
+<script>
+    var table_reset = null
+
+    function fillForm(){
+            $.colorbox({inline:true,open:true,width:"70%", height:"80%",href:"#inline_content",escKey: false, overlayClose: false});
+            $("#cboxClose").click(function(){
+                $("#resumen").replaceWith(table_reset);
+            });
+            var dataObject={}
+            dataObject["idioma"] = $("#id_idioma").prop("value");
+            dataObject["descuento"] = $("#id_descuento").prop("value");
+            dataObject["horario_curso"] = $("#id_horario_curso").prop("value");
+            dataObject["programa_academico"] = $("#id_programa_academico").prop("value");
+            $.getJSON("{% url 'preinscripcion_fase_previa' %}", dataObject, function(data) {
+                $("#idioma_reg").val(data["idioma"])
+                $("#horario_curso_reg").val(data["horario"])
+                $("#descuento_reg").val(data["descuento_id"])
+                $("#hash").val(data["hash"])
+                $("#n_nombre").text(data["primer_nombre"]+" "+data["segundo_nombre"]+" "+data["primer_apellido"]+" "+data["segundo_apellido"]+" ")
+                $("#n_documento").text(data["tipo_documento"]+" "+data["numero_documento"])
+                $("#n_idioma").text(data["idioma_nombre"])
+                $("#n_programa").text(data["programa_academico"])
+                $("#n_horario_curso").text(data["horario_nombre"])
+                $("#n_precio").text(data["precio"])
+                $("#n_precio_con_descuento").text(data["precio_con_descuento"])
+                $("#n_valor_a_cancelar").text(data["precio_total"])
+                $("#n_periodo").text(data["periodo"])
+                table_reset = $("#resumen").clone();
+                if (data['detalle']['beca']){
+                        $("#resumen tr").eq(1).after('<tr><td>'+ data['detalle']['beca']['nombre'] +' ' + data['detalle']['beca']['porcentaje'] + '%' +'</td><td class="text-center"><h2><strong>' + data['detalle']['beca']['signo'] + '</strong></h2></td><td class="text-right"><span>' + data['detalle']['beca']['valor'] + '</span></td></tr>')
+                    }
+                if (data['detalle']['materiales']){
+                        $("#resumen tr").eq(1).after('<tr><td>'+ 'Tarifa Materiales' + '</td><td class="text-center"><h2><strong>' + '+' + '</strong></h2></td><td class="text-right"><span>' + data['detalle']['materiales'] + '</span></td></tr>')
+                    }
+                if (data['detalle']['descuento']){
+                        $("#resumen tr").last().before('<tr><td>'+ data['detalle']['descuento']['nombre'] + ' ' +data['detalle']['descuento']['porcentaje'] + '%' + '</td><td class="text-center"><h2><strong>' + data['detalle']['descuento']['signo'] + '</strong></h2></td><td class="text-right"><span>' + data['detalle']['descuento']['valor'] + '</span></td></tr>')
+                }
+                if (data['detalle']['saldos']){
+                    for (var s in data['detalle']['saldos']) {
+                        var saldo = data['detalle']['saldos'][s]
+                        $("#resumen tr").last().before('<tr><td>'+ saldo['nombre'] + '</td><td class="text-center"><h2><strong>' + saldo['signo'] + '</strong></h2></td><td class="text-right"><span>' + saldo['valor'] + '</span></td></tr>')
+                    }
+                }
+            });
+    }      
+</script>
+    <div class="wrap-preinscripcion">
+        <h2 class="title-project">Preinscripción a cursos de idiomas</h2>
+
+        <div class="alert alert-warning"><b>Señor aspirante: </b> Tenga en cuenta que si algún filtro no muestra opciones es debido a:
+            <ol class="center">
+                <li>Usted no cuenta con la edad requerida para el <b>programa académico</b></li>
+                <li>No existen <b>horarios</b> con cupos disponibles</li>
+                <li>Usted no ha aprobado los niveles necesarios para preinscribirse a un nivel</li>
+            </ol>
+        </div>
+        {% if form.errors %}
+        <!-- Error messaging -->
+        <div id="errors" class="alert alert-warning" role="alert">
+            <div class="inner">
+                <h3>Hay errores en la información ingresada. por favor corrija lo siguiente:</h3>
+                {{ form.non_field_errors }}
+                <ul>
+                    {% for field in form %}
+                        {% if field.errors %}<li class="alert alert-danger">{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!-- /Error messaging -->
+        {% endif %}
+        <div class="panel panel-primary tab">
+            <div class="panel-heading">
+                <h3 class="panel-title">Selección de Curso</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group row">
+                    <label class="col-md-3">{{ form.idioma.label }}:</label>
+                    <div class="col-md-9">
+                        {{ form.idioma|add_class:'form-control cascadeDropDown'|attr:"nextfield:#id_programa_academico"|attr:"nextblock:#bloque_programa"|attr:"dataurl:/ajax/cargar-programas/"|attr:"parametro:idioma"|attr:"datafield:0" }}
+                    </div>
+                </div>
+                <div class="form-group row stepByStep" id="bloque_programa">
+                    <label class="col-md-3">Programa académico</label>
+                    <div class="col-md-9">
+                        <select name="programa_academico" required="" id="id_programa_academico" class="form-control cascadeDropDown" nextfield="#id_nivel" nextblock="#bloque_nivel" dataurl="{% url 'ajax_cargar_niveles' %}" parametro="programa_academico"  datafield="0">
+                            <option value="" selected="">---------</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row stepByStep" id="bloque_nivel">
+                    <label class="col-md-3">Nivel</label>
+                    <div class="col-md-9">
+                        <select name="nivel" required="" id="id_nivel" class="form-control cascadeDropDown" nextfield="#id_horario_curso" nextblock="#bloque_horario" dataurl="{% url 'ajax_cargar_horarios' %}" parametro="nivel" datafield="0">
+                            <option value="" selected="">---------</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row stepByStep" id="bloque_horario" >
+                    <label class="col-md-3">Horario</label>
+                    <div class="col-md-9">
+                        <select name="horario_curso" required="" id="id_horario_curso" class="form-control cascadeDropDown" nextfield="#id_descuento" nextblock="#bloque_descuento,#bloque_enviar" dataurl="{% url 'ajax_cargar_descuentos' %}" parametro="programa_academico" datafield="#id_programa_academico">
+                            <option value="" selected="">---------</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="bloque_descuento" class="stepByStep form-group row">
+                    <label class="col-md-3">Descuento</label>
+                    <div class="col-md-9">
+                        <select name="descuento" required="" id="id_descuento" class="form-control cascadeDropDown" nextblock="#bloque_enviar" dataurl="">
+                        </select>
+                    </div>
+                </div>
+                <div id="bloque_enviar" class="stepByStep form-group row">
+
+                    <div style="text-align: center">
+                        <br />
+
+                        <button type="button" class="btn-primary-login" onclick="fillForm()">
+                                    Realizar preinscripción
+                        </button>
+                    </div>
+                    <div style='display:none'>
+                        <div id='inline_content' style='padding:10px; background:#fff;' class="center-block">
+                            <form method="post" id="preinscripcion_curso_form">
+                                {% csrf_token %}
+                                <input type="hidden" name="idioma" id="idioma_reg">
+                                <input type="hidden" name="horario_curso" id="horario_curso_reg">
+                                <input type="hidden" name="descuento" id="descuento_reg">
+                                <input type="hidden" name="hash" id="hash">
+                                <br />
+                                <br />
+                                <span id="resumen_operacion">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-xs-9">
+                                                <div class="text-center">
+                                                    <h2>Resumen de la operación</h2>
+                                                </div>
+                                                <hr>
+                                                <div class="row">
+                                                    <div class="col-xs-9 col-md-6 col-lg-6">
+                                                        <div class="panel panel-default height">
+                                                            <div class="panel-heading"><h3><strong> Datos del usuario</strong></h3></div>
+                                                            <div class="panel-body">
+                                                                <div>
+                                                                    <h4><strong>Nombre completo:</strong><br /></h4>
+                                                                    <h4><span id="n_nombre"></span></h4>
+                                                                </div>
+                                                                <div>
+                                                                    <h4><strong>Documento de identidad:</strong><br /></h4>
+                                                                    <h4><span id="n_documento"></span></h4>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-9 col-md-6 col-lg-6">
+                                                        <div class="panel panel-default height">
+                                                            <div class="panel-heading"><h3><strong>Datos de Preinscripción</strong></h3></div>
+                                                            <div class="panel-body">
+                                                                    <div>
+                                                                        <h4><strong>Período:</strong><br /></h4>
+                                                                        <h4><span id="n_periodo"></span></h4>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4><strong>Idioma:</strong><br /></h4>
+                                                                        <h4><span id="n_idioma"></span></h4>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4><strong>Programa Académico:</strong><br /></h4>
+                                                                        <h4><span id="n_programa"></span></h4>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4><strong>Horario:</strong><br /></h4>
+                                                                        <h4><span id="n_horario_curso"></span></h4>
+                                                                    </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <h3 class="text-center"><strong>Resumen de Costos</strong></h3>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-condensed" id="resumen">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td><strong>Concepto</strong></td>
+                                                                        <td class="text-center"><strong></strong></td>
+                                                                        <td class="text-right"><strong>Valor</strong></td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>Tarifa Curso</td>
+                                                                        <td class="text-center"><h2><strong>+</strong></h2></td>
+                                                                        <td class="text-right"><span id="n_precio"></span></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td class="emptyrow"></td> 
+                                                                        <td class="emptyrow text-center"><strong>Total</strong></td>
+                                                                        <td class="emptyrow text-right"><h2>$ <span id="n_valor_a_cancelar" class="label label-success"></span></h2></td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </span>
+                                <br />
+                                <br />
+
+                                <div class="container-login100-form-btn col-md-6 col-md-offset-3">
+                                    <input type="submit" class="btn-primary-login" value="Confirmar preinscripción">
+                                    </input>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var dependenceCascade = {}
+        var skipElement=false
+        dependenceCascade["id_idioma"] ="";
+        dependenceCascade["id_programa_academico"] ="bloque_programa";
+        dependenceCascade["id_nivel"]="bloque_nivel";
+        dependenceCascade["id_horario_curso"]="bloque_horario";
+        dependenceCascade["id_descuento"]="bloque_descuento";
+        dependenceCascade["enviar"]="bloque_enviar";
+
+        $(".cascadeDropDown").change(function () {
+            var url = $(this).attr("dataurl");
+            var parametro = $(this).attr("parametro");
+            var id= $(this).prop("value")
+
+            nextblock = $(this).attr("nextblock")
+            nextfield = $(this).attr("nextfield")
+            var dataObject = {
+                "randomval": Math.random(),
+            };
+            var list = $(nextfield);
+            for (var key in dependenceCascade) {
+                if(key==$(this).attr("id")||skipElement){
+                    if(key!=$(this).attr("id")){
+                        $("#"+dependenceCascade[key]).hide()
+                    }
+                    skipElement=true
+                }
+            }
+            list.empty()
+            list.append('<option value="" selected>------</option>')
+
+            if($(this).attr("datafield")!="0"){
+                datafield=$(this).attr("datafield")
+                id=$(datafield).prop("value")
+            }
+            dataObject[parametro] = id;
+            skipElement=false
+            $.getJSON(url, dataObject, function(data) {
+                $.each(data, function(index, label) {
+                    list.append('<option value=' + index + '>' + label + '</option>');
+                });
+                $(nextblock).show("fast");
+            })
+            if(url==''){
+                $(nextblock).show("fast");
+            }
+        });
+    </script>
+    <style>
+        .height {
+            min-height: 200px;
+        }
+        
+        .icon {
+            font-size: 47px;
+            color: #5CB85C;
+        }
+        
+        .iconbig {
+            font-size: 77px;
+            color: #5CB85C;
+        }
+        
+        .table > tbody > tr > .emptyrow {
+            border-top: none;
+        }
+        
+        .table > thead > tr > .emptyrow {
+            border-bottom: none;
+        }
+        
+        .table > tbody > tr > .highrow {
+            border-top: 3px solid;
+        }
+
+        .center{
+            list-style-position: inside;
+        }
+        </style>
+{% endblock %}

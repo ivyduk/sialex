@@ -1,0 +1,71 @@
+{% extends 'administracion/home.html' %}
+{% load widget_tweaks  profile_tags %}
+{% block content %}
+
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'seleccion_oferta' %}">Volver a Grupos</a>
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Mover estudiantes entre grupos de nivel {{ nivel.nombre }} </h1>
+
+    {% block form %}
+            <div class="form-group">
+                <form action="{% url 'cambiar_grupos' nivel.id %}" method="get">
+                    <div class="col-sm-6">
+                        <label for="grupo1" class="col-sm-2 control-label">Grupo origen:</label>
+                        <select class="form-control" name="grupo1" required>
+                            {% for grupo in grupos %}
+                                <option value="{{ grupo.id }}" {% if grupo.id|stringformat:"s" == current_grupo1 %} selected="True"{% endif %}>{{ grupo.codigo }}-{{ grupo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="grupo2" class="col-sm-2 control-label">Grupo destino:</label>
+                        <select class="form-control" name="grupo2" required>
+                            {% for grupo in grupos %}
+                                <option value="{{ grupo.id }}" {% if grupo.id|stringformat:"s" == current_grupo2 %} selected="True"{% endif %}>{{ grupo.codigo }}-{{ grupo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% csrf_token %}
+                    <input class="btn btn-primary" type="submit" name="filtrar" value="Filtrar">
+                </form>
+            </div>
+
+    {% endblock %}
+
+    {% if form %}
+        <div class="col-sm-6">
+        <form action={% url 'cambiar_grupos' nivel.id %} method="post">
+        <table>
+            <tr>
+                <b>Mueva los estudiantes del grupo origen al grupo Destino</b>
+            </tr>
+            <tr>
+                 {{ form.as_table }}
+            </tr>
+            <tr>
+               <td>&nbsp;</td>
+                <input name="grupoDestino" type="hidden" value="{{ current_grupo2 }}">
+               <td><input type="submit" class="btn btn-primary" value="Guardar"></td>
+            </tr>
+        </table>
+         {% csrf_token %}
+        </form>
+        </div>
+        <div class="col-sm-6">
+            <b>Matriculas actuales Grupo Destino</b>
+            <ul>
+                {% for matricula in matriculas_grupo2 %}
+                    <div class="p-3 mb-2 bg-info text-white"><li>{{ matricula }}</li></div>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    </div>
+{% endblock %}
+
+
+
+

@@ -1,0 +1,97 @@
+{% extends "explorer/base.html" %}
+
+{% load explorer_tags %}
+
+{% block sql_explorer_navlinks %}
+    {% if can_change %}
+      <li><a href="{% url "query_create" %}">Nuevo Reporte</a></li>
+      <li class="active"><a href="">Área de prueba</a></li>
+      <li><a href="{% url "explorer_logs" %}">Logs</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block sql_explorer_content %}
+<div class="row">
+    <div id="query_area" class="col-md-12">
+        <h2>Área de prueba</h2>
+        <p>El Área de prueba es para experimentar con consultas nuevas. Por defecto, nada que se haga acá será guardado.</p>
+        <form role="form" action="{% url "explorer_playground" %}" method="post" id="editor" class="playground-form form-horizontal">{% csrf_token %}
+            {% if error %}
+                <div class="alert alert-danger">{{ error|escape }}</div>
+            {% endif %}
+            {% if form.connections|length > 1 %}
+              <div class="form-group">
+                <label for="id_connection" class="col-sm-2 control-label">Conexión</label>
+                <div class="col-sm-10">
+                  {{ form.connection }}
+                </div>
+              </div>
+            {% else %}
+              {# still need to submit the connection, just hide the UI element #}
+              <div class="hidden">
+                {{ form.connection }}
+              </div>
+            {% endif %}
+            <div class="panel panel-default sql-panel">
+                <div class="panel-heading">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <span class="panel-title">Área de prueba SQL</span>
+                    </div>
+                    {% if ql_id %}
+                        <div class="col-md-6 text-right">
+                          <small><a href="{% url "explorer_playground" %}?querylog_id={{ ql_id }}"><i class="glyphicon glyphicon-link"></i></a></small>
+                        </div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="panel-content">
+                    <textarea class="form-control" cols="40" id="id_sql" name="sql" rows="20">{{ query.sql }}</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="text-center">
+                  <div class="btn-group">
+                    <input type="submit" value="Actualizar" id="refresh_play_button" class="btn btn-default"/>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="caret"></span>
+                      <span class="sr-only">Menu de Selección</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><input type="submit" value="Guardar como nuevo Reporte" id="create_button" class="btn btn-link"/></li>
+                    </ul>
+                  </div>
+                  <div class="btn-group">
+                    <label class="btn btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Descargar</label>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="caret"></span>
+                      <span class="sr-only">Menu de Selección</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      {% export_buttons query %}
+                    </ul>
+                  </div>
+
+                  <button type="button" class="btn btn-default" id="show_schema_button">Mostar Esquema</button>
+                  <button type="button" class="btn btn-default" id="hide_schema_button" style="display: none;">Ocultar Esquema</button>
+                  <button type="button" class="btn btn-default" id="format_button">Formato</button>
+                </div>
+            </div>
+            <input type="hidden" value="Playground Query" name="title" />
+        </form>
+    </div>
+    <div id="schema" style="display: none;">
+        <iframe src="about:blank" height="828px" frameBorder="0" id="schema_frame"></iframe>
+    </div>
+</div>
+{% include 'explorer/preview_pane.html' %}
+
+{% endblock %}
+
+{% block sql_explorer_scripts %}
+    <script>
+        $(function() {
+            var e = new ExplorerEditor(queryId);
+        });
+    </script>
+{% endblock %}

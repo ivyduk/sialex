@@ -1,0 +1,14 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+
+<h1>Borrar Beca</h1>
+
+<p>¿Está seguro de borrar esta beca del estudiante: {{ beca.beneficiario.getNombreCompleto }}?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="SI, Borrar.">
+</form>
+
+{% endblock %}

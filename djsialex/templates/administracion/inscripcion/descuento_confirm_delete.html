@@ -1,0 +1,16 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+
+<h1>Cancelar Descuento</h1>
+
+<h3>Preinscripción: {{ preinscripcionhorariocurso.horario_cupo.nombre }}</h3>
+<h3>¿Está Seguro de cancelar el descuento para el usuario: {{ preinscripcionhorariocurso.persona.numero_documento }}?</h3>
+<h2 class="bg-danger text-white"><strong>Atención!</strong> Esta acción no será reversible</h2>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-danger" value="SI, Cancelar.">
+</form>
+
+{% endblock %}

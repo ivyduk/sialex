@@ -1,0 +1,194 @@
+{% extends "administracion/home.html" %}
+{% load profile_tags %}
+{% block content %}
+
+    {% if opcion == 1 %}
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'mi_historia_academica' %}">Volver a mi Historia Académica</a>
+    {% endif %}
+     <div class="col-sm-9 col-md-9">
+
+     {% if opcion == '1' %}
+    <h1 class="title-project">Mis calificaciones</h1>
+    <div class="well">
+        Estimado estudiante.
+        <br>A continuación se relacionan las calificaciones e información del curso de <b>{{ matricula.grupo.horarioCurso.curso.nombre }}</b>
+        <br>Recuerde que el <b>estado</b> puede ir cambiando a medida que transcurre el periodo del curso, ya que su docente puede registrar calificaciones
+        e inasistencias y con esto se actualiza su estado.
+    </div>
+     {% else %}
+        <h1 class="title-project">Calificaciones</h1>
+        <h3>Estudiante: {{ matricula.estudiante.tipo_documento}} {{ matricula.estudiante.numero_documento }}- {{ matricula.estudiante.getNombreCompleto }}</h3>
+
+    <div class="well">
+        A continuación se relacionan las calificaciones e información del curso de <b>{{ matricula.grupo.horarioCurso.curso.nombre }}</b>
+        <br>Recuerde que el <b>estado</b> puede ir cambiando a medida que transcurre el periodo del curso, ya que el docente puede registrar calificaciones
+        e inasistencias y con esto se actualiza el estado de la matrícula.
+    </div>
+
+
+     {% endif %}
+
+     <div class="well">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="title-project">Grupo:</h3> {{ matricula.grupo.nombre }}
+                <h3 class="title-project">Código:</h3> {{ matricula.grupo.codigo }}
+                <h3 class="title-project">Idioma:</h3> {{ matricula.grupo.horarioCurso.curso.nivel.idioma.nombre }}
+                <h3 class="title-project">Nivel:</h3> {{ matricula.grupo.horarioCurso.curso.nivel.nombre }}
+                <h3 class="title-project">Horario:</h3> {{ matricula.grupo.horarioCurso.horario.nombre }}
+            </div>
+            <div class="col-sm-6">
+                <h3 class="title-project">Periodo:</h3>{{ matricula.grupo.horarioCurso.curso.oferta_academica.periodo.alias }}
+                <h3 class="title-project">Docente(s) general(es):</h3>
+                {% for docente in docentes_generales %}
+                    {{ docente.docente.persona.getNombreCompleto }}<br>
+                {% endfor %}
+
+                <h3 class="title-project">Docente(s) especializado(s):</h3>
+                {% for docente in docentes_especializados %}
+                    {{ docente.docente.persona.getNombreCompleto }}<br>
+                {% endfor %}
+
+                <h3 class="title-project">Salón(es):</h3>
+                {% for salon in salones %}
+                    Edificio: {{ salon.edificio.nombre }} - Salón: {{ salon.nombre }} <br>
+                {% endfor %}
+
+                <h3 class="title-project">Observación(es):</h3>
+                {% if matricula.grupo.observaciones %}
+                    {{ matricula.grupo.observaciones }} <br>
+                {% endif %}
+
+                <h3 class="title-project">Contenido curso:</h3>
+                {% if matricula.grupo.contenido_nivel_version %}
+                    <a class="iframe" target="_blank" href="{% url 'archivos-show' matricula.grupo.contenido_nivel_version.id %}">{{ matricula.grupo.contenido_nivel_version.alias }}</a>
+                {% else %}
+                    No existe un contenido asociado a este curso
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    {% if matricula %}
+        <h3 class="title-project">Calificaciones</h3>
+        <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Nota</th>
+                <th scope="col">Ponderación</th>
+                <th scope="col">Calificación</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for calificacion in calificaciones %}
+            <tr>
+                <td>{{ calificacion.nota.nombre }}</td>
+                <td>{{ calificacion.nota.ponderacion }}%</td>
+                <td>{{ calificacion.calificacion }}</td>
+            </tr>
+
+            {% endfor %}
+            <tr>
+                <td><b>Calificación final</b></td>
+                <td><b>100%</b></td>
+                <td><b>{{ matricula.calificacionFinal }}</b></td>
+            </tr>
+            <tr>
+                <td><b>Estado</b></td>
+                <td></td>
+                <td><b>{{ matricula.estado_matricula|getEstadoMatricula }}</b></td>
+            </tr>
+
+        </table>
+        </div>
+
+        <h3 class="title-project">Observaciones</h3>
+
+            {% if observaciones %}
+            <div class="table-responsive">
+            <table class="table table-striped table-border">
+                <thead class="table-head">
+                <tr>
+                    <th scope="col" width="20%">Docente</th>
+                    <th scope="col" width="10%">Tipo Docente</th>
+                    <th scope="col" width="60%">Observación</th>
+                    <th scope="col" width="10%">Cohorte</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for observacion in observaciones %}
+                <tr>
+                    <td width="20%">{{ observacion.persona_asignadora.getNombreCompleto }}</td>
+                    <td width="10%">
+                    {% if observacion.persona_asignadora in docentes %}
+                        {% with tipo_docente=docentes|get_item:observacion.persona_asignadora %}
+                            {{ tipo_docente.tipo }}
+                        {% endwith %}
+                    {% else %}
+                        No es docente asignado
+                    {% endif %}
+                    </td>
+                    <td width="60%">{{ observacion.observacion }}</td>
+                    <td width="10%">{{ observacion.cohorte|getCohorte }}</td>
+                </tr>
+
+                {% endfor %}
+            </table>
+            </div>
+            {% else %}
+                {% if opcion == '1' %}
+                    <div class="alert alert-warning">Usted no tiene observaciones registradas por parte de sus docentes
+                o el programa al que está inscrito no permite el registro de las mismas.</div>
+                {% else %}
+                    <div class="alert alert-warning">El estudiante no tiene observaciones registradas por parte de sus docentes
+                o el programa al que está inscrito no permite el registro de las mismas.</div>
+                {% endif %}
+            {% endif %}
+
+
+        <h3 class="title-project">Inasistencias</h3>
+        {% if inasistencias %}
+        <div class="table-responsive">
+            <table class="table table-striped table-border">
+                <thead class="table-head">
+                <tr>
+                    <th>Docente que la registró</th>
+                    <th>Tipo Docente</th>
+                    <th>Fecha</th>
+                    <th># Inasistencias</th>
+
+                </tr>
+              </thead>
+              <tbody>
+              {% for inasistencia in inasistencias %}
+                <tr>
+                    <td>{{ inasistencia.persona_asignadora.getNombreCompleto }}</td>
+                    <td>
+                    {% if inasistencia.persona_asignadora in docentes %}
+                        {% with tipo_docente=docentes|get_item:inasistencia.persona_asignadora %}
+                            {{ tipo_docente.tipo }}
+                        {% endwith %}
+                    {% else %}
+                        No es docente asignado
+                    {% endif %}
+                    </td>
+                    <td>{{ inasistencia.fecha|date:'d-m-Y' }}</td>
+                    <td>{{ inasistencia.cantidad_fallas }}</td>
+                </tr>
+
+                {% endfor %}
+            </table>
+            </div>
+     </div>
+    {% else %}
+            {% if opcion == '1' %}
+               <div class="alert alert-warning">Usted no tiene inasistencias registradas por parte de sus docentes.</div>
+            {% else %}
+               <div class="alert alert-warning">El estudiante no tiene inasistencias registradas por parte de los docentes.</div>
+            {% endif %}
+    {% endif %}
+    {% endif %}
+{% endblock %}

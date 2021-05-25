@@ -1,0 +1,181 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración » <a href="{% url 'autorizado_opciones' %}">Autorizados</a>
+{% endblock %}
+
+{% block administration-title %}
+    <h2 class="title-project">Preinscripciones a cursos en lote</h2>
+{% endblock %}
+
+{% block form %}
+    <div class="row card">
+
+        <div class="alert alert-info">
+            Recuerde que el archivo necesario para subir los datos debe tener extensión <b>.csv</b> y
+            tener los siguientes campos: <b>{{ campos }} </b> separados por <b>comas</b> y sin cabecera
+            <br>El campo <b>Tipo_Documento</b> debe ser alguno de los siguientes: <b>{% for tipo in tipos_documento %}{{ tipo }}, {% endfor %} </b>
+            <br>El campo <b>Descuento_solicitado</b> debe ser alguno de los siguientes códigos (si aplica), de lo contrario,
+            deje este campo en blanco:
+                <table style="font-size: 15px">
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for descuento in descuentos %}
+                    <tr>
+                        <td>{{ descuento.id }}</td>
+                        <td>{{ descuento.nombre }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+
+        <form class="form-horizontal" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+         <div class="form-group row">
+              <label class="col-md-3">Periodo actual: </label>
+              <div class="col-md-9">
+                  {{ periodo }}
+              </div>
+          </div>
+
+          <div class="form-group">
+              <label class="col-md-3">{{ form.archivo.label }}</label>
+              <div class="col-md-9">
+                  {{ form.archivo|add_class:'form-control' }}
+              </div>
+          </div>
+
+          <div class="form-group">
+              <label class="col-md-3">{{ form.motivo.label }}</label>
+              <div class="col-md-9">
+                  {{ form.motivo|add_class:'form-control' }}
+              </div>
+          </div>
+
+          <div class="form-group row">
+              <label class="col-md-3">{{ form.idioma.label }}:</label>
+              <div class="col-md-9">
+                  {{ form.idioma|add_class:'form-control cascadeDropDown'|attr:"nextfield:#id_programa_academico"|attr:"nextblock:#bloque_programa"|attr:"dataurl:/ajax/cargar-programas-autorizado/"|attr:"parametro:idioma"|attr:"datafield:0" }}
+              </div>
+          </div>
+
+          <div class="form-group row" id="bloque_programa">
+              <label class="col-md-3">Programa académico</label>
+              <div class="col-md-9">
+                  <select name="programa_academico" required="" id="id_programa_academico" class="form-control cascadeDropDown" nextfield="#id_curso" nextblock="#bloque_curso" dataurl="{% url 'ajax_cargar_cursos_autorizado' %}" parametro="programa_academico"  datafield="0">
+                      <option value="" selected="">---------</option>
+                      {% if programa %}
+                          <option value={{ programa.id }} selected="selected">{{ programa }}</option>
+                          {% for programa_academico in programas_academicos %}
+                              <option value={{ programa_academico.id }} selected="selected">{{ programa_academico.nombre }}</option>
+                          {% endfor %}
+                      {% endif %}
+                  </select>
+              </div>
+          </div>
+
+                <div class="form-group row" id="bloque_curso">
+                    <label class="col-md-3">Curso</label>
+                    <div class="col-md-9">
+                        <select name="curso" required="" id="id_curso" class="form-control cascadeDropDown" nextfield="#id_horario_curso" nextblock="#bloque_horario" dataurl="{% url 'ajax_cargar_horarios_autorizado' %}" parametro="curso" datafield="0">
+                            <option value="" selected="">---------</option>
+                            {% if curso %}
+                                <option value="{{ curso.id }}" selected="selected">{{ curso }}</option>
+                                {% for curso_n in cursos %}
+                                    <option value={{ curso_n.id }} selected="selected">{{ curso_n.nombre }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group row" id="bloque_horario" >
+                    <label class="col-md-3">Horario</label>
+                    <div class="col-md-9">
+                        <select name="horario_curso" required="" id="id_horario_curso" class="form-control cascadeDropDown" nextfield="#id_descuento" nextblock="#bloque_descuento" dataurl="{% url 'ajax_cargar_descuentos' %}" parametro="programa_academico" datafield="#id_programa_academico">
+                            <option value="" selected="">---------</option>
+                            {% if horario_curso or mostrar_horarios%}
+                                {% if not mostrar_horarios %}
+                                    <option value="{{ horario_curso.id }}" selected="selected">{{ horario_curso }}</option>
+                                {% endif %}
+                                {% for horario in horarios %}
+                                    <option value={{ horario.id }}>{{ horario.nombre }}</option>
+                                {% endfor %}
+
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-ok-sign"></span> Preinscribir
+            </button>
+        </div>
+
+        </form>
+
+    </div>
+{% endblock %}
+{% block actions %}
+
+    <script>
+        var dependenceCascade = {}
+        var skipElement=false
+        dependenceCascade["id_idioma"] ="";
+        dependenceCascade["id_programa_academico"] ="bloque_programa";
+        dependenceCascade["id_curso"]="bloque_curso";
+        dependenceCascade["id_horario_curso"]="bloque_horario";
+        dependenceCascade["enviar"]="bloque_enviar";
+
+        $(".cascadeDropDown").change(function () {
+            var url = $(this).attr("dataurl");
+            var parametro = $(this).attr("parametro");
+            var id= $(this).prop("value")
+
+            nextblock = $(this).attr("nextblock")
+            nextfield = $(this).attr("nextfield")
+            var dataObject = {
+                "randomval": Math.random(),
+            };
+            var list = $(nextfield);
+            for (var key in dependenceCascade) {
+                if(key==$(this).attr("id")||skipElement){
+                    if(key!=$(this).attr("id")){
+                        $("#"+dependenceCascade[key]).hide()
+                    }
+                    skipElement=true
+                }
+            }
+            list.empty()
+            list.append('<option value="" selected>------</option>')
+
+            if($(this).attr("datafield")!="0"){
+                datafield=$(this).attr("datafield")
+                id=$(datafield).prop("value")
+            }
+            dataObject[parametro] = id;
+            skipElement=false
+            $.getJSON(url, dataObject, function(data) {
+                $.each(data, function(index, label) {
+                    list.append('<option value=' + index + '>' + label + '</option>');
+                });
+                $(nextblock).show("fast");
+            })
+            if(url==''){
+                $(nextblock).show("fast");
+            }
+        });
+
+    </script>
+{% endblock %}

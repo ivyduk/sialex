@@ -1,0 +1,60 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+        {% if FULL_DATA.available %}
+        {% if FULL_DATA.periodo_nulo %}
+            <div class="alert alert-warning" role="alert">
+            <strong>¡Periodo sin contextualizar!</strong> Recuerde seleccionar un periodo en la esquina superior derecha
+        </div>
+        {% else %}
+            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'seleccion_oferta' %}">Volver a selección Oferta Académica</a>
+            <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Preinscritos a {{ horario_curso.nombre}}</h1>
+
+
+    {%  if preinscripciones %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Documento Identidad</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Correo electrónico</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Fecha Preinscripción</th>
+                <th scope="col">Valor preinscripción</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for preinscripcion in preinscripciones %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ preinscripcion.persona.tipo_documento }} {{ preinscripcion.persona.numero_documento }}</td>
+                <td>{{ preinscripcion.persona.getNombreCompleto | upper }}</td>
+                <td>{{ preinscripcion.persona.usuario.email | lower }}</td>
+                <td>{{ preinscripcion.get_estado_preinscripcion_display }}</td>
+                <td>{{ preinscripcion.fecha_preinscripcion|date:"d/m/Y - h:m:s"}}</td>
+                <td>{{ preinscripcion.valor_preinscripcion }}</td>
+
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay personas preinscritas para este curso
+        </div>
+
+    {% endif %}
+
+    </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+{% endblock %}

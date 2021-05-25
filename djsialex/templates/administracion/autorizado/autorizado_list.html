@@ -1,0 +1,131 @@
+{% extends 'administracion/home.html' %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración » <a href="{% url 'autorizado_opciones' %}">Autorizados</a>
+{% endblock %}
+
+{% block content %}
+    {% if FULL_DATA.available %}
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'autorizado_opciones' %}">Volver a menú de autorizados</a>
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Autorizados a pre-inscripción a cursos en periodos activos</h1>
+
+    <div id="toolbar" class="list-toolbar">
+        <form id="searchform" action="{% url 'autorizados' %}" method="get" accept-charset="utf-8">
+
+            <div class="input-group">
+                <input type="text" class="form-control" name="q" placeholder="Search" id="txtSearch"/>
+            <div class="input-group-btn">
+            <button class="btn btn-primary" type="submit">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+        </div>
+      </div>
+        </form>
+        <span class="list-resultados">Mostrando {{ object_list|length }} resultados de {{ total }}</span>
+    </div>
+
+    {%  if object_list %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Tipo Documento</th>
+                <th scope="col">Número Documento</th>
+                <th scope="col">Periodo Autorizado</th>
+                <th scope="col">Curso</th>
+                <th scope="col">Horario</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Autorizado por</th>
+                <th scope="col">Motivo</th>
+                <th scope="col">Fecha autorización</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for autorizado in object_list %}
+            <tr>
+                <td>{{ autorizado.tipo_documento }}</td>
+                <td>{{ autorizado.numero_documento }}</td>
+                <td>{{ autorizado.periodo.alias }}</td>
+                <td>{{ autorizado.curso_autorizado.nombre }}</td>
+                <td>{{ autorizado.horario_curso_autorizado.nombre }}</td>
+                <td>{{ autorizado.get_estado_display }}</td>
+                <td>{{ autorizado.autorizado_por.getDocNombre }}</td>
+                <td>{{ autorizado.motivo }}</td>
+                <td>{{ autorizado.getFechaAutorizacion }}</td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'autorizado_update' autorizado.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'autorizado_delete' autorizado.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+     <div class="text-center">
+    <ul class="pagination">
+    {% if object_list.has_previous %}
+            <li class="waves-effect"><a href="?page=
+                    {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">&laquo;</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
+        {% endif %}
+        {% for num in object_list.paginator.page_range %}
+            {% if object_list.number == num %}
+                <li class="active"><a href="#!">{{ num }}</a></li>
+            {% else %}
+                <li class="waves-effect"><a
+                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if object_list.has_next %}
+            <li class="waves-effect"><a
+                    href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">&raquo;</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
+        {% endif %}
+  </ul>
+    </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay personas autorizadas a cursos en el periodo actual
+        </div>
+
+    {% endif %}
+
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+
+    </div>
+    </div>
+
+
+{% endblock %}
+

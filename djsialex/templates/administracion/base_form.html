@@ -1,0 +1,31 @@
+{% extends "administracion/home.html" %}
+{% block content %}
+
+    <div class="col-sm-9 col-md-9">
+    {% block administration-title %}
+    {% endblock %}
+    <div class="row">
+    <div class="col-md-9 col-sm-9">
+    {% if FULL_DATA.available %}
+        {% if FULL_DATA.periodo_nulo %}
+            <div class="alert alert-warning" role="alert">
+            <strong>¡Periodo sin contextualizar!</strong> Recuerde seleccionar un periodo en la esquina superior derecha
+        </div>
+        {% else %}
+            {% block form %}
+            {% endblock %}
+        {% endif %}
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+
+    </div>
+    <div class="col-md-3 col-sm-3">
+        {% block actions %}
+        {% endblock %}
+    </div>
+    </div>
+    </div>
+{% endblock %}

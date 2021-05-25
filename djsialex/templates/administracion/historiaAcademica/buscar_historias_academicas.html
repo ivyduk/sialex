@@ -1,0 +1,17 @@
+{% extends 'administracion/base_form.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block form %}
+
+<div class="row card">
+        <h1 class="title-project">Búsqueda de historias académicas por documento</h1>
+        <form action="{% url 'historias-academicas' %}" method="get">
+            <label class="form-control"> BUSCAR POR DOCUMENTO</label>
+            <div class="active-cyan-3 active-cyan-4 mb-4">
+                <input class="form-control" type="text" placeholder="Documento..." aria-label="Buscar" name="q">
+                <button type="submit" class="btn btn-info pull-right btn-primary">
+             <span class="glyphicon glyphicon-search"></span> Buscar</button>
+            </div>
+        </form>
+</div>
+{% endblock %}

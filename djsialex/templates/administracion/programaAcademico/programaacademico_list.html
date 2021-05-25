@@ -1,0 +1,69 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administración de Programas Académicos</h1>
+
+    {%  if programaacademico_list %}
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Idioma</th>
+                <th scope="col">Escala notas</th>
+                <th scope="col">Nivel</th>
+                <th scope="col">Activo</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for programa_academico in programaacademico_list %}
+            <tr>
+                <td><a href="{{ programa_academico.get_absolute_url }}">{{ programa_academico.nombre}}</a></td>
+                <td>{{ programa_academico.idioma }}</td>
+                <td>{{ programa_academico.escala_nota }}</td>
+                <td>{% for niv in programa_academico.nivel.all %}{{ niv }}, {% endfor %}</td>
+                <td>{% if programa_academico.activo %}
+                    Sí
+                    {% else %}
+                    No
+                    {% endif %}
+                </td>
+                <td>
+                    <p>
+                        <a href="{% url 'programa_update' programa_academico.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'programa_delete' programa_academico.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay programas académicos creados
+        </div>
+
+    {% endif %}
+
+    <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'programa_create' %}'">
+             <span class="glyphicon glyphicon-plus-sign"></span> Nuevo Programa</button>
+    </div>
+{% endblock %}

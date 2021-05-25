@@ -1,0 +1,101 @@
+{% extends "administracion/home.html" %}
+{% load profile_tags %}
+{% block content %}
+
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'mis-estudiantes' matricula.grupo.id %}">Volver a grupo</a>
+
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Observaciones</h1>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal" xmlns="http://www.w3.org/1999/html">
+        <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div>
+        </div>
+    </div>
+
+    <div class="well">
+            <h3 class="title-project">Grupo:</h3> {{ matricula.grupo.nombre }}
+            <h3 class="title-project">Código Grupo:</h3> {{ matricula.grupo.codigo }}
+            <h3 class="title-project">Estudiante:</h3> {{ matricula.estudiante.numero_documento }} - {{ matricula.estudiante.getNombreCompleto }}
+    </div>
+
+    <div class="alert alert-info">Recuerde que el estudiante debe tener al menos una observación por cada cohorte</div>
+
+    {% if observaciones %}
+        <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Fecha y hora última modificación</th>
+                <th scope="col">Observación</th>
+                <th scope="col">Cohorte</th>
+                <th scope="col">Persona que la registró</th>
+                <th scope="col">Tipo docente</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for observacion in observaciones %}
+            <tr>
+                <td>{{ observacion.fecha_actualizacion|date:"d-m-Y _ H:m:s" }}</td>
+                <td>{{ observacion.observacion }}</td>
+                <td>{{ observacion.cohorte|getCohorte }}</td>
+                <td>{{ observacion.persona_asignadora.getNombreCompleto }}</td>
+                <td>
+                    {% if observacion.persona_asignadora in docentes %}
+                        {% with tipo_docente=docentes|get_item:observacion.persona_asignadora %}
+                            {{ tipo_docente.tipo }}
+                        {% endwith %}
+                    {% else %}
+                        No es docente asignado
+                    {% endif %}
+                </td>
+                <td>
+                    <p>
+                        <button class="observacion_matricula_update btn btn-primary btn-xs" data-id="{% url 'observacion_matricula_update' observacion.id %}">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'observacion_matricula_delete' observacion=observacion.id %}">
+                        <button class="btn btn-danger btn-xs pull-right" onclick="return confirm('¿Está seguro de borrar esta observación?');">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            El estudiante no tiene observaciones registradas
+        </div>
+    {% endif %}
+
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+        $(".observacion_matricula_update").each(function () {
+            $(this).modalForm({formURL: $(this).data('id')});
+        });
+
+    });
+
+    </script>
+
+{% endblock %}
+

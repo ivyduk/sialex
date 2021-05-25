@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load profile_tags %}
+
+{% block breadcrumb %}
+<a href="{% url 'index' %}">Home</a>
+{% endblock %}
+
+{% block fullwidth %}
+<div class="row">
+    <div class="col-sm-12">
+    </div>
+</div>
+{% endblock %}
+{% block title %}SIALEX{% endblock %}
+
+{% if user.is_authenticated %}
+{% block sidebar %}
+<div class="col-sm-3 col-md-3">
+    <div class="panel-group">
+        {% include '../elements/menu/user.html' %}
+        {% if request.user|has_group:"Aspirante" %}
+        {% include '../elements/menu/applicant.html' %}
+        {% endif %}
+        {% if request.user|has_group:"Estudiante" %}
+        {% include '../elements/menu/student.html' %}
+        {% endif %}
+        {% if request.user|has_group:"Docente" or request.user|has_group:"Coordinador"%}
+        {% include '../elements/menu/teacher.html' %}
+        {% endif %}
+        {% if request.user|has_group:"Administrador" %}
+        {% include '../elements/menu/manager.html' %}
+        {% endif %}
+        {% if request.user|has_group:"Funcionario" %}
+        {% include '../elements/menu/funcionario.html' %}
+        {% endif %}
+        {% include '../elements/menu/all.html' %}
+    </div>
+
+</div>
+{% endblock %}
+{% endif %}
+{% block content %}
+{% if user.is_authenticated %}
+
+    <div class="col-sm-9 col-md-9">
+        <h1 class="title-project">Bienvenido a SIALEX
+            <br>Sistema de Información Académica de Lenguas Extranjeras</h1>
+    </div>
+{% else %}
+
+
+
+<div class="jumbotron text-center">
+    <h1>SIALEx</h1>
+    <p>Sistema de Información Académica de Lenguas Extranjeras</p>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="box text-center">
+                 <a href="{% url 'login' %}">
+                <i class="fas fa-user-lock fa-3x"></i>
+                <h3>Iniciar sesión</h3></a>
+                <br />
+                <p>inscriba sus cursos y exámenes, gestione sus calificaciones</p>
+
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="box text-center">
+<a href="{% url 'signup' %}">
+                <i class="fas fa-user-plus fa-3x"></i>
+                <h3>Registrarse</h3></a>
+                <br />
+                <p>Cree su cuenta de usuario de manera gratuita</p>
+      </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="box text-center">
+
+                <i class="fas fa-chalkboard-teacher fa-3x"></i>
+                <h3>Cursos de idioma</h3>
+                <br />
+                <p>Visite nuestra oferta de cursos</p>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="box text-center">
+
+                <i class="fas fa-file-alt fa-3x"></i>
+                <h3>Exámenes</h3>
+                <br />
+                <p>Visite nuestra oferta de exámenes de clasificación</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endif %}
+{% endblock %}

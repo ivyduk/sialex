@@ -1,0 +1,273 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+{% block extrahead %}
+    {{ form.media }}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/intlTelInput.min.css" %}" xmlns="">
+    <script src="{% static "js/intlTelInput.min.js" %}" type="text/javascript"></script>
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+{% endblock %}
+{% block form %}
+
+
+    {% if form.errors %}
+        {% for message in form.errors %}
+            <div class="alert alert-warning alert-dismissible fade in" style="text-align: center">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong> {{ message }} </strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        <script>
+            function getRegionAndCountryFromCity(e,n){var a=e,i={randomval:Math.random()};i.child=e,$.getJSON("{%  url 'webservice_pais_region_ciudad' %}",i,function(o){console.log(o),$("#id_pais_id_"+n).empty(),$.getJSON("{%  url 'webservice_desplegable_paises' %}",function(e){for(j in e)j==o.pais?$("#id_pais_id_"+n).append('<option value="'+j+'" selected>'+e[j]+"</option>"):$("#id_pais_id_"+n).append('<option value="'+j+'">'+e[j]+"</option>");var i={randomval:Math.random()};i.parent=o.pais,$("#id_region_id_"+n).empty(),$.getJSON("{%  url 'webservice_desplegable_regiones' %}",i,function(e){for(j in e)j==o.region?$("#id_region_id_"+n).append('<option value="'+j+'" selected>'+e[j]+"</option>"):$("#id_region_id_"+n).append('<option value="'+j+'">'+e[j]+"</option>");var i={randomval:Math.random()};i.parent=o.region,$("#id_"+n).empty(),$.getJSON("{%  url 'webservice_desplegable_ciudades' %}",i,function(e){for(j in e)j==a?$("#id_"+n).append('<option value="'+j+'" selected >'+e[j]+"</option>"):$("#id_"+n).append('<option value="'+j+'">'+e[j]+"</option>")})})})})}
+        </script>
+        <div class="wrap-edit-profile">
+
+        <span class="login100-form-title p-b-49">
+            Mis Datos Personales
+        </span>
+            <div class="row" style="padding: 0 1em">
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">Tipo de documento</span>
+                    <br><span class="label-input100">{{ user.profile.tipo_documento }}</span>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">Documento de Identidad</span>
+                    <br><span class="label-input100">{{ user.profile.numero_documento }}</span>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">Correo electrónico</span>
+                    <br><span class="label-input100">{{ user.email }}</span>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">Fecha de nacimiento</span>
+                    <br><span class="label-input100">{{ user.profile.fecha_nacimiento |date:"d-m-Y" }}</span>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">Primer nombre</span>
+                    <br><span class="label-input100">{{ user.profile.primer_nombre }}</span>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.segundo_nombre.label }}</span>
+                        {{ form.segundo_nombre|add_class:'form-control' }}
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">Primer apellido</span>
+                    <br><span class="label-input100">{{ user.profile.primer_apellido }}</span>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.segundo_apellido.label }}</span>
+                        {{ form.segundo_apellido|add_class:'form-control' }}
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.nivel_formacion.label }}</span>
+                        {{ form.nivel_formacion|add_class:'form-control' }}
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.tipo_vinculacion_un.label }}</span>
+                        {{ form.tipo_vinculacion_un|add_class:'form-control' }}
+                </div>
+
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.genero_sexual.label }}</span>
+                        {{ form.genero_sexual|add_class:'form-control' }}
+                </div>
+
+                {% for field in form %}
+
+                    {% if field.name == "ciudad_nacimiento" or field.name == "ciudad_residencia" or field.name == "ciudad_expedicion_documento" %}
+                        </div>
+                        <div class="row" style="background-color: #7bcac91a;padding: 1em 1em 0 1em">
+                            <div class="col-md-12 col-sm-12"><h4>{{ field.label }}</h4></div>
+                            <div class="form-group col-md-4 col-sm-4">
+                                <span class="label-input100">Pais</span>
+                                <select id="id_pais_{{ field.id_for_label }}" class="form-control">
+                                    {% for entry in paises %}
+                                        <option value="{{ entry.id }}">{{ entry.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-4">
+                                <span class="label-input100">Departamento</span>
+                                <select id="id_region_{{ field.id_for_label }}" class="form-control">
+                                    {% for entry in regiones %}
+                                        <option disabled value="{{ entry.id }}"
+                                                pais="{{ entry.pais.id }}">{{ entry.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4 col-sm-4">
+                                <span class="label-input100">Ciudad</span>
+                                <select id="id_{{ field.name }}" name="{{ field.name }}" class="form-control">
+                                    {% if field.name == "ciudad_nacimiento" %}
+                                        <option selected value="{{ ciudad_nacimiento.id }}"
+                                                region="{{ ciudad_nacimiento.region.id }}">{{ ciudad_nacimiento.nombre }}</option>
+                                    {% endif %}
+
+                                    {% if field.name == "ciudad_residencia" %}
+                                        <option selected value="{{ ciudad_residencia.id }}"
+                                                region="{{ ciudad_residencia.region.id }}">{{ ciudad_residencia.nombre }}</option>
+                                    {% endif %}
+
+                                    {% if field.name == "ciudad_expedicion_documento" %}
+                                        <option selected value="{{ ciudad_expedicion_documento.id }}"
+                                                region="{{ ciudad_expedicion_documento.region.id }}">{{ ciudad_expedicion_documento.nombre }}</option>
+                                    {% endif %}
+
+
+                                </select>
+                            </div>
+                            <script>
+
+                                $("#id_pais_id_{{ field.name }}").change(function () {
+                                    var e = {
+                                        randomval: Math.random()
+                                    };
+                                    e.parent = $(this).val()
+                                    $("#id_region_id_{{ field.name }}").empty()
+                                    $.getJSON("{%  url 'webservice_desplegable_regiones' %}", e, function (d) {
+                                            for (j in d) {
+                                                $("#id_region_id_{{ field.name }}").append('<option value="' + j + '">' + d[j] + '</option>');
+                                            }
+                                            $("#id_region_id_{{ field.name }}").change()
+                                        }
+                                    )
+
+                                })
+                                $("#id_region_id_{{ field.name }}").change(function () {
+                                     var e = {
+                                        randomval: Math.random()
+                                    };
+                                    e.parent = $(this).val()
+                                    $("#id_{{ field.name }}").empty()
+                                    $.getJSON("{%  url 'webservice_desplegable_ciudades' %}", e, function (d) {
+                                            for (j in d) {
+                                                $("#id_{{ field.name }}").append('<option value="' + j + '">' + d[j] + '</option>');
+                                            }
+                                        })
+                                })
+                                getRegionAndCountryFromCity({{ field.value }}, "{{ field.name }}");
+                            </script>
+
+                        </div>
+                        <div class="row" style="padding: 1em 1em 0 1em">
+                    {% endif %}
+                {% endfor %}
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.direccion_residencia.label }}</span>
+                        {{ form.direccion_residencia|add_class:'form-control' }}
+                </div>
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.telefono_fijo.label }}</span>
+                        {{ form.telefono_fijo|add_class:'form-control' }}
+                </div>
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.telefono_celular.label }}</span>
+                        {{ form.telefono_celular|add_class:'form-control' }}
+                </div>
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.tipo_sangre.label }}</span>
+                        {{ form.tipo_sangre|add_class:'form-control' }}
+                </div>
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.eps.label }}</span>
+                        {{ form.eps|add_class:'form-control' }}
+                </div>
+                {% csrf_token %}
+                </div>
+        </div>
+        {{ persona_contacto_formset.management_form }}
+        <br/>
+        <div class="wrap-edit-profile">
+        <span class="login100-form-title p-b-49">
+            Personas de contacto
+        </span>
+
+            {% for contacto_form in persona_contacto_formset %}
+
+                <div class="container-fluid contacto-formset" style="padding-bottom: 1em">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <span class="label-input100">Nombres</span>
+                            {{ contacto_form.nombres|add_class:'form-control'|attr:"required:true" }}
+                        </div>
+                        <div class="col-md-6">
+                            <span class="label-input100">Apellidos</span>
+                            {{ contacto_form.apellidos|add_class:'form-control'|attr:"required:true" }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <span class="label-input100">Celular</span>
+                            {{ contacto_form.numero_celular|add_class:'form-control'|attr:"required:true" }}
+                        </div>
+                        <div class="col-md-4">
+                            <span class="label-input100">Email</span>
+                            {{ contacto_form.correo_electronico |add_class:'form-control'|attr:"required:true" }}
+                        </div>
+                        <div class="col-md-4">
+                            <span class="label-input100">Parentesco</span>
+                            {{ contacto_form.parentesco |add_class:'form-control'|attr:"required:true" }}
+                        </div>
+                        {{ contacto_form.value }}
+                    </div>
+                </div>
+
+            {% endfor %}
+            {% if persona_contacto_formset.non_form_errors %}
+                {% for error in persona_contacto_formset.non_form_errors %}
+                    {{ error|escape }}
+                {% endfor %}
+            {% endif %}
+            <div class="container-login100-form-btn col-md-6 col-md-offset-3">
+                <button type="submit" class="btn-primary-login" id="guardar">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </form>
+    <script>
+        var tel_fijo = document.querySelector("#id_telefono_fijo");
+        var iti_fijo = window.intlTelInput(tel_fijo, {
+            preferredCountries: ['co'],
+            initialCountry: "{{ form.indicativo_fijo }}".toLowerCase()
+        });
+
+        var tel_celular = document.querySelector("#id_telefono_celular");
+        var iti_celular = window.intlTelInput(tel_celular, {
+            preferredCountries: ['co'],
+            initialCountry: "{{ form.indicativo_celular }}".toLowerCase()
+        });
+
+        $('form').on('submit', function () {
+            var indc_fijo = iti_fijo.getSelectedCountryData().iso2;
+            var indc_celular = iti_celular.getSelectedCountryData().iso2;
+            document.getElementById("id_telefono_fijo").value = indc_fijo + "+" + document.getElementById("id_telefono_fijo").value;
+            document.getElementById("id_telefono_celular").value = indc_celular + "+" + document.getElementById("id_telefono_celular").value;
+
+        });
+        $(function () {
+            $('.contacto-formset').formset({
+                addText: '<br>Agregar persona de contacto',
+                deleteText: '<i class="fa fa-trash" aria-hidden="true" style="color:red"></i>',
+                min_num: 1,
+                max_num: 3,
+            });
+        })
+
+    </script>
+
+
+{% endblock %}

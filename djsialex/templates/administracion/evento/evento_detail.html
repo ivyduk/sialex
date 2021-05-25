@@ -1,0 +1,25 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Evento: {{ evento.nombre }}</h1>
+
+    <div class="row">
+        <div class="col-md-9">
+        <ul class="list-group">
+            <li class="list-group-item">Nombre: {{ evento.nombre }}</li>
+        </ul>
+        </div>
+
+        <div class="col-md-3">
+            <div class="well">
+                <h3>Acciones</h3>
+                <a href="{% url 'evento_update' evento.id %}" class="btn btn-default">Editar</a>
+                <a href="{% url 'evento_delete' evento.id %}" class="btn btn-default">Borrar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-9 col-md-9">
+
+{% endblock %}
+

@@ -1,0 +1,31 @@
+{% extends 'administracion/home.html' %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración » <a href="{% url 'autorizado_opciones' %}">Autorizados</a>
+{% endblock %}
+
+{% block content %}
+
+    <div class="col-sm-9 col-md-9">
+     <h1 class="title-project">Borrar autorización a Examen de Clasificación</h1>
+    <div class="alert alert-warning col-sm-6 col-md-6">
+
+
+        <p>¿Está seguro de borrar la persona autorizada con documento: <b>{{ autorizadoexamen.numero_documento }}</b> al examen <b>{{ autorizadoexamen.examen.nombre }}</b>?</p>
+        <br>
+        <div class="row">
+        <div class=" col-sm-11 col-md-11 text-right">
+            <form action="" method="POST">
+            {% csrf_token %}
+             <input type="submit" class="btn btn-danger navbar-right" value="SI, Borrar.">
+        </form>
+                <a href="{% url 'autorizados-examen' %}" class="btn btn-primary .navbar-right">Cancelar
+            </a>
+
+        </div></div>
+
+    </div>
+    </div>
+
+
+{% endblock %}

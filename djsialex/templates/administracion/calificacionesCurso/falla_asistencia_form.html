@@ -1,0 +1,33 @@
+{% load widget_tweaks %}
+{% block form %}
+    <form method="post" action="{% url 'falla_asistencia_create' matricula.id %}">
+    {% csrf_token %}
+         <div class="modal-header" id="header">
+            <h2 class="modal-title align-center" id="titulo">Registro de inasistencia</h2>
+             <h3 class="text-center">Estudiante: {{ matricula.estudiante.getNombreCompleto }}</h3>
+             <div class="alert alert-info">Recuerde que el número de inasistencias corresponde al número de horas que no asistió el estudiante en la fecha dada</div>
+          </div>
+
+          <div class="modal-body">
+            {% for field in form %}
+              <div class="form-group{% if field.errors %} invalid{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:"form-control" }}
+                {% for error in field.errors %}
+                  <p class="help-block">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-primary" id="registrar">Registrar</button>
+          </div>
+
+    </form>
+
+    <script>
+
+    </script>
+{% endblock %}

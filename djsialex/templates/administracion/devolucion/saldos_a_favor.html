@@ -1,0 +1,120 @@
+{% extends 'administracion/base_form.html' %}
+{% load widget_tweaks %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "css/base_preinscripcion.css" %}">
+{% block content %}
+<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'buscar-saldos' %}">Nueva búsqueda</a>
+    <div class="col-sm-9 col-md-9">
+        {% if usuario %}
+            <div class="row">
+                <div class="column col-sm-5 col-md-5">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="text-center"><strong>Total Saldos a favor usuario</strong></h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                               <table class="table table-condensed">
+                                  <thead class="table-head">
+                                  <tr>
+                                      <th scope="col">Periodo generado</th>
+                                      <th scope="col">Enlace preinscripción</th>
+                                      <th scope="col">Valor</th>
+                                      <th scope="col">Devuelto</th>
+                                  </tr>
+                                  </thead>
+                                   <tbody>
+                                {% for saldo in object_list.saldos %}
+                                    <tr>
+                                        <td>{{ saldo.periodo_generado.alias }}</td>
+                                        <td><a href="{% url 'formalizar-curso' saldo.recibo_preinscripcion_generado.preinscripcion.id %}">preinscripción</a></td>
+                                        <td>${{ saldo.valor }}</td>
+                                        <td>{% if saldo.devuelto %}SI{% else %}NO{% endif %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                   </tbody>
+                               </table>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column  col-sm-7 col-md-7">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="text-center"><strong>Saldos Activos Usuario</strong></h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                               <table class="table table-condensed">
+                                  <thead class="table-head">
+                                  <tr>
+                                      <th scope="col">Periodo generado</th>
+                                      <th scope="col">Enlace preinscripción</th>
+                                      <th scope="col">Valor</th>
+                                      <th scope="col">Reservas</th>
+                                      <th scope="col">Devolver</th>
+                                  </tr>
+                                  </thead>
+                                   <tbody>
+                                    {% for saldo in object_list.activos %}
+                                    <tr>
+                                        <td>{{ saldo.periodo_generado.alias }}</td>
+                                        <td><a href="{% url 'formalizar-curso' saldo.recibo_preinscripcion_generado.preinscripcion.id %}">preinscripción</a></td>
+                                        <td>${{ saldo.valor }}</td>
+                                        <td><ul>
+                                            {% for reserva in saldo.reservassaldo_set.all %}
+                                                {% if reserva.valor > 0 %}<li>{{ reserva.valor }}{% endif %}</li>
+                                            {% endfor %}
+                                        </ul></td>
+                                        <td>{% if saldo.devuelto %}Devuelto{% else %}<a href="{% url 'devolucion' saldo.id %}" class="btn btn-warning"><span class="glyphicon glyphicon-repeat"></span></a>{% endif %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                   </tbody>
+                               </table>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="text-center"><strong>Devoluciones</strong></h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                               <table class="table table-condensed">
+                                  <thead class="table-head">
+                                  <tr>
+                                      <th scope="col">Valor Saldo</th>
+                                      <th scope="col">Valor Devuelto</th>
+                                      <th scope="col">Porcentaje</th>
+                                      <th scope="col">Observación</th>
+                                      <th scope="col">Aprobó Devolución</th>
+                                  </tr>
+                                  </thead>
+                                   <tbody>
+                                   {% for devolucion in object_list.devoluciones %}
+                                    <tr>
+                                        <td>$ {{ devolucion.saldo_a_favor.valor }}</td>
+                                        <td>$ {{ devolucion.get_valor_devuelto }}</td>
+                                        <td>{{ devolucion.porcentaje }}</td>
+                                        <td>{{ devolucion.observacion }}</td>
+                                        <td>{{ devolucion.encargado.primer_nombre }} {{ devolucion.encargado.primer_apellido }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                   </tbody>
+                               </table>
+                           </div>
+                        </div>
+                    </div>
+            </div>
+        {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay usuarios con este documento
+        </div>
+        {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "administracion/home.html" %}
+{% load profile_tags %}
+{% block content %}
+
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'mis-cursos' %}">Volver a mis cursos</a>
+
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Mis estudiantes</h1>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal" xmlns="http://www.w3.org/1999/html">
+        <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div>
+        </div>
+    </div>
+
+    <div class="well">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="title-project">Grupo:</h3> {{ grupo.nombre }}
+                <h3 class="title-project">Código:</h3> {{ grupo.codigo }}
+                <h3 class="title-project">Idioma:</h3> {{ grupo.horarioCurso.curso.nivel.idioma.nombre }}
+                <h3 class="title-project">Nivel:</h3> {{ grupo.horarioCurso.curso.nivel.nombre }}
+            </div>
+            <div class="col-sm-6">
+                <h3 class="title-project">Periodo:</h3>{{ grupo.horarioCurso.curso.oferta_academica.periodo.alias }}
+                <h3 class="title-project">Docente(s) general(es):</h3>
+                {% for docente in docentes_generales %}
+                    {{ docente.docente.persona.getNombreCompleto }}<br>
+                {% endfor %}
+
+                <h3 class="title-project">Docente(s) especializado(s):</h3>
+                {% for docente in docentes_especializados %}
+                    {{ docente.docente.persona.getNombreCompleto }}<br>
+                {% endfor %}
+
+                <h3 class="title-project">Salón(es):</h3>
+                {% for salon in salones %}
+                    Edificio: {{ salon.edificio.nombre }} -Salón: {{ salon.nombre }} <br>
+                {% endfor %}
+                <h3 class="title-project">Observación(es):</h3>
+                {% if grupo.observaciones %}
+                    {{ grupo.observaciones }} <br>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    {% if matriculas %}
+        <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Código grupo</th>
+                <th scope="col">Documento</th>
+                <th scope="col">Nombre estudiante</th>
+                <th scope="col">Correo electrónico</th>
+                <th scope="col">Nota final</th>
+                <th scope="col">Estado</th>
+                <th scope="col" colspan="3" class="text-center">Inasistencias</th>
+                <th scope="col" colspan="3" class="text-center">Observaciones</th>
+
+            </tr>
+          </thead>
+          <tbody>
+          {% for matricula in matriculas %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ matricula.grupo.codigo }}</td>
+                <td>{{ matricula.estudiante.numero_documento }}</td>
+                <td>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </td>
+                <td>{{ matricula.estudiante.usuario.email }}</td>
+                <td>{{ matricula.calificacionFinal }}</td>
+                <td><span class="{% if matricula.estado_matricula|getColorEstadoMatricula == 1 %} alert-success
+                        {% elif matricula.estado_matricula|getColorEstadoMatricula == 2 %}  alert-danger
+                        {% endif %}">
+                        {{ matricula.estado_matricula|getEstadoMatricula }}
+                    </span>
+                </td>
+                <td>{{ matricula.total_fallas }}</td>
+                <td><a href="{% url 'falla_asistencia_list' matricula=matricula.id %}">
+                        <button class="btn btn-primary btn-xs" title="Ver inasistencias">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                        </button>
+                    </a>
+                </td>
+                <td>
+                    <button class="btn btn-warning btn-xs js-create-falla-asistencia" title="Registrar inasistencias" id="{{ matricula.id }}">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                    </button>
+
+                </td>
+                <td>{{ observaciones_matricula|get_item:matricula}}</td>
+                <td><a href="{% url 'observacion_matricula_list' matricula=matricula.id %}">
+                        <button class="btn btn-primary btn-xs" title="observaciones">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                        </button>
+                    </a>
+                </td>
+
+                <td>
+                        <button class="btn btn-warning btn-xs js-create-observacion-matricula" title="Registrar observaciones" id="{{ matricula.id }}">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                        </button>
+
+                </td>
+
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+        {% if FULL_DATA.available %}
+            {% if FULL_DATA.periodo_nulo %}
+                <div class="alert alert-warning" role="alert">
+                    <strong>¡Periodo sin contextualizar!</strong>
+                </div>
+            {% else %}
+                <button type="button" class="btn btn-danger pull-right" onclick="location.href='{% url 'actualizar-estados' grupo.id %}'">
+             <span class="glyphicon glyphicon-refresh"></span> Publicar notas </button>
+            {% endif %}
+        {% else %}
+            <button type="button" class="btn btn-danger pull-right" disabled>
+                <span class="glyphicon glyphicon-refresh"></span> Publicar notas </button>
+        {% endif %}
+
+        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'calificaciones-grupo-csv' grupo.id %}'">
+             <span class="glyphicon glyphicon-download"></span> Descargar CSV </button>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No se encontraron estudiantes para este grupo académico
+        </div>
+    {% endif %}
+
+    </div>
+
+    <script type="text/javascript">
+
+        $(".js-create-falla-asistencia").click(function (e) {
+            var matricula_seleccionada = $(this).attr('id'); // $(this) refers to button that was clicked
+
+            url_matricula = "{% url 'falla_asistencia_create' matricula='param' %}".replace('param', matricula_seleccionada);
+            $.ajax({
+                type: 'GET',
+                url : url_matricula,
+                dataType: 'json',
+                beforeSend: function () {
+                    $("#modal").modal("show");
+                },
+                success: function (data) {
+                    $("#modal .modal-content").html(data.html_form);
+
+                },
+                error: function () {
+                  alert('Error!');
+                }
+            });
+            return false;
+        });
+
+         $(".js-create-observacion-matricula").click(function (e) {
+            var matricula_seleccionada = $(this).attr('id'); // $(this) refers to button that was clicked
+
+            url_matricula = "{% url 'observacion_matricula_create' matricula='param' %}".replace('param', matricula_seleccionada);
+            $.ajax({
+                type: 'GET',
+                url : url_matricula,
+                dataType: 'json',
+                beforeSend: function () {
+                    $("#modal").modal("show");
+                },
+                success: function (data) {
+                    $("#modal .modal-content").html(data.html_form);
+
+                },
+                error: function () {
+                  alert('Error!');
+                }
+            });
+            return false;
+        });
+
+    </script>
+
+{% endblock %}
+

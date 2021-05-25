@@ -1,0 +1,65 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Administración Franjas de horario</h1>
+
+    {%  if franja_list %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Dia</th>
+                <th scope="col">Hora inicio</th>
+                <th scope="col">Hora Final</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for franja in franja_list %}
+            <tr>
+                <td><a href="{{ franja.get_absolute_url }}">{{ franja.nombre}}</a></td>
+                <td>{{ franja.get_dia_display }}</td>
+                <td>{{ franja.hora_inicio }}</td>
+                <td>{{ franja.hora_final }}</td>
+                <td>
+                    <p>
+                        <a href="{% url 'franja_update' franja.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'franja_delete' franja.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay franjas creadas
+        </div>
+
+    {% endif %}
+
+        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'franja_create' %}'">
+            <span class="glyphicon glyphicon-plus-sign"></span> Nueva franja</button>
+    </div>
+{% endblock %}
+

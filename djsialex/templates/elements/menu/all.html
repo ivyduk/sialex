@@ -1,0 +1,17 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a href="{% url 'logout'%}"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+        </h4>
+    </div>
+</div>
+{% if user.is_superuser %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a href="{% url 'admin:index'%}"><i class="fas fa-star" style="color:#ffdd00"></i> Super
+                Administrador</a>
+        </h4>
+    </div>
+</div>
+{% endif %}

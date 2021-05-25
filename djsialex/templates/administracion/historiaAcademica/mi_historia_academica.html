@@ -1,0 +1,107 @@
+{% extends "administracion/home.html" %}
+{% load profile_tags %}
+{% block content %}
+
+     <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Mi historia académica</h1>
+    <div class="well">
+        Estimado estudiante.
+        <br>A continuación se relacionan los cursos a los que ha sido inscrito con sus respectivas notas.
+        <br>Recuerde que el <b>estado</b> puede ir cambiando a medida que transcurre el periodo del curso, ya que sus docentes pueden
+        subir notas o registrar inasistencias y con esto se actualiza su estado.
+    </div>
+    <h1 class="title-project">Cursos</h1>
+    {% if matriculas %}
+        <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Curso</th>
+                <th scope="col">Grupo</th>
+                <th scope="col">Idioma</th>
+                <th scope="col">Nivel</th>
+                <th scope="col">Periodo</th>
+                <th scope="col">Nota final</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for matricula in matriculas %}
+            <tr>
+                <td>{{ matricula.grupo.horarioCurso.curso.nombre }}</td>
+                <td>{{ matricula.grupo.codigo }}</td>
+                <td>{{ matricula.grupo.horarioCurso.curso.nivel.idioma.nombre }}</td>
+                <td>{{ matricula.grupo.horarioCurso.curso.nivel.nombre }}</td>
+                <td>{{ matricula.grupo.horarioCurso.curso.oferta_academica.periodo }}</td>
+                <td>{{ matricula.calificacionFinal }}</td>
+
+                <td><span class="{% if matricula.estado_matricula|getColorEstadoMatricula == 1 %} alert-success
+                        {% elif matricula.estado_matricula|getColorEstadoMatricula == 2 %}  alert-danger
+                        {% endif %}">
+                        {{ matricula.estado_matricula|getEstadoMatricula }}
+                    </span>
+                </td>
+
+                <td>
+                    {% if matricula.estado_matricula|isMatriculaValida %}
+                    <p>
+                        <a href="{% url 'calificaciones-detalle' matricula.id 1 %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-eye-open">
+                            </span>
+                        </button>
+                        </a>
+                    <a href="{% url 'calificaciones-detalle-pdf' matricula.id 1 %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-save-file">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            Usted no cuenta con cursos en la historia académica
+        </div>
+    {% endif %}
+
+     <h1 class="title-project">Exámenes de Clasificación</h1>
+    {% if calificaciones_examen %}
+        <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Examen de Clasificación</th>
+                <th scope="col">Idioma</th>
+                <th scope="col">Fecha de presentación</th>
+                <th scope="col">Resultado</th>
+
+            </tr>
+          </thead>
+          <tbody>
+
+          {% for calificacion in calificaciones_examen %}
+            <tr>
+                <td>{{ calificacion.preinscripcion_examen.examen.nombre }}</td>
+                <td>{{ calificacion.preinscripcion_examen.examen.idioma.nombre }}</td>
+                <td>{{ calificacion.preinscripcion_examen.examen.fecha_hora|date:"d/m/Y - h:m" }}</td>
+                <td>{{ calificacion.nivel.nombre }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            Usted no cuenta con calificaciones de exámenes de clasificación
+        </div>
+    {% endif %}
+
+
+     </div>
+{% endblock %}

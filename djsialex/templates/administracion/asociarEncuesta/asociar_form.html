@@ -1,0 +1,23 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+
+{% block administration-title %}
+    <h2 class="title-project">Administrar Asociación Encuesta</h2>
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'asociaciones' %}">Volver a Asociaciones</a>
+{% endblock %}
+
+{% block form %}
+    <div class="row card">
+
+    <form class="form-horizontal" method="post">
+    {% csrf_token %}
+            {{ form.as_ul }}
+        <div class="form-group">
+            <button type="submit" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-ok-sign"></span> Guardar
+            </button>
+        </div>
+    </form>
+    </div>
+{% endblock %}

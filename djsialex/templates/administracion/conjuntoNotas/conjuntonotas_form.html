@@ -1,0 +1,99 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+{% block administration-title %}
+    <h2 class="title-project">Administrar Conjunto Notas </h2>
+{% endblock %}
+
+
+{% block form %}
+    <div class="row card">
+
+    <form class="form-horizontal" method="post">
+    {% csrf_token %}
+        {% for field in form.visible_fields %}
+            <div class="form-group small-margin">
+             <label for="{{ field.id_for_label }}" class="col-md-3 control-label">{{ field.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="{{ field.help_text }}" data-content="{{ field.help_text }}" ></i></span>
+             </label>
+
+            <div class="col-md-9">
+                {{ field|add_class:'form-control' }}
+             </div>
+            {% for error in field.errors %}
+                <span class="help-block">{{ error }}</span>
+            {% endfor %}
+            </div>
+        {% endfor %}
+
+        {{ notas_formset.management_form }}
+        <br/>
+        <h2 class="title-project">Notas asociadas</h2>
+        <div class="wrap-edit-profile">
+            {% for form in  notas_formset %}
+                <div class="container-fluid formset_row-{{ notas_formset.prefix }}" style="padding-bottom: 1em">
+                    {% for field in form.visible_fields %}
+                        {% if forloop.first %}
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                        {% endif %}
+                        {{ field.errors.as_ul }}
+                        {% if not field.is_hidden %}
+                            <div class="row">
+                            <div class="form-group small-margin">
+                                <label for="{{ field.id_for_label }}" class="col-md-3 control-label">{{ field.label }}
+                                    <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="{{ field.help_text }}" data-content="{{ field.help_text }}" ></i></span>
+                                </label>
+
+                                <div class="col-md-9">
+                                    {{ field|add_class:'form-control' }}
+                                </div>
+                            </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% if form.errors %}
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            {% endfor %}
+            {% if notas_formset.non_form_errors %}
+                {% for error in notas_formset.non_form_errors %}
+                    {{ error|escape }}
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-ok-sign"></span> Guardar
+            </button>
+        </div>
+    </form>
+    </div>
+
+    {% load static %}
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script type="text/javascript">
+    $('.formset_row-{{ notas_formset.prefix }}').formset({
+        addText: 'Agrega nota',
+        deleteText: '<i class="fa fa-trash" aria-hidden="true" style="color:red"></i>',
+        prefix: '{{ notas_formset.prefix }}',
+        min_num:1,
+    });
+
+    </script>
+{% endblock %}
+
+

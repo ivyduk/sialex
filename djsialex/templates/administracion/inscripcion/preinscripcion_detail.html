@@ -1,0 +1,159 @@
+{% extends "administracion/home.html" %}
+
+
+{% block breadcrumb %}
+    {{ block.super }} » Oferta Académica » <a href="{% url 'mis-preinscripciones' %}">Inscripciones</a>
+{% endblock %}
+
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Preinscripcion {{ preinscripcionhorariocurso.horario_cupo.nombre }}</h1>
+
+    <div class="col-md-9">
+         <ul class="list-group">
+            <li class="list-group-item"><b>Estado:</b> {{ preinscripcionhorariocurso.get_estado_preinscripcion_display }}</li>
+            <li class="list-group-item"><b>Fecha De Preinscripción: </b>{{ preinscripcionhorariocurso.fecha_preinscripcion }}</li>
+            <li class="list-group-item"><b>Horario: </b>{{ preinscripcionhorariocurso.horario_cupo.horario }}</li>
+             <li class="list-group-item"><b>Nivel: </b>{{ preinscripcionhorariocurso.horario_cupo.curso.nivel.nombre }}</li>
+             <li class="list-group-item"><b>Programa: </b>{{ preinscripcionhorariocurso.horario_cupo.curso.oferta_academica.programa.nombre }}</li>
+             <li class="list-group-item"><b>Grupo: </b> {% if grupo %}{{ grupo.nombre }}{% else %}No definido{% endif %}</li>
+             {% if preinscripcionhorariocurso.estado_preinscripcion == 1 or preinscripcionhorariocurso.estado_preinscripcion == 3 or preinscripcionhorariocurso.estado_preinscripcion == 5 %}
+             <li class="list-group-item"><div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="text-center"><strong>Resumen de Costos</strong></h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-condensed" id="resumen">
+                                    <thead>
+                                    <tr>
+                                        <td><strong>Concepto</strong></td>
+                                        <td class="text-center"><strong></strong></td>
+                                        <td class="text-right"><strong>Valor</strong></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Tarifa Curso</td>
+                                        <td class="text-center"><h3><strong>+</strong></h3></td>
+                                        <td class="text-right">{{ tarifa_plena }}</td>
+                                    </tr>
+                                    {% if beca %}
+                                        <tr>
+                                            <td>Beca</td>
+                                            <td class="text-center"><h3><strong>-</strong></h3></td>
+                                            <td class="text-right">{{ beca.valor }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if descuento_aplicado %}
+                                        <tr>
+                                            <td>{{ descuento_aplicado.descuento.nombre }}</td>
+                                            <td class="text-center"><h3><strong>-</strong></h3></td>
+                                            <td class="text-right">{{ descuento_aplicado.valor }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if reservas %}
+                                        {% for reserva in reservas %}
+                                            <tr>
+                                                <td>Saldo de {{ reserva.saldo.periodo_generado }}</td>
+                                                <td class="text-center"><h3><strong>-</strong></h3></td>
+                                                <td class="text-right">{{ reserva.valor }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if  preinscripcionhorariocurso.horario_cupo.curso.nivel.costo_materiales > 0 %}
+                                        <tr>
+                                            <td>Tarifa Materiales</td>
+                                            <td class="text-center"><h3><strong>+</strong></h3></td>
+                                            <td class="text-right">{{  preinscripcionhorariocurso.horario_cupo.curso.nivel.costo_materiales }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td class="emptyrow"></td>
+                                        <td class="emptyrow text-center"><strong>Total a pagar</strong></td>
+                                        <td class="emptyrow text-right"><h3>$ <span class="label label-success">{{ preinscripcionhorariocurso.valor_preinscripcion }}</span></h3></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+             </div>
+             </li>
+                 <li class="list-group-item"><div class="panel-body">
+                     <h2><strong>Datos para formalizar preinscripción</strong></h2>
+
+        <p>Código generado</p>
+        <p>{{ preinscripcionhorariocurso.codigo_hash}}</p>
+        <div class="blockquote">
+                <h2>Instrucciones:</h2>
+
+                <p>Tome en cuenta la siguiente información para realizar su formalización</p>
+                <div>
+                        <ul>
+                          <li>
+                            <h3>Documentos a presentar para pago</h3>
+                            <p>{{ mensaje_formalizacion.documentos_pago }}</p>
+
+                            {% if preinscripcion_curso.descuento_solicitado %}
+                                <br/>Descuento aplicado: <strong>{{ preinscripcion_curso.descuento_solicitado }}</strong>
+                                <br/>
+                                <br/>Recuerde que para poder aplicar como beneficiario de este descuento deberá presentar los siguientes
+                                documentos:
+                            <ul>
+                                {% for documento in documentos_requeridos %}
+                                    <li>{{ documento }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                          </li>
+
+                          <li>
+                            <h3>Datos para realizar el pago</h3>
+                            <p>{{ mensaje_formalizacion.datos_pago }}</p>
+                          </li>
+
+                          <li>
+                            <h3>Fecha de citación</h3>
+                            <p>{{ mensaje_formalizacion.fecha_citacion }}</p>
+                          </li>
+
+                          <li>
+                            <h3>Lugar de citación</h3>
+                            <p>{{ mensaje_formalizacion.lugar_citacion }}</p>
+                          </li>
+
+                          <h3>Horario de citación</h3>
+                            <p>{{ mensaje_formalizacion.horario_citacion }}</p>
+                        </ul>
+                      </div>
+                        <div class="container-fluid">
+                              <div class="row vertical-align">
+                                <h3>En caso que vaya a realizar pago virtual: </h3>
+                                <div class="col-xs-12">
+                                  <a href="http://www.pagovirtual.unal.edu.co" target="_blank"><img src="http://www.pagovirtual.unal.edu.co/img/logounpagos2.png" class="img-responsive center-block" style="width:200px;height: 80px"></a>
+                                </div>
+                          </div>
+                        </div>
+
+                </div>
+                 </div></li>
+         {% else %}
+                 <li class="list-group-item">Preinscripcion cancelada</li>
+         {% endif %}
+        </ul>
+    </div>
+
+    {% if preinscripcionhorariocurso.estado_preinscripcion == 5 %}
+        <div class="col-md-3">
+            <div class="well">
+                <h3>Acciones</h3>
+                <a href="{% url 'preinscripcion_delete' preinscripcionhorariocurso.id %}" class="btn btn-danger btn-cancelar">Cancelar Pre-inscripcion</a>
+            </div>
+        </div>
+    {% else %}
+        Sin acciones
+    {% endif %}
+    </div>
+
+{% endblock %}

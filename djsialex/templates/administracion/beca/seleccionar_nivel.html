@@ -1,0 +1,70 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+{% load profile_tags %}
+{% block administration-title %}
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'beca-opciones' %}">Volver a menú de becas</a>
+    <h1 class="title-project">Asignación de beca</h1>
+{% endblock %}
+{% block form %}
+        {% if es_estudiante %}
+        <div class="well">
+            Se ha encontrado el siguiente estudiante:
+            <h3 class="title-project">Documento:</h3> {{ estudiante.tipo_documento }} - {{ estudiante.numero_documento }}
+            <h3 class="title-project">Nombre completo:</h3> {{ estudiante.getNombreCompleto }}
+        </div>
+
+        <div class="alert alert-info">
+            <h3 class="title-project">Nota:</h3>Recuerde que algunos niveles podrían estar en diferentes Programas Académicos, así que el estudiante podría obtener la beca
+            en cualquiera de los programas siempre y cuando sea becado para dicho nivel.
+        </div>
+    <div class="row card">
+
+    <form class="form-horizontal" method="post">
+    {% csrf_token %}
+        <input type="hidden" name="std" value="{{ estudiante.id }}">
+        <div class="form-group">
+         <label class="col-md-3 control-label">Tipo beca
+         </label>
+         <div class="col-md-9">
+            <select name="tipo_beca" class="form-control" required="">
+            {% for tipo in tipos_beca %}
+                <option value="{{ tipo.id }}" {% if tipo == tipo_beca_seleccionada %}selected=""{% endif %}>{{ tipo.nombre }}</option>
+            {% endfor %}
+        </select>
+         </div>
+        </div>
+        <div class="form-group">
+        <label class="col-md-3 control-label">Niveles Disponibles
+         </label>
+         <div class="col-md-9">
+            <select name="nivel_idioma" class="form-control" required="" id="id_nivel_idioma" multiple="" style="position: absolute; left: -9999px;">
+            {% for nivel in niveles %}
+                {% if nivel in niveles_seleccionados %}
+                {% endif %}
+                    <option value="{{ nivel.id }}" {% if nivel in niveles_seleccionados %}selected=""{% endif %}>{{ nivel.getNombreNivelIdioma }}</option>
+            {% endfor %}
+            </select>
+         </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-ok-sign"></span> Guardar
+            </button>
+        </div>
+    </form>
+    </div>
+    {% else %}
+        <div class="well">
+            Se ha encontrado la siguiente persona registrada:
+            <h3 class="title-project">Documento:</h3> {{ estudiante.tipo_documento }} - {{ estudiante.numero_documento }}
+            <h3 class="title-project">Nombre completo:</h3> {{ estudiante.getNombreCompleto }}
+        </div>
+
+        <div class="alert alert-danger">
+            <h3>Nota:</h3>Esta persona no aparece como estudiante, y por este motivo no es posible asignarle una beca.
+            Si está seguro de que esta es la persona que busca, entonces asigne el rol de <b>Estudiante</b>
+            antes de continuar con el proceso.
+        </div>
+    {% endif %}
+{% endblock %}

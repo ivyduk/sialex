@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}SIALEX{% endblock %}
+
+{% block content %}
+<li><a href="{% url 'login'%}">{% trans "Iniciar Sesion" %}</a></li>
+<h1>{% trans "Bienvenido a SIALEX" %}</h1>
+
+{% endblock %}

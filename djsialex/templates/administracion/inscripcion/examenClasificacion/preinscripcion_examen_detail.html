@@ -1,0 +1,35 @@
+{% extends "administracion/home.html" %}
+
+
+{% block breadcrumb %}
+    {{ block.super }} » Oferta Académica » <a href="{% url 'mis-preinscripciones' %}">Inscripciones</a>
+{% endblock %}
+
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Preinscripcion {{ preinscripcionexamen.examen.nombre }}</h1>
+
+    <div class="col-md-9">
+         <ul class="list-group">
+            <li class="list-group-item">Estado: {{ preinscripcionexamen.get_estado_preinscripcion_display }}</li>
+            <li class="list-group-item">Fecha De Preinscripción: {{ preinscripcionexamen.fecha_preinscripcion }}</li>
+            <li class="list-group-item">Valor a Pagar: $ {{ preinscripcionexamen.valor_preinscripcion }}</li>
+            <li class="list-group-item">Información sobre la entrega de documentos: {{ preinscripcionexamen.examen.fecha_hora_recepcion_documentos }}</li>
+            <li class="list-group-item">Fecha de presentación del examen: {{ preinscripcionexamen.examen.getFechaAplicacion }}</li>
+        </ul>
+    </div>
+
+    {% if preinscripcionexamen.estado_preinscripcion == 5 %}
+        <div class="col-md-3">
+            <div class="well">
+                <h3>Acciones</h3>
+                <a href="{% url 'preinscripcion_delete' preinscripcionexamen.id %}" class="btn btn-danger btn-cancelar">Cancelar Pre-inscripcion</a>
+            </div>
+        </div>
+    {% else %}
+        Sin acciones
+    {% endif %}
+    </div>
+
+{% endblock %}

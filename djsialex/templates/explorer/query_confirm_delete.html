@@ -1,0 +1,12 @@
+{% extends "explorer/base.html" %}
+
+{% block sql_explorer_content %}
+    <form method="post">{% csrf_token %}
+        <div class="alert alert-info">
+            Esta seguro de borrar: "{{ object.title }}" ?
+        </div>
+        <div>
+            <input type="submit" value="Delete Query" class="btn btn-default" />
+        </div>
+    </form>
+{%  endblock %}

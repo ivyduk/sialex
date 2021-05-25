@@ -1,0 +1,50 @@
+{% load widget_tweaks %}
+{% block form %}
+    <form method="post" action="{% url 'observacion_matricula_create' matricula.id %}">
+    {% csrf_token %}
+         <div class="modal-header" id="header">
+            <h2 class="modal-title align-center" id="titulo">Registro de observación</h2>
+             <h3 class="text-center">Estudiante: {{ matricula.estudiante.getNombreCompleto }}</h3>
+          </div>
+
+          <div class="modal-body">
+            {% for field in form %}
+              <div class="form-group{% if field.errors %} invalid{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:"form-control" }}
+                {% for error in field.errors %}
+                  <p class="help-block">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-primary" id="registrar">Registrar</button>
+          </div>
+
+    </form>
+
+    <script>
+
+         $("#registrar").click(function (e) {
+            header = $("#header")
+
+            var hoy = new Date();
+            var fecha_falla = Date.parse($("#id_fecha").val());
+            fallas = $("#id_cantidad_fallas").val();
+
+            if(fecha_falla > hoy || fecha_falla == ""){
+                header.append('<div class="alert alert-danger">La fecha de las inasistencias no puede ser posteriores a la fecha actual</div>');
+                return false;
+            }else if(fallas < 1){
+                header.append('<div class="alert alert-danger">El número de inasistencias debe ser mayor a 0</div>');
+                return false;
+            }
+             return true;
+
+        });
+
+    </script>
+{% endblock %}

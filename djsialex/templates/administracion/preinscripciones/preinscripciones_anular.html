@@ -1,0 +1,53 @@
+{% extends 'administracion/home.html' %}
+{% load widget_tweaks %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "css/base_preinscripcion.css" %}">
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+        <h1 class="title-project">Preinscripciones sin formalizar en el periodo {{ periodo }}</h1>
+
+        <div class="alert alert-info">
+            <h4>A continuación se muestran los horarios en los cuales existen preinscripciones sin formalizar.
+            <br>
+                Una vez pulse el botón <b>anular preinscripciones</b>, se liberarán los cupos.</h4>
+        </div>
+        <h2 class="title-project"></h2>
+        {% if preinscripciones %}
+            <div class="table-responsive">
+            <table class="table table-striped table-border">
+              <thead class="table-head">
+              <tr>
+                  <th scope="col">Idioma</th>
+                  <th scope="col">Nivel</th>
+                  <th scope="col">Curso</th>
+                  <th scope="col">Horario</th>
+                  <th scope="col">Cupos a liberar</th>
+              </tr>
+              </thead>
+               <tbody>
+                {% for preinscripcion in preinscripciones %}
+                <tr>
+                    <td>{{ preinscripcion.0 }}</td>
+                    <td>{{ preinscripcion.1 }}</td>
+                    <td> {{ preinscripcion.2 }}</td>
+                    <td> {{ preinscripcion.3 }}</td>
+                    <td> {{ preinscripcion.4 }}</td>
+                </tr>
+                {% endfor %}
+               </tbody>
+            </table>
+            </div>
+            <a href="{% url 'liberarcupos' %}">
+                <button class="btn btn-danger pull-right"><span class="glyphicon glyphicon-fire"></span>
+                    Anular preinscripciones
+                </button>
+            </a>
+
+        {% else %}
+           <div class="alert alert-warning" role="alert">
+                No hay preinscripciones sin formalizar en el presente periodo o ya se han liberado los cupos
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

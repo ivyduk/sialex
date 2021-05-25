@@ -1,0 +1,37 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Nivel: {{ nivel.nombre }}</h1>
+
+    <div class="col-md-9">
+        <ul class="list-group">
+            <li class="list-group-item">Nombre: {{ nivel.nombre }}</li>
+            <li class="list-group-item">Alias: {{ nivel.alias }}</li>
+            <li class="list-group-item">Idioma: <a href="{% url 'idioma-detail' nivel.idioma.id %}">{{ nivel.idioma.nombre }}</a></li>
+            <li class="list-group-item">Contenido:
+                {% if nivel.contenido%}<a href="{% url 'contenido-nivel-detail' nivel.contenido.id %}">{{ nivel.contenido.alias }}</a>
+                {% else %} No tiene contenido asociado
+                {% endif %}
+            </li>
+            <li class="list-group-item" >Visualizar contenido (última versión):
+                {% if contenido_nivel %}<a class="iframe" href="{% url 'archivos-show' contenido_nivel.id %}">{{ contenido_nivel.alias }}</a>
+                {% else %} No tiene contenido asociado
+                {% endif %}
+
+            </li>
+        </ul>
+    </div>
+
+    <div class="col-md-3">
+            <div class="well">
+                <h3>Acciones</h3>
+                <a href="{% url 'nivel_delete' nivel.id %}" class="btn btn-default">Borrar Nivel</a>
+                <a href="{% url 'nivel_update' nivel.id %}" class="btn btn-default">Editar Nivel</a>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+

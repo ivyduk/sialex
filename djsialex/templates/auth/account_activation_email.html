@@ -1,0 +1,22 @@
+{% autoescape off %}
+Hola {{ user.profile.primer_nombre }},
+
+Para continuar con los procesos de inscripción es necesario activar su cuenta, lo puede hacer haciendo click en el siguiente enlace o copiando la dirección en su navegador
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+
+* * * * * *
+Favor no responder este mensaje, esta cuenta solo realiza actividades de envío automático de correo.
+
+---
+Cordialmente,
+Programa de Extensión y Educación Continua
+Cursos de Extensión de Lenguas Extranjeras
+Departamento de Lenguas Extranjeras
+Facultad de Ciencias Humanas - Sede Bogotá
+Tel.: (57-1) 316 50 00 Ext. :16772 - 16762 - 16763 
+Universidad Nacional de Colombia
+
+{% endautoescape %}
+

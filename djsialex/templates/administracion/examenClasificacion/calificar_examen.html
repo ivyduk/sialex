@@ -1,0 +1,128 @@
+{% extends "administracion/home.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Calificar exámenes de clasificación</h1>
+
+            <div class="well">
+                    <h3> Escoja el idioma que calificará en el examen de clasificación</h3>
+                <div class="form-group">
+                    <form action="{% url 'buscar-examen' %}" method="get">
+                        <label for="idioma" class="col-sm-2 control-label">Idioma</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" name="idioma">
+                            {% for idioma in idiomas %}
+                                <option value="{{ idioma.id }}" {% if idioma.id|stringformat:"s" == current_idioma %} selected="True"{% endif %}>{{ idioma.nombre }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+
+                    {% csrf_token %}
+                    <input class="btn btn-primary" type="submit" value="Seleccionar">
+                    </form>
+
+                </div>
+
+            </div>
+
+        {% if calificaciones_examen %}
+
+         <div class="well">
+
+                 <h4>Las siguientes personas se preinscribieron a exámenes de clasificación del idioma <b>{{ idioma_sel.nombre }}</b> en el periodo <b>{{ periodo.nombreAmigable }}</b></h4>
+             <div class="alert alert-info"><h4><b>Recuerde:</b></h4>
+                 <ol>
+                     <li>Debe ingresar el nivel en el que el estudiante ha sido clasificado para iniciar su curso en el idioma seleccionado</li>
+                     <li>El Nivel 1 del listado será tomado como INSUFICIENTE, y debe ser asignado a aquellos estudiantes que no obtuvieron un resultado superior</li>
+                     <li>Debe guardar cada calificación con el botón <b>Calificar</b></li>
+                 </ol>
+             </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-border">
+                        <thead class="table-head">
+                    <tr>
+                        <th scope="col" width="5%">No.</th>
+                        <th scope="col" width="20%">Nivel</th>
+                        <th scope="col" width="5%">Acciones</th>
+                        <th scope="col" width="10%">Nivel Actual</th>
+                        <th scope="col" width="10%">Fecha última calificación</th>
+                        <th scope="col" width="10%">Examen</th>
+                        <th scope="col" width="10%">Documento Identidad</th>
+                        <th scope="col" width="10%">Nombre</th>
+                        <th scope="col" width="5%">Fecha presentación</th>
+                        <th scope="col" width="10%">Docente evaluador</th>
+                    </tr>
+                    </thead>
+
+                        {% for calificacion in calificaciones_examen %}
+                        <form action="{% url 'calificar_examen' %}" method="post">
+                            {% csrf_token %}
+                            <tr>
+                            <td>{{ forloop.counter }}</td>
+                                <td width="20%">
+                                 <select class="form-control" name="nivel" id="nivelmenu">
+                                {% for nivel in niveles %}
+                                    <option value="{{ nivel.id }}" {% if calificacion.nivel and calificacion.nivel.id == nivel.id %} selected=""{% endif %}>{{ nivel.alias }}</option>
+                                {% endfor %}
+                            </select>
+                                <input type="hidden" name="calificacion" value="{{ calificacion.id }}">
+                            </td>
+                            <td>
+                                <p>
+                                    <button type="submit" class="btn btn-success btn-sm"
+                                            onclick="return mostrarAlerta({{ calificacion.docente_evaluador.persona.usuario }})">
+                                        <span class="glyphicon glyphicon-ok-sign"></span> Calificar
+                                    </button>
+                                </p>
+                            </td>
+                            <td>
+                                {% if calificacion.nivel %}
+                                    {{ calificacion.nivel.nombre }}
+                                {% else %}
+                                    Sin nivel
+                                {% endif %}
+                            </td>
+                            <td>{{ calificacion.fecha_hora_calificacion|date:"Y-m-d h:m"}}</td>
+                            <td>{{ calificacion.preinscripcion_examen.examen.nombre }}</td>
+                            <td>{{ calificacion.preinscripcion_examen.persona.tipo_documento }} - {{ calificacion.preinscripcion_examen.persona.numero_documento }}</td>
+                            <td>{{ calificacion.preinscripcion_examen.persona.getNombreCompleto }}</td>
+                            <td>{{ calificacion.preinscripcion_examen.examen.getFechaAplicacion}}</td>
+                            <td>{{ calificacion.docente_evaluador.persona.getNombreCompleto }}</td>
+
+
+                        </tr>
+                            </form>
+                        {% endfor %}
+                    </table>
+            </div>
+         </div>
+    {% else %}
+    <div class="alert alert-warning">No existen exámenes o inscritos a exámenes para el idioma seleccionado</div>
+    {% endif %}
+    </div>
+
+    <script>
+        function mostrarAlerta(docenteEvaluador) {
+            var user = {{ user }}
+            if (user != docenteEvaluador && docenteEvaluador != undefined) {
+                var respuesta = confirm('¿Esta seguro de calificar a esta persona que ya fue calificada por otro docente? ');
+                if(!respuesta)
+                    return false;
+            }
+        }
+
+    </script>
+
+    <style>
+        #nivelmenu{
+            width:100px;
+        }
+
+        #nivelmenu option{
+            width:100px;
+        }
+    </style>
+{% endblock %}
+
+

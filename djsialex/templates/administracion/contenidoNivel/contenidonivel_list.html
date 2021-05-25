@@ -1,0 +1,50 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+    {% if FULL_DATA.available %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administración de Contenidos de Nivel</h1>
+
+    {%  if contenidonivel_list %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+              <th scope="col">Nombre</th>
+                <th scope="col">Editar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for contenido_nivel in contenidonivel_list %}
+            <tr>
+                <td><a href="{{ contenido_nivel.get_absolute_url }}">{{ contenido_nivel.alias}}</a></td>
+                <td>
+                    <p>
+                        <a href="{% url 'contenido-nivel_update' contenido_nivel.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay contenidos de niveles creados
+        </div>
+
+    {% endif %}
+    </div>
+
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+{% endblock %}
+

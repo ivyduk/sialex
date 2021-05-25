@@ -1,0 +1,72 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+    {% if FULL_DATA.available %}
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Administración de Descuentos</h1>
+
+    {%  if descuento_list %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Porcentaje</th>
+                <th scope="col">Documentos requeridos</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for descuento in descuento_list %}
+            <tr>
+                <td><a href="{{ descuento.get_absolute_url }}">{{ descuento.nombre}}</a></td>
+                <td>{{ descuento.descripcion }}</td>
+                <td>{{ descuento.porcentaje }}</td>
+                <td>{% for documento in descuento.documentos_requeridos.all %}{{ documento }}, {% endfor %}</td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'descuento_update' descuento.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'descuento_delete' descuento.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay descuentos creados
+        </div>
+
+    {% endif %}
+        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'descuento_create' %}'">
+             <span class="glyphicon glyphicon-plus-sign"></span> Nuevo descuento</button>
+
+    </div>
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+{% endblock %}
+

@@ -1,0 +1,40 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+ <div class="col-sm-9 col-md-9">
+<h1>Aplicar Devolución</h1>
+
+<h3>¿Está seguro de aplicar esta devolución al usuario {{ saldo.beneficiario.primer_nombre }} {{ saldo.beneficiario.primer_apellido }}?</h3>
+ <h3>Valor Inicial Saldo $ {{ saldo.valor }}</h3>
+
+    <h3 class="alert-info"> Valor disponible en el saldo por el usuario $ {{ valor_disponible }}</h3>
+
+    <div class="row">
+         <ul class="list-group">
+             {% for r in reservas %}
+                 {% if r.valor > 0 %}
+                      <li class="list-group-item row">
+                        Reservado $ {{ r.valor }}
+                      </li>
+                 {% endif %}
+             {% endfor %}
+         </ul>
+    </div>
+
+    {% if form %}
+        <div class="col-sm-6">
+        <form action={% url 'devolucion' saldo.id %} method="post">
+            {{ form.as_ul }}
+            <input type="submit" class="btn btn-primary" value="Enviar" id="devolver">
+         {% csrf_token %}
+        </form>
+        </div>
+    {% endif %}
+
+    <script type="text/javascript">
+    $(document).on('click', '#devolver', function(){
+        return confirm('¿Está seguro de aplicar esta devolucion?');
+    })
+    </script>
+ </div>
+{% endblock %}

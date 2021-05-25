@@ -1,0 +1,65 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    {% if FULL_DATA.available %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administración de Cursos</h1>
+
+    {%  if curso_list %}
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Oferta Académica</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for curso in curso_list %}
+            <tr>
+                <td><a href="{{ curso.get_absolute_url }}">{{ curso.nombre}}</a></td>
+                <td>{{ curso.oferta_academica }}</td>
+                <td>
+                    <p>
+                        <a href="{% url 'curso_update' curso.id%}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'curso_delete' curso.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay cursos creados
+        </div>
+
+    {% endif %}
+
+    <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'curso_create' %}'">
+             <span class="glyphicon glyphicon-plus-sign"></span> Nuevo Curso</button>
+    </div>
+        {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+{% endblock %}
+

@@ -1,0 +1,14 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+
+<h1>Borrar Nivel</h1>
+
+<p>Are you sure to delete this level: {{ nivel }}?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="SI, Borrar.">
+</form>
+
+{% endblock %}

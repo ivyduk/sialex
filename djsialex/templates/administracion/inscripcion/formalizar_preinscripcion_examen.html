@@ -1,0 +1,283 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal" xmlns="http://www.w3.org/1999/html">
+        <div class="modal-dialog">
+        <div class="modal-content">
+    
+        </div>
+        </div>
+    </div>
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'buscar-preinscripciones' %}">Nueva búsqueda</a>
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administrar Preinscripcion </h1>
+
+
+    <div class="col-md-9">
+        <div class="well well-sm">
+            <h4>Datos Preinscripción {{ preinscripcionexamen.examen.nombre }}</h4>
+        </div>
+        <div class="row">
+          <div class="column">
+             <h3>Estado Preinscripción: <span class="label label-info"> {{ preinscripcionexamen.get_estado_preinscripcion_display}}</span></h3>
+          </div>
+          <div class="column"><h3>Estado Calificación:
+              {% if nivel_asignado %}
+                  <span class="label label-primary"> Calificado: {{ nivel_asignado }} </span>
+              {% else %}
+                <span class="label label-primary"> No definida </span>
+              {% endif %}</h3></div>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                        <thead>
+                            <tr>
+                              <th colspan="2">Persona</th>
+                              <th colspan="2">Examen</th>
+                            </tr>
+                          </thead>
+                        <tbody>
+                            <tr>
+                                <td># Documento :</td>
+                                <td class="table-info">{{ preinscripcionexamen.persona.numero_documento}}</td>
+                                <td>Idioma</td>
+                                <td>{{ preinscripcionexamen.examen.idioma.nombre}}</td>
+                            </tr>
+                            <tr>
+                                <td>Nombres: </td>
+                                <td>{{ preinscripcionexamen.persona.primer_nombre}} {{ preinscripcionexamen.persona.segundo_nombre}}</td>
+                                <td>Nombre Examen</td>
+                                <td>{{ preinscripcionexamen.examen.nombre }}</td>
+                            </tr>
+                            <tr>
+                                <td>Apellidos</td>
+                                <td>{{ preinscripcionexamen.persona.primer_apellido}} {{ preinscripcionexamen.persona.segundo_apellido}}</td>
+                                <td>Lugar: </td>
+                                <td>{{ preinscripcionexamen.examen.lugar_aplicacion }}</td>
+                            </tr>
+                            <tr>
+                                <td>Fecha De Preinscripción: </td>
+                                <td>{{ preinscripcionexamen.fecha_preinscripcion }}</td>
+                                <td>Fecha presentación: </td>
+                                <td>{{ preinscripcionexamen.examen.fecha_hora }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+        </div>
+        <h2>Documentos Requeridos</h2>
+        <div class="row">
+         <ul class="list-group">
+              <li class="list-group-item row">
+                  <div class="col-md-4">
+                      <h4 class="list-group-item-heading">Documento de identidad</h4>
+                      {% if preinscripcionexamen.persona.documento_identificacion_entregado%}
+                      <p class="list-group-item-text alert-success">Entregado</p>
+                      {% else %}
+                          <p class="list-group-item-text alert-danger">Pendiente</p>
+                      {% endif %}
+                  </div>
+              </li>
+                {% if reservas %}
+                    {% for reserva in reservas %}
+                        <li class="list-group-item row">
+                              <div class="col-md-4"><h3><b>Reserva Saldo: </b>{{ reserva.valor }}</h3></div>
+                              <div class="col-md-4"><h3><b>Estado: </b> {% if reserva.pagado %}<span>Aplicado</span>{% else %}<span>Sin aplicar</span>{% endif %}</h3></div>
+                              <div class="col-md-4">{% if not reserva.pagado %}<a href="{% url 'saldo_aplicar' reserva.id %}" class="btn btn-primary">Aplicar Saldo</a>{% endif %}</div>
+                    </li>
+                    {% endfor %}
+                {% endif %}
+                {% if comprobantes_banco %}
+                    {% for comprobante in comprobantes_banco %}
+                            <li class="list-group-item list-group-flush row">
+                              <div class="col-md-3"><h3><b>Tipo: </b>{{ comprobante.get_tipo_comprobante_display }}</h3></div>
+                              <div class="col-md-3"><h3><b>Número recibo: </b> <span>{{ comprobante.numero_recibo }}</span></h3></div>
+                              <div class="col-md-3"><h3><b>Valor: $</b> <span>{{ comprobante.valor }}</span></h3></div>
+                              <div class="col-md-3">
+                                {% if comprobante.estado_pago == 1 %}
+                                    <button class="comprobante_pago_update btn btn-primary btn-xs" data-id="{% url 'comprobante_pago_update' comprobante.id preinscripcionexamen.id %}">
+                                        <span class="glyphicon glyphicon-pencil">
+                                        </span>
+                                    </button>
+                                {% endif %}
+                                </div>
+                            </li>                            
+                        {% endfor %}
+                {% endif %}
+                <li class="list-group-item row">
+                        <div class="col-md-4">
+                            {% if pendiente > 0 %}
+                                <button type="button" class="btn btn-primary js-create-pago">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Agregar Pago
+                                </button>
+                            {% endif %}
+                    </div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"></div>
+                </li>
+                
+          </ul>
+        </div>
+        <div class="row">
+                <div class="column">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="text-center"><strong>Resumen de Costos</strong></h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-condensed" id="resumen">
+                                    <thead>
+                                    <tr>
+                                        <td><strong>Concepto</strong></td>
+                                        <td class="text-center"><strong></strong></td>
+                                        <td class="text-right"><strong>Valor</strong></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Tarifa Examen</td>
+                                        <td class="text-center"><h3><strong>+</strong></h3></td>
+                                        <td class="text-right">{{ tarifa_plena }}</td>
+                                    </tr>
+                                    {% if reservas %}
+                                        {% for reserva in reservas %}
+                                            <tr>
+                                                <td>Saldo de {{ reserva.saldo.periodo_generado }}</td>
+                                                <td class="text-center"><h3><strong>-</strong></h3></td>
+                                                <td class="text-right">{{ reserva.valor }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <tr>
+                                        <td class="emptyrow"></td>
+                                        <td class="emptyrow text-center"><strong>Total</strong></td>
+                                        <td class="emptyrow text-right"><h3>$ <span class="label label-success">{{ preinscripcionexamen.valor_preinscripcion }}</span></h3></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                     <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="text-center"><strong>Resumen de Pagos</strong></h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-condensed" id="pagos">
+                                    <thead>
+                                    <tr>
+                                        <td><strong>Tipo</strong></td>
+                                        <td class="text-right" colspan="2"><strong>Valor</strong></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if pagos %}
+                                        {% for pago in pagos %}
+                                        <tr>
+                                            <td>{{ pago.tipo }}</td>
+                                            <td class="text-right" colspan="2">$ {{ pago.financiero.valor }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                        <tr>
+                                            <td class="emptyrow text-center"><strong>Pendiente</strong></td>
+                                            <td class="emptyrow text-right" colspan="2"><h3>$ <span class="label label-danger">{{ pendiente }}</span></h3></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+        </div>
+    </div>
+
+        <div class="col-md-3">
+            <div class="well">
+                <h3>Acciones</h3>
+                <ul class="list-group">
+                    {% if preinscripcionexamen.estado_preinscripcion == 5 %}
+                    <li class="list-group-item l"><a href="{% url 'preinscripcion_delete' preinscripcionexamen.id %}" class="btn btn-danger btn-cancelar">Cancelar Pre-inscripcion</a></li>
+                    {% endif %}
+                    <form action = "{% url 'formalizar-examen' preinscripcionexamen.id %}" method = "post">
+                        <li class="list-group-item l"><input type="submit" class="btn btn-success btn-cancelar" id="formalizar" value="Formalizar"></li>
+                    <form>
+                    {% if not nivel_asignado %}
+                        {% if preinscripcionexamen.estado_preinscripcion == 1 or preinscripcionexamen.estado_preinscripcion == 3 %}
+                            <li class="list-group-item l"><a href="{% url 'aplazar-examen' preinscripcionexamen.id %}" class="btn btn-warning">Aplazar</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </div>
+            {% if sobrante > 0 %}
+            <div>
+                <h3>Sobrante:</h3>
+                <h3>$<span class="label label-warning">{{ sobrante }}</span></h3>
+                {% if not saldo_flag %}
+                    <a href="{% url 'aplicar-saldo' recibo.id %}" class="btn btn-warning btn-saldo">Aplicar Saldo a favor</a>
+                {% else %}
+                    <h3><span class="label label-info">Saldo Cargado al Usuario</span></h3>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+<style>
+l {
+  display: inline-block;
+  padding: 5px;
+}
+.column {
+  float: left;
+  width: 50%;
+}
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.btn-cancelar{
+    white-space: normal;
+}
+
+</style>
+    <script type="text/javascript">
+    $(function () {
+
+        $(".js-create-pago").click(function () {
+        $.ajax({
+            url: "{% url 'comprobante_pago_create' preinscripcionexamen.id %}",
+            type: 'get',
+            dataType: 'json',
+            beforeSend: function () {
+            $("#modal").modal("show");
+            },
+            success: function (data) {
+            $("#modal .modal-content").html(data.html_form);
+            }
+        });
+        });
+
+        });
+    $(document).on('click', '#formalizar', function(){
+        return confirm('¿Está seguro de hacer esta formalización?');
+    })
+    $(document).ready(function() {
+        $(".documento-descuento-requerido_update").each(function () {
+            $(this).modalForm({formURL: $(this).data('id')});
+        });
+    });
+    $(document).ready(function() {
+        $(".comprobante_pago_update").each(function () {
+            $(this).modalForm({formURL: $(this).data('id')});
+        });
+        
+    });
+    </script>
+{% endblock %}

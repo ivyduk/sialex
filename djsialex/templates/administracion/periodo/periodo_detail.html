@@ -1,0 +1,39 @@
+{% extends "administracion/home.html" %}
+
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración » <a href="{% url 'periodos' %}">Periodo</a>
+{% endblock %}
+
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Periodo {{ periodo.alias }}</h1>
+
+    <div class="col-md-9">
+         <ul class="list-group">
+        <li class="list-group-item">Alias: {{ periodo.alias }}</li>
+        <li class="list-group-item">Periodicidad: {{ periodo.periodicidad }}</li>
+        <li class="list-group-item">Año: {{ periodo.anio }}</li>
+        <li class="list-group-item">Secuencia: {{ periodo.secuencia }}</li>
+        {% if periodo.periodo_anterior %}
+             <li class="list-group-item">Periodo anterior:
+
+         <a href="{% url 'periodo-detail' periodo.periodo_anterior.id %}">{{ periodo.periodo_anterior }}</a></p>
+
+        </li>
+             {% endif %}
+
+    </ul>
+    </div>
+
+   <div class="col-md-3">
+       <div class="well">
+           <h3>Acciones</h3>
+           <a href="{% url 'periodo_update' periodo.id %}" class="btn btn-default">Editar</a>
+           <a href="{% url 'periodo_delete' periodo.id %}" class="btn btn-default">Borrar</a>
+       </div>
+   </div>
+    </div>
+
+{% endblock %}

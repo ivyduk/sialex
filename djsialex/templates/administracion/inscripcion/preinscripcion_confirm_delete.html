@@ -1,0 +1,18 @@
+{% extends "administracion/home.html" %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Oferta Académica » <a href="{% url 'mis-preinscripciones' %}">Inscripciones</a> >> Cancelar
+{% endblock %}
+
+{% block content %}
+
+<h1>Cancelar Preinscripción</h1>
+
+<h3>¿Está Seguro de cancelar esta preincripción: {{ preinscripcionhorariocurso.horario_cupo.nombre }}?</h3>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-danger" value="SI, Cancelar.">
+</form>
+
+{% endblock %}

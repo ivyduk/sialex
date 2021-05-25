@@ -1,0 +1,134 @@
+{% extends 'administracion/home.html' %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración » <a href="">Becas</a>
+{% endblock %}
+
+{% block content %}
+    {% if FULL_DATA.available %}
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'beca-opciones' %}">Volver a menú de becas</a>
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Estudiantes becados</h1>
+
+    <div id="toolbar" class="list-toolbar">
+        <form id="searchform" action="{% url 'becados' %}" method="get" accept-charset="utf-8">
+
+            <div class="input-group">
+                <input type="text" class="form-control" name="q" placeholder="Search" id="txtSearch"/>
+            <div class="input-group-btn">
+            <button class="btn btn-primary" type="submit">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+        </div>
+      </div>
+        </form>
+        <span class="list-resultados">Mostrando {{ object_list|length }} resultados de {{ total }}</span>
+    </div>
+
+    {%  if object_list %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Tipo Documento</th>
+                <th scope="col">Número Documento</th>
+                <th scope="col">Estudiante</th>
+                <th scope="col">Periodo generación</th>
+                <th scope="col">Tipo Beca</th>
+                <th scope="col">Niveles</th>
+                <th scope="col">Fecha-Hora Asignación</th>
+                <th scope="col">Asignada por</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for beca in object_list %}
+            <tr>
+                <td>{{ beca.beneficiario.tipo_documento }}</td>
+                <td>{{ beca.beneficiario.numero_documento }}</td>
+                <td>{{ beca.beneficiario.getNombreCompleto|upper }}</td>
+                <td>{{ beca.periodo_generado.alias }}</td>
+                <td>{{ beca.tipo_beca.nombre }}</td>
+                <td>{% for nivel in beca.nivel_idioma.all %}
+                    {{ nivel.idioma.nombre }} - {{ nivel.nombre }}<br>
+                    {% endfor %}
+                </td>
+                <td>{{ beca.fecha_asignacion|date:"d-m-Y h:m:s" }}</td>
+                <td>{{ beca.asignada_por.getDocNombre }}</td>
+                <td>{{ beca.get_estado_beca_display }}</td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'beca-update' beca.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'beca-delete' beca.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+     <div class="text-center">
+    <ul class="pagination">
+    {% if object_list.has_previous %}
+            <li class="waves-effect"><a href="?page=
+                    {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">&laquo;</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
+        {% endif %}
+        {% for num in object_list.paginator.page_range %}
+            {% if object_list.number == num %}
+                <li class="active"><a href="#!">{{ num }}</a></li>
+            {% else %}
+                <li class="waves-effect"><a
+                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if object_list.has_next %}
+            <li class="waves-effect"><a
+                    href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">&raquo;</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
+        {% endif %}
+  </ul>
+    </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay becados
+        </div>
+
+    {% endif %}
+
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+
+    </div>
+    </div>
+
+
+{% endblock %}
+

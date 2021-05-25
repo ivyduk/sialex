@@ -1,0 +1,28 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Franja: {{ franja.nombre }}</h1>
+
+    <div class="row">
+        <div class="col-md-9">
+        <ul class="list-group">
+            <li class="list-group-item">Nombre: {{ franja.nombre }}</li>
+            <li class="list-group-item">Dia: {{ franja.get_dia_display }}</li>
+            <li class="list-group-item">Hora Inicio: {{ franja.hora_inicio }}</li>
+            <li class="list-group-item">Hora Final: {{ franja.hora_final }}</li>
+        </ul>
+        </div>
+
+        <div class="col-md-3">
+            <div class="well">
+                <h3>Acciones</h3>
+                <a href="{% url 'franja_update' franja.id %}" class="btn btn-default">Editar</a>
+                <a href="{% url 'franja_delete' franja.id %}" class="btn btn-default">Borrar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-9 col-md-9">
+
+{% endblock %}
+

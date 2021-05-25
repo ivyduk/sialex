@@ -1,0 +1,10 @@
+{% extends 'administracion/encuesta/base.html' %}
+{% load i18n %}
+
+{% block title %} {% trans "Encuesta completada" %}{% endblock title %}
+
+{% block body %}
+<h1>{% trans "Encuesta completada" %}</h1>
+<p> {% trans "Disculpe, usted ya ha respondido esta encuesta previamente" %} "{{ survey.name }}". </p>
+<p> <a href="{% url "survey-list" %}">{% trans "Volver a lista de encuestas" %}</a> </p>
+{% endblock %}

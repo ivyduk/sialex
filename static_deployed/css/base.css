@@ -1,0 +1,234 @@
+.page-content{
+    margin: 20px 0px;
+}
+
+.card{
+    border-radius: 3px;
+    background: #f3f3f3;
+    padding: 20px 50px;
+    margin: 0px 3px;
+
+}
+
+.small-margin {
+    margin-bottom: 5px !important;
+}
+
+.table-head {
+    background: #7bcac9;
+}
+
+.table-border {
+    border: 1px solid #CCCCCC;
+    border-radius: 10px;
+    box-shadow: 0 1px 1px #CCCCCC;
+}
+
+.title-project {
+    color: #0C536B;
+}
+
+.jumbotron h1 {
+    font-size: 40px;
+}
+
+.panel-default > .panel-heading {
+    background-color: #7bcac9 !important;
+    background-image: none;
+}
+
+.icon-panel {
+    color:#131136
+}
+
+.wrap-login {
+
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+    padding: 50px 40px 20px 40px;
+}
+
+.wrap-edit-profile {
+
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+    padding: 10px 10px 10px 10px;
+}
+
+.input-login {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #666666;
+
+  display: block;
+  width: 100%;
+  background: #e6e6e6;
+  height: 50px;
+  border-radius: 25px;
+  padding: 0 30px 0 68px;
+}
+
+
+.wrap-input100 {
+  width: 100%;
+  position: relative;
+  border-bottom: 2px solid #d9d9d9;
+}
+
+.label-input100 {
+  font-size: 16px;
+  color: #131136;
+  line-height: 1.5;
+  padding-left: 7px;
+}
+
+.input100 {
+  font-size: 16px;
+  color: #333333;
+  line-height: 1.2;
+
+  display: block;
+  width: 100%;
+  height: 55px;
+  background: transparent;
+  padding: 0 7px 0 43px;
+}
+
+.focus-input100 {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.wrap-login100 {
+  width: 500px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.m-b-23 {
+    margin-bottom: 15px;
+}
+
+
+/* enable absolute positioning */
+.inner-addon {
+    position: relative;
+}
+
+/* style icon */
+.inner-addon .glyphicon {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+/* align icon */
+.left-addon .glyphicon  { left:  0px;}
+.right-addon .glyphicon { right: 0px;}
+
+/* add padding  */
+.left-addon input  { padding-left:  30px; }
+.right-addon input { padding-right: 30px; }
+
+.container-login100-form-btn {
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.login100-form-btn {
+  font-size: 16px;
+  color: #fff;
+  line-height: 1.2;
+  text-transform: uppercase;
+    background-color: #52B883;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  width: 100%;
+  height: 50px;
+}
+
+.btn-primary-login {
+  font-size: 16px;
+    background-color: #039B9A;
+    color: #ffffff;
+  letter-spacing: 1px;
+  line-height: 15px;
+  border: 2px solid #039B9A;
+  border-radius: 40px;
+
+  transition: all 0.3s ease 0s;
+  height: 40px;
+    padding-left: 3em;
+    padding-right: 3em;
+
+
+}
+
+.btn-primary-login:hover {
+  color: #FFF;
+  background: #0C536B;
+  border: 2px solid #0c536b;
+}
+
+.p-t-8 {padding-top: 8px;}
+.p-b-31 {padding-bottom: 31px;}
+
+.login100-form-title {
+  display: block;
+  font-size: 39px;
+  color: #333333;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.error-login{
+  color: #83AA59;
+}
+
+.error-form{
+  color: #ff0000;
+}
+
+.pd-10{
+  padding: 10px;
+}
+
+/*PREINSCRIPCION*/
+
+.wrap-preinscripcion{
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 50px 40px 20px 40px;
+}
+
+.stepByStep{
+    display: none;
+}
+
+.input-group {
+    width: 100%;
+}
+.row.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.btn-cancelar{
+    white-space: normal;
+}

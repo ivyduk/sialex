@@ -1,0 +1,66 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administración de Escalas de Notas</h1>
+
+    {%  if escalanota_list %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Nota mínima</th>
+                <th scope="col">Nota máxima</th>
+                <th scope="col">Nota aprobatoria</th>
+                <th scope="col">Número decimales</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for escala_nota in escalanota_list %}
+            <tr>
+                <td><a href="{{ escala_nota.get_absolute_url }}">{{ escala_nota.nombre}}</a></td>
+                <td>{{ escala_nota.nota_minima}}</td>
+                <td>{{ escala_nota.nota_maxima }}</td>
+                <td>{{ escala_nota.nota_aprobatoria }}</td>
+                <td>{{ escala_nota.numero_decimales }}</td>
+                <td>
+                    <p>
+                        <a href="{% url 'escala-nota_update' escala_nota.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'escala-nota_delete' escala_nota.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay escalas de notas creadas
+        </div>
+
+    {% endif %}
+        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'escala-nota_create' %}'">
+             <span class="glyphicon glyphicon-plus-sign"></span> Nuevo Escala</button>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,113 @@
+{% extends 'administracion/home.html' %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración » <a href="{% url 'examen-clasificacion-opciones' %}">Exámenes</a>
+{% endblock %}
+
+{% block content %}
+    {% if FULL_DATA.available %}
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'examen-clasificacion-opciones' %}">Volver a menú de Exámenes de Clasificación</a>
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Calificaciones examen de clasificación</h1>
+        <div class="alert alert-info"><h4>Recuerde que las siguientes personas deben ser autorizadas para su posterior preinscripción al curso correspondiente.
+            Para ello, debe descargar el archivo CSV, retirar todas las columnas excepto Tipo de Documento y Documento y finalmente cargarlo
+            a través del servicio de <b><a href="{% url 'autorizado_opciones' %}">Autorizar a cursos en lote</a></b></h4></div>
+
+    <div id="toolbar" class="list-toolbar">
+        <form id="searchform" action="{% url 'calificacion-examen-list' %}" method="get" accept-charset="utf-8">
+
+            <div class="input-group">
+                <input type="text" class="form-control" name="q" placeholder="Search" id="txtSearch"/>
+            <div class="input-group-btn">
+            <button class="btn btn-primary" type="submit">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+        </div>
+      </div>
+        </form>
+        <span class="list-resultados">Mostrando {{ object_list|length }} resultados de {{ total }}</span>
+    </div>
+
+    {%  if object_list %}
+     <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Tipo Documento</th>
+                <th scope="col">Documento</th>
+                <th scope="col">Nombre completo</th>
+                <th scope="col">Periodo examen</th>
+                <th scope="col">Idioma</th>
+                <th scope="col">Resultado</th>
+                <th scope="col">Examen</th>
+                <th scope="col">Fecha examen</th>
+                <th scope="col">Docente evaluador</th>
+                <th scope="col">Fecha Evaluación</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for calificacion in object_list %}
+            <tr>
+                <td>{{ calificacion.preinscripcion_examen.persona.tipo_documento }}</td>
+                <td>{{ calificacion.preinscripcion_examen.persona.numero_documento }}</td>
+                <td>{{ calificacion.preinscripcion_examen.persona.getNombreCompleto }}</td>
+                <td>{{ calificacion.preinscripcion_examen.examen.periodo.alias }}</td>
+                <td>{{ calificacion.preinscripcion_examen.examen.idioma.nombre }}</td>
+                <td>{% if calificacion.nivel %}{{ calificacion.nivel.nombre }}{% else %}Sin Calificación{% endif %}</td>
+                <td>{{ calificacion.preinscripcion_examen.examen.nombre }}</td>
+                <td>{{ calificacion.preinscripcion_examen.examen.fecha_hora|date:"d/m/Y - h:m" }}</td>
+                <td>{{ calificacion.docente_evaluador.persona.getNombreCompleto }}</td>
+                <td>{{ calificacion.fecha_hora_calificacion|date:"d/m/Y - h:m" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+     <div class="text-center">
+    <ul class="pagination">
+    {% if object_list.has_previous %}
+            <li class="waves-effect"><a href="?page=
+                    {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">&laquo;</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
+        {% endif %}
+        {% for num in object_list.paginator.page_range %}
+            {% if object_list.number == num %}
+                <li class="active"><a href="#!">{{ num }}</a></li>
+            {% else %}
+                <li class="waves-effect"><a
+                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if object_list.has_next %}
+            <li class="waves-effect"><a
+                    href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">&raquo;</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
+        {% endif %}
+  </ul>
+    </div>
+        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'calificacion-examen-csv' %}'">
+             <span class="glyphicon glyphicon-download"></span> Descargar CSV </button>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay personas inscritas a exámenes de clasificación para este periodo
+        </div>
+
+    {% endif %}
+
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+
+    </div>
+
+
+{% endblock %}
+

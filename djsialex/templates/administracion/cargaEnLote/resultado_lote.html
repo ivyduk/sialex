@@ -1,0 +1,58 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración » <a href="{% url 'autorizado_opciones' %}">Autorizados</a>
+{% endblock %}
+
+{% block administration-title %}
+    <h2 class="title-project">Administrar autorizados en lote</h2>
+{% endblock %}
+{% block form %}
+<div class="row card">
+    <div class="col-md-6 text-center">
+
+        {% if tipo == 'curso' %}
+            <a href="{% url 'autorizados' %}">
+                <button class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span>
+                    Ver autorizados
+                </button>
+            </a>
+        {% elif tipo == 'examen' %}
+            <a href="{% url 'autorizados-examen' %}">
+                <button class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span>
+                    Ver autorizados
+                </button>
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="col-md-6 text-center">
+        <button class="btn btn-primary" ONCLICK="descargarCSV()"><span class="glyphicon glyphicon-download"></span>
+            Descargar log de subida</button>
+
+    </div>
+</div>
+
+    <script>
+        function descargarCSV() {
+            var diccionario = {{ resultado|safe }};
+        var csvRows = [];
+
+        Object.keys(diccionario).forEach(function(key) {
+            var line = key + ';' + diccionario[key].join(';');
+            csvRows.push(line);
+        });
+
+        var csvString = csvRows.join("%0A");
+        var a         = document.createElement('a');
+        a.href        = 'data:attachment/csv,' + csvString;
+        a.target      = '_blank';
+        a.download    = 'resultado_log.csv';
+
+        document.body.appendChild(a);
+        a.click();
+        }
+
+    </script>
+{% endblock %}

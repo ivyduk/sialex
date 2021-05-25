@@ -1,0 +1,18 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+
+<h1 class="title-project">Borrar Idioma</h1>
+
+    <div class="card" style="width: 18rem;">
+
+        <p>¿Está seguro de borrar el idioma: {{ idioma }}?</p>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="SI, Borrar.">
+        </form>
+
+    </div>
+    </div>
+{% endblock %}

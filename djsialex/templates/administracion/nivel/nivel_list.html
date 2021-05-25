@@ -1,0 +1,80 @@
+{% extends 'administracion/home.html' %}
+
+{% block content %}
+    <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Administración de Niveles</h1>
+
+    {%  if nivel_list %}
+     <div class="table-responsive">
+        <table class="table table-condensed table-striped table-border">
+            <thead class="table-head">
+            <tr>
+              <th scope="col">Alias</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Idioma</th>
+                <th scope="col">Orden</th>
+                <th scope="col">Nivel predecesor</th>
+                <th scope="col">Contenido</th>
+                <th scope="col">Intensidad Horaria</th>
+                <th scope="col">Fallas máximas</th>
+                <th scope="col">Activo</th>
+                <th scope="col">Editar</th>
+                <th scope="col">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for nivel in nivel_list %}
+            <tr>
+                <td><a href="{{ nivel.get_absolute_url }}">{{ nivel.alias}}</a></td>
+                <td>{{ nivel.nombre }}</td>
+                <td>{{ nivel.idioma.nombre }}</td>
+                <td>{{ nivel.orden }}</td>
+                <td><a href="{{ nivel.predecesor.get_absolute_url }}">{{ nivel.predecesor.alias }}</a></td>
+                <td><a href="{{ nivel.contenido.get_absolute_url }}">{{ nivel.contenido.alias }}</a></td>
+                <td>{{ nivel.intensidad_horaria }}</td>
+                <td>{{ nivel.fallas_maximas }}</td>
+                <td>
+                    {% if nivel.activo%} Sí
+                    {% else %} No
+                    {% endif %}
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'nivel_update' nivel.id %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+                <td>
+                    <p>
+                        <a href="{% url 'nivel_delete' nivel.id %}">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </p>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No hay niveles creados
+        </div>
+
+    {% endif %}
+
+        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'nivel_create' %}'">
+            <span class="glyphicon glyphicon-plus-sign"></span> Nuevo Nivel</button>
+    </div>
+{% endblock %}
+
