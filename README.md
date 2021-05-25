@@ -1,3 +1,5 @@
+rebase
+
 Manual de despligue entorno de desarrollo.
 
 1. Instalar Python 3.6 > 
