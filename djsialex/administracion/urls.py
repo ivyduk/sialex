@@ -277,6 +277,7 @@ urlpatterns = [
 	url(r'^administracion/grupos/matriculas-list/(?P<grupoacademico>[-\w]+)', matriculaPorGrupoAcademicoList, name='grupo-detail'),
 	url(r'^administracion/grupos/estudiantes/(?P<grupoacademico>[-\w]+)', descargarListaPorGrupo, name='estudiantes-grupo-csv'),
 	url(r'^administracion/grupos/docente-salon/(?P<grupoacademico>[-\w]+)', asignarDocenteSalonAGrupo, name='docente-salon'),
+	url(r'^administracion/grupos/docente-salon-correo/(?P<grupoacademico>[-\w]+)', informacionDocenteSalonAGrupo, name='docente-salon-correo'),
 	url(r'^administracion/grupos/eliminar-docente-grupo/(?P<grupoacademico>[-\w]+)/(?P<docente>[-\w]+)', eliminarDocenteDeGrupo, name='eliminar-docente-grupo'),
 	url(r'^administracion/grupos/eliminar-salon-grupo/(?P<grupoacademico>[-\w]+)/(?P<salon>[-\w]+)', eliminarSalonDeGrupo, name='eliminar-salon-grupo'),
 	url(r'^administracion/grupos/aplazar-grupo/(?P<grupoacademico>[-\w]+)', aplazarCursoLoteView, name='aplazar-grupo'),

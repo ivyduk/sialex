@@ -121,7 +121,7 @@ DATABASES = {
         'USER': 'sialex',
         'PASSWORD': 'sialex',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
     }
 }
 """

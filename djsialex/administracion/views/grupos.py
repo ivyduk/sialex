@@ -333,6 +333,30 @@ def descargarListaPorGrupo(request, grupoacademico):
     csv_writer = CSVWriter()
     response = csv_writer.download_csv_file(data, header, str(grupo_academico.codigo))
     return response
+@login_required
+def informacionDocenteSalonAGrupo(request, grupoacademico):
+
+    tipo_general = TipoDocente.objects.get(tipo='General')
+    tipo_especializado = TipoDocente.objects.get(tipo='Especializado')
+    context = {}
+    try:
+        grupo_academico = GrupoAcademico.objects.get(pk=grupoacademico)
+    except GrupoAcademico.DoesNotExist:
+        grupo_academico = None
+
+    if request.method == 'GET':
+        docentes_generales_actual = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico, tipo_docente=tipo_general).all().order_by('docente__persona__primer_apellido', 'docente__persona__primer_nombre')
+        docentes_especializados_actual = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico, tipo_docente=tipo_especializado).all().order_by('docente__persona__numero_documento', 'docente__persona__primer_nombre')
+        form = AsignarSalonDocenteAGrupoForm(grupo_academico.id)
+
+        salones = grupo_academico.salones.all()
+        observaciones = grupo_academico.observaciones
+        context = {'docentes_generales_actual': docentes_generales_actual, 'docentes_especializados_actual': docentes_especializados_actual,
+                   'salones_asignados': salones, 'grupo': grupo_academico, 'observaciones': observaciones, 'form': form}
+
+
+    return render(request, 'administracion/grupos/correoGrupo.html', context)
+
 
 @login_required
 def asignarDocenteSalonAGrupo(request, grupoacademico):

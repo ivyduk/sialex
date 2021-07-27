@@ -6,144 +6,152 @@
         <a href="{% url 'seleccion_oferta' %}">Volver a grupos</a>
 
     <div class="col-sm-9 col-md-9">
-    <h1 class="title-project">Administración de Grupos</h1>
+        <h1 class="title-project">Administración de Grupos</h1>
 
-    <div class="well">
-        <div class="row">
-            <div class="col-sm-6">
-                <h3 class="title-project">Grupo:</h3> {{ grupo.nombre }}
-                <h3 class="title-project">Código:</h3> {{ grupo.codigo }}
-                <h3 class="title-project">Idioma:</h3> {{ grupo.horarioCurso.curso.nivel.idioma.nombre }}
-                <h3 class="title-project">Nivel:</h3> {{ grupo.horarioCurso.curso.nivel.nombre }}
-            </div>
-            <div class="col-sm-6">
-                <h3 class="title-project">Horario:</h3> {{ grupo.horarioCurso.horario.nombre }}
+        <div class="well">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="title-project">Grupo:</h3> {{ grupo.nombre }}
+                    <h3 class="title-project">Código:</h3> {{ grupo.codigo }}
+                    <h3 class="title-project">Idioma:</h3> {{ grupo.horarioCurso.curso.nivel.idioma.nombre }}
+                    <h3 class="title-project">Nivel:</h3> {{ grupo.horarioCurso.curso.nivel.nombre }}
+                </div>
+                <div class="col-sm-6">
+                    <h3 class="title-project">Horario:</h3> {{ grupo.horarioCurso.horario.nombre }}
 
-            <h3 class="title-project">Docente(s):</h3>
-            {% for docente in docentes %}
-                {{ docente.docente.persona.getNombreCompleto }},
+                <h3 class="title-project">Docente(s):</h3>
+                {% for docente in docentes %}
+                    {{ docente.docente.persona.getNombreCompleto }},
 
-            {% endfor %}
+                {% endfor %}
 
-            <h3 class="title-project">Salón(es):</h3>
-            {% for salon in salones %}
-                Edificio: {{ salon.edificio.nombre }} - Salón: {{ salon.nombre }} <br>
-            {% endfor %}
-            <h3 class="title-project">Observaciones:</h3> {% if grupo.observaciones %} {{ grupo.observaciones }} {% endif %}
-            <h3 class="title-project">Contenido curso:</h3>
-            {% if grupo.contenido_nivel_version %}
-                <a class="iframe" target="_blank" href="{% url 'archivos-show' grupo.contenido_nivel_version.id %}">{{ grupo.contenido_nivel_version.alias }}</a>
-            {% else %}
-                No existe un contenido asociado a este curso
-            {% endif %}
+                <h3 class="title-project">Salón(es):</h3>
+                {% for salon in salones %}
+                    Edificio: {{ salon.edificio.nombre }} - Salón: {{ salon.nombre }} <br>
+                {% endfor %}
 
-            </div>
-        </div>
-
-    </div>
-
-    <div class="well">
-    <a href="{% url "docente-salon"  grupo.id %}">
-                <button class="btn btn-warning ">
-                    <span class="glyphicon glyphicon-th-list"> Asignar docentes y salones</span>
-                </button>
-            </a>
-    </div>
-
-    <div id="toolbar" class="list-toolbar">
-        <form id="searchform" action="{% url 'grupo-detail' grupo.id %}" method="get" accept-charset="utf-8">
-
-            <div class="input-group">
-                <input type="text" class="form-control" name="q" placeholder="Search" id="txtSearch"/>
-        <div class="input-group-btn">
-          <button class="btn btn-primary" type="submit">
-            <span class="glyphicon glyphicon-search"></span>
-          </button>
-        </div>
-      </div>
-        </form>
-        <span class="list-resultados">Mostrando {{ object_list|length }} resultados de {{ total }}</span>
-    </div>
-
-    {% if object_list %}
-        <div class="table-responsive">
-        <table class="table table-striped table-border">
-            <thead class="table-head">
-            <tr>
-                <th scope="col">Nº</th>
-                <th scope="col">Código grupo</th>
-                <th scope="col">Nombre estudiante</th>
-                <th scope="col">Periodo</th>
-                <th scope="col">Curso</th>
-                <th scope="col">Documento</th>
-                <th scope="col">Estado</th>
-                <th></th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for matricula in object_list %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ matricula.grupo.codigo }}</td>
-                <td>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </td>
-                <td>{{ matricula.grupo.horarioCurso.curso.oferta_academica.periodo.alias }}</td>
-                <td>{{ matricula.grupo.horarioCurso.nombre }}</td>
-                <td><a href="{% url 'persona-detail-update' matricula.estudiante.id %}">{{ matricula.estudiante.numero_documento }}</a></td>
-                <td>{{ matricula.estado_matricula|getEstadoMatricula }}</td>
-                <td>
-                    <a href="{% url 'calificaciones-detalle-pdf' matricula.id 1 %}">
-                        <button class="btn btn-primary btn-xs">
-                            <span class="glyphicon glyphicon-save-file">
-                            </span>
-                        </button>
+                <div>
+                    <h3 class="title-project">Observaciones:</h3> {% if grupo.observaciones %} {{ grupo.observaciones }} {% endif %}
+                    <div class="well">
+                        <a href="{% url "docente-salon-correo"  grupo.id %}">
+                            <button class="btn btn-danger">
+                                <span class="icon-envelope"></span> Enviar Correo Observaciones</span>
+                            </button>
                         </a>
-                    </p>
-                </td>
+                    </div>
+                </div>
 
-            </tr>
-            {% endfor %}
-        </table>
+                <h3 class="title-project">Contenido curso:</h3>
+                {% if grupo.contenido_nivel_version %}
+                    <a class="iframe" target="_blank" href="{% url 'archivos-show' grupo.contenido_nivel_version.id %}">{{ grupo.contenido_nivel_version.alias }}</a>
+                {% else %}
+                    No existe un contenido asociado a este curso
+                {% endif %}
+
+                </div>
+            </div>
         </div>
 
-        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'estudiantes-grupo-csv' grupo.id %}'">
-             <span class="glyphicon glyphicon-download"></span> Descargar CSV</button>
-
-    {% else %}
-        <div class="alert alert-warning" role="alert">
-            No se encontraron estudiantes para este grupo académico
+        <div class="well">
+        <a href="{% url "docente-salon"  grupo.id %}">
+                    <button class="btn btn-warning ">
+                        <span class="glyphicon glyphicon-th-list"> Asignar docentes y salones</span>
+                    </button>
+                </a>
         </div>
-    {% endif %}
 
-    <div class="text-center">
-    {% if object_list.has_other_pages %}
-    <ul class="pagination">
-        {% if object_list.has_previous %}
-            <li class="waves-effect"><a href="?page=
-                    {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
-                    class="material-icons">&laquo;</i></a></li>
+        <div id="toolbar" class="list-toolbar">
+            <form id="searchform" action="{% url 'grupo-detail' grupo.id %}" method="get" accept-charset="utf-8">
+
+                <div class="input-group">
+                    <input type="text" class="form-control" name="q" placeholder="Search" id="txtSearch"/>
+            <div class="input-group-btn">
+            <button class="btn btn-primary" type="submit">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+            </div>
+        </div>
+            </form>
+            <span class="list-resultados">Mostrando {{ object_list|length }} resultados de {{ total }}</span>
+        </div>
+
+        {% if object_list %}
+            <div class="table-responsive">
+            <table class="table table-striped table-border">
+                <thead class="table-head">
+                <tr>
+                    <th scope="col">Nº</th>
+                    <th scope="col">Código grupo</th>
+                    <th scope="col">Nombre estudiante</th>
+                    <th scope="col">Periodo</th>
+                    <th scope="col">Curso</th>
+                    <th scope="col">Documento</th>
+                    <th scope="col">Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for matricula in object_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ matricula.grupo.codigo }}</td>
+                    <td>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </td>
+                    <td>{{ matricula.grupo.horarioCurso.curso.oferta_academica.periodo.alias }}</td>
+                    <td>{{ matricula.grupo.horarioCurso.nombre }}</td>
+                    <td><a href="{% url 'persona-detail-update' matricula.estudiante.id %}">{{ matricula.estudiante.numero_documento }}</a></td>
+                    <td>{{ matricula.estado_matricula|getEstadoMatricula }}</td>
+                    <td>
+                        <a href="{% url 'calificaciones-detalle-pdf' matricula.id 1 %}">
+                            <button class="btn btn-primary btn-xs">
+                                <span class="glyphicon glyphicon-save-file">
+                                </span>
+                            </button>
+                            </a>
+                        </p>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </table>
+            </div>
+
+            <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'estudiantes-grupo-csv' grupo.id %}'">
+                <span class="glyphicon glyphicon-download"></span> Descargar CSV</button>
+
         {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
+            <div class="alert alert-warning" role="alert">
+                No se encontraron estudiantes para este grupo académico
+            </div>
         {% endif %}
-        {% for num in object_list.paginator.page_range %}
-            {% if object_list.number == num %}
-                <li class="active"><a href="#!">{{ num }}</a></li>
-            {% else %}
-                <li class="waves-effect"><a
-                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+
+        <div class="text-center">
+            {% if object_list.has_other_pages %}
+                <ul class="pagination">
+                    {% if object_list.has_previous %}
+                        <li class="waves-effect"><a href="?page=
+                                {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                                class="material-icons">&laquo;</i></a></li>
+                    {% else %}
+                        <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
+                    {% endif %}
+                    {% for num in object_list.paginator.page_range %}
+                        {% if object_list.number == num %}
+                            <li class="active"><a href="#!">{{ num }}</a></li>
+                        {% else %}
+                            <li class="waves-effect"><a
+                                    href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if object_list.has_next %}
+                        <li class="waves-effect"><a
+                                href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                                class="material-icons">&raquo;</i></a></li>
+                    {% else %}
+                        <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
+                    {% endif %}
+                </ul>
             {% endif %}
-        {% endfor %}
-        {% if object_list.has_next %}
-            <li class="waves-effect"><a
-                    href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
-                    class="material-icons">&raquo;</i></a></li>
-        {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
-        {% endif %}
-    </ul>
         </div>
-{% endif %}
-
-
     </div>
 
 {% endblock %}
