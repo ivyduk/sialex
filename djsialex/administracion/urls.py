@@ -1,3 +1,4 @@
+from django import urls
 from django.urls import path, include
 from django.conf.urls import url
 from django.urls import path
@@ -32,10 +33,19 @@ from administracion.views.preinscripciones.adminPreinscripciones import escogerO
 	liberarCuposCursoNivel1
 from .views import *
 
+from administracion.views.DatosEstudiantesView import DatosEstudiantesAPI
+
+from rest_framework.routers import DefaultRouter
+
+router=DefaultRouter()
+router.register('DatosEstudiantesModel',DatosEstudiantesAPI)
 
 urlpatterns = [
 	url(r'^$', HomePageView.as_view(), name='index'),
 	url(r'^i18n/', include('django.conf.urls.i18n')),
+
+	path('',include(router.urls)),
+
 	path('about/', AboutPageView.as_view(), name='about'),
 	path('administracion/', HomePageView.as_view(), name='home'),
 

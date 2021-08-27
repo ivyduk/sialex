@@ -26,6 +26,39 @@ from administracion.enums import *
 import logging
 LOGGER = logging.getLogger(__name__)
 
+class DatosEstudiantesModel(models.Model):
+    id                      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id_sub_proyecto_curso   = models.CharField(max_length=15)
+    tipo_documento          = models.IntegerField()
+    numero_documento        = models.CharField(max_length=100)
+    primer_nombre           = models.CharField(max_length=100)
+    segundo_nombre          = models.CharField(max_length=100)
+    primer_apellido         = models.CharField(max_length=100)
+    segundo_apellido        = models.CharField(max_length=100)
+    sexo_biologico          = models.IntegerField()
+    estado_civil            = models.CharField(max_length=3)
+    fecha_nacimiento        = models.DateField()
+    pais_nacimiento         = models.IntegerField()
+    departamento_nacimiento = models.IntegerField()
+    ciudad_nacimiento       = models.IntegerField()
+    nivel_formacion         = models.IntegerField()
+    egresado_un             = models.IntegerField()
+    vinculacion             = models.IntegerField()
+    telefono_fijo           = models.CharField(max_length=15)
+    ext                     = models.CharField(max_length=3)
+    celular                 = models.CharField(max_length=15)
+    email                   = models.CharField(max_length=254)
+    direccion_residencia    = models.CharField(max_length=1000)
+    pais_residencia         = models.IntegerField(),
+    departamento_residencia = models.IntegerField()
+    ciudad_residencia       = models.IntegerField()
+    descuento               = models.IntegerField()
+    valor_inscripcion       = models.FloatField(null=False)
+    fecha_pago              = models.DateField()
+    no_soporte_de_pago      = models.CharField(max_length=100)
+    tipo_pago               = models.IntegerField()
+
+
 class Pais(models.Model):
 
     id = models.AutoField(primary_key=True, editable=False)
@@ -527,11 +560,12 @@ class OfertaAcademica(models.Model):
 
 
 class Curso(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=150, editable=False, default="curso", unique=True)
+    id               = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nombre           = models.CharField(max_length=150, editable=False, default="curso", unique=True)
+    #codigo_proyecto  = models.CharField(max_length=15,  editable=True, default="codigo", unique=True) esta en horario curso
     oferta_academica = models.ForeignKey(OfertaAcademica, on_delete=models.PROTECT)
-    nivel = models.ForeignKey(Nivel, on_delete=models.PROTECT)
-    conjunto_notas = models.ForeignKey(ConjuntoNotas, on_delete=models.PROTECT)
+    nivel            = models.ForeignKey(Nivel, on_delete=models.PROTECT)
+    conjunto_notas   = models.ForeignKey(ConjuntoNotas, on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = "Curso"
@@ -599,8 +633,8 @@ class NotaParcial(models.Model):
 
 
 class TipoDocumentoIdentidad(models.Model):
-    id = models.AutoField(primary_key=True, editable=False)
-    nombre = models.CharField(max_length=100)
+    id       = models.AutoField(primary_key=True, editable=False)
+    nombre   = models.CharField(max_length=100)
 
     class Meta:
         verbose_name = "Tipo de documento"
@@ -810,6 +844,7 @@ class Salon(models.Model):
 class GrupoAcademico(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=500)
+    codigo_proyecto  = models.CharField(max_length=15, unique=True) #AGREGADO
     horarioCurso = models.ForeignKey(HorarioCurso, on_delete=models.PROTECT)
     salones = models.ManyToManyField(Salon)
     codigo = models.IntegerField(default=9001)

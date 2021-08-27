@@ -9,7 +9,7 @@
     <h1 class="title-project">Envio de correo a grupo
         <br>{{ grupo.nombre }} </h1>
 
-    {% block form %}
+
         <div class="col-sm-6">
             <h3 class="title-project">Salones asignados actualmente </h3>
             <ul class="list-group">
@@ -50,14 +50,15 @@
 
             </div>
             <div class="form-group">
-                    <button type="submit" class="btn btn-success pull-right">
-                        <span class="glyphicon glyphicon-ok-sign"></span> Enviar Correo
-                    </button>
-                </div>
-            </form>
+                <button type="submit" class="btn btn-success pull-right">
+                    <span class="glyphicon glyphicon-ok-sign"></span> Enviar Correo
+                </button>
+            </div>
+        </form>
         </div>
     {% endif %}
 
+    </div>
 
     {% if object_list %}
         <div class="table-responsive">
@@ -67,9 +68,8 @@
                 <th scope="col">Nº</th>
                 <th scope="col">Código grupo</th>
                 <th scope="col">Nombre estudiante</th>
-                <th scope="col">Periodo</th>
-                <th scope="col">Curso</th>
                 <th scope="col">Documento</th>
+                <th scope="col">Correo</th>
                 <th scope="col">Estado</th>
                 <th></th>
             </tr>
@@ -80,20 +80,17 @@
                 <td>{{ forloop.counter }}</td>
                 <td>{{ matricula.grupo.codigo }}</td>
                 <td>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </td>
-                <td>{{ matricula.grupo.horarioCurso.curso.oferta_academica.periodo.alias }}</td>
-                <td>{{ matricula.grupo.horarioCurso.nombre }}</td>
                 <td><a href="{% url 'persona-detail-update' matricula.estudiante.id %}">{{ matricula.estudiante.numero_documento }}</a></td>
-                <td>{{ matricula.estado_matricula|getEstadoMatricula }}</td>
+                <td>{{ matricula.email }}</td>
                 <td>
                     <a href="{% url 'calificaciones-detalle-pdf' matricula.id 1 %}">
                         <button class="btn btn-primary btn-xs">
                             <span class="glyphicon glyphicon-save-file">
                             </span>
                         </button>
-                        </a>
+                    </a>
                     </p>
                 </td>
-
             </tr>
             {% endfor %}
         </table>
@@ -108,38 +105,34 @@
         </div>
     {% endif %}
 
-    <div class="text-center">
     {% if object_list.has_other_pages %}
-    <ul class="pagination">
-        {% if object_list.has_previous %}
-            <li class="waves-effect"><a href="?page=
-                    {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
-                    class="material-icons">&laquo;</i></a></li>
-        {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
-        {% endif %}
-        {% for num in object_list.paginator.page_range %}
-            {% if object_list.number == num %}
-                <li class="active"><a href="#!">{{ num }}</a></li>
+        <div class="text-center">
+        <ul class="pagination">
+            {% if object_list.has_previous %}
+                <li class="waves-effect"><a href="?page=
+                        {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                        class="material-icons">&laquo;</i></a></li>
             {% else %}
-                <li class="waves-effect"><a
-                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+                <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
             {% endif %}
-        {% endfor %}
-        {% if object_list.has_next %}
-            <li class="waves-effect"><a
-                    href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
-                    class="material-icons">&raquo;</i></a></li>
-        {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
-        {% endif %}
-    </ul>
-    </div>
+            {% for num in object_list.paginator.page_range %}
+                {% if object_list.number == num %}
+                    <li class="active"><a href="#!">{{ num }}</a></li>
+                {% else %}
+                    <li class="waves-effect"><a
+                            href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if object_list.has_next %}
+                <li class="waves-effect"><a
+                        href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                        class="material-icons">&raquo;</i></a></li>
+            {% else %}
+                <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
+            {% endif %}
+        </ul>
+        </div>
     {% endif %}
-
-
-    {% endblock %}
-    </div>
 
 {% endblock %}
 
