@@ -1,0 +1,141 @@
+{% extends 'administracion/home.html' %}
+{% load widget_tweaks  profile_tags %}
+{% block content %}
+
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <a href="{% url 'grupo-detail' grupo.id %}">Volver a Grupo</a>
+    <div class="col-sm-9 col-md-9">
+
+    <h1 class="title-project">Envio de correo a grupo
+        <br>{{ grupo.nombre }} </h1>
+
+
+        <div class="col-sm-6">
+            <h3 class="title-project">Salones asignados actualmente </h3>
+            <ul class="list-group">
+                {% for salon in salones_asignados %}
+                    <li class="list-group-item">{{ salon.edificio.nombre }} : {{ salon.nombre }}
+                        <a href="{% url 'eliminar-salon-grupo' grupoacademico=grupo.id salon=salon.id %}">
+                        <button class="btn btn-danger btn-xs pull-right">
+                            <span class="glyphicon glyphicon-trash">
+                            </span>
+                        </button>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <h3 class="title-project">Observaciones (información para estudiantes): </h3>
+            {% if observaciones %}
+                {{ observaciones }}
+            {% endif %}
+        </div>
+        </div>
+
+    {% if form %}
+        <div class="row">
+        {% if form.errors %}
+            {% for message in form.errors %}
+                <div class="alert alert-warning alert-dismissible fade in" style="text-align: center">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong> {{ message }} </strong>
+                    </div>
+            {% endfor %}
+            {% endif %}
+        <form action="{% url 'docente-salon' grupo.id %}" method="post">
+            {% csrf_token %}
+                <div class="form-group">
+                    <h3 class="title-project">{{ form.observaciones.label }}</h3>
+                    {{ form.observaciones|add_class:"form-control" }}
+                </div>
+
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success pull-right">
+                    <span class="glyphicon glyphicon-ok-sign"></span> Enviar Correo
+                </button>
+            </div>
+        </form>
+        </div>
+    {% endif %}
+
+    </div>
+
+    {% if object_list %}
+        <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Nº</th>
+                <th scope="col">Código grupo</th>
+                <th scope="col">Nombre estudiante</th>
+                <th scope="col">Documento</th>
+                <th scope="col">Correo</th>
+                <th scope="col">Estado</th>
+                <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for matricula in object_list %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ matricula.grupo.codigo }}</td>
+                <td>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </td>
+                <td><a href="{% url 'persona-detail-update' matricula.estudiante.id %}">{{ matricula.estudiante.numero_documento }}</a></td>
+                <td>{{ matricula.email }}</td>
+                <td>
+                    <a href="{% url 'calificaciones-detalle-pdf' matricula.id 1 %}">
+                        <button class="btn btn-primary btn-xs">
+                            <span class="glyphicon glyphicon-save-file">
+                            </span>
+                        </button>
+                    </a>
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+
+        <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'estudiantes-grupo-csv' grupo.id %}'">
+             <span class="glyphicon glyphicon-download"></span> Descargar CSV</button>
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No se encontraron estudiantes para este grupo académico
+        </div>
+    {% endif %}
+
+    {% if object_list.has_other_pages %}
+        <div class="text-center">
+        <ul class="pagination">
+            {% if object_list.has_previous %}
+                <li class="waves-effect"><a href="?page=
+                        {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                        class="material-icons">&laquo;</i></a></li>
+            {% else %}
+                <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
+            {% endif %}
+            {% for num in object_list.paginator.page_range %}
+                {% if object_list.number == num %}
+                    <li class="active"><a href="#!">{{ num }}</a></li>
+                {% else %}
+                    <li class="waves-effect"><a
+                            href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if object_list.has_next %}
+                <li class="waves-effect"><a
+                        href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                        class="material-icons">&raquo;</i></a></li>
+            {% else %}
+                <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
+            {% endif %}
+        </ul>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+
+
+

@@ -121,7 +121,10 @@ DATABASES = {
         'USER': 'sialex',
         'PASSWORD': 'sialex',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
+        'OPTIONS':{
+            'init_command':"SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 """

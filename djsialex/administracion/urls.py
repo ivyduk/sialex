@@ -1,3 +1,4 @@
+from django import urls
 from django.urls import path, include
 from django.conf.urls import url
 from django.urls import path
@@ -32,10 +33,19 @@ from administracion.views.preinscripciones.adminPreinscripciones import escogerO
 	liberarCuposCursoNivel1
 from .views import *
 
+from administracion.views.DatosEstudiantesView import DatosEstudiantesAPI
+
+from rest_framework.routers import DefaultRouter
+
+router=DefaultRouter()
+router.register('DatosEstudiantesModel',DatosEstudiantesAPI)
 
 urlpatterns = [
 	url(r'^$', HomePageView.as_view(), name='index'),
 	url(r'^i18n/', include('django.conf.urls.i18n')),
+
+	path('',include(router.urls)),
+
 	path('about/', AboutPageView.as_view(), name='about'),
 	path('administracion/', HomePageView.as_view(), name='home'),
 
@@ -277,6 +287,7 @@ urlpatterns = [
 	url(r'^administracion/grupos/matriculas-list/(?P<grupoacademico>[-\w]+)', matriculaPorGrupoAcademicoList, name='grupo-detail'),
 	url(r'^administracion/grupos/estudiantes/(?P<grupoacademico>[-\w]+)', descargarListaPorGrupo, name='estudiantes-grupo-csv'),
 	url(r'^administracion/grupos/docente-salon/(?P<grupoacademico>[-\w]+)', asignarDocenteSalonAGrupo, name='docente-salon'),
+	url(r'^administracion/grupos/docente-salon-correo/(?P<grupoacademico>[-\w]+)', informacionDocenteSalonAGrupo, name='docente-salon-correo'),
 	url(r'^administracion/grupos/eliminar-docente-grupo/(?P<grupoacademico>[-\w]+)/(?P<docente>[-\w]+)', eliminarDocenteDeGrupo, name='eliminar-docente-grupo'),
 	url(r'^administracion/grupos/eliminar-salon-grupo/(?P<grupoacademico>[-\w]+)/(?P<salon>[-\w]+)', eliminarSalonDeGrupo, name='eliminar-salon-grupo'),
 	url(r'^administracion/grupos/aplazar-grupo/(?P<grupoacademico>[-\w]+)', aplazarCursoLoteView, name='aplazar-grupo'),

@@ -335,6 +335,69 @@ def descargarListaPorGrupo(request, grupoacademico):
     return response
 
 @login_required
+def informacionDocenteSalonAGrupo(request, grupoacademico):
+    campos = ['grupo__codigo',
+                'estudiante__numero_documento',
+                'estudiante__primer_nombre',
+                'estudiante__segundo_nombre',
+                'estudiante__primer_apellido',
+                'estudiante__segundo_apellido',
+                'grupo__horarioCurso__nombre',
+                'grupo__codigo'
+                ]
+                
+    try:
+        grupo_academico = GrupoAcademico.objects.get(pk=grupoacademico)
+    except GrupoAcademico.DoesNotExist:
+        grupo_academico = None
+
+    if grupo_academico:
+
+        docentes = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico).all()
+        salones = grupo_academico.salones.all()
+
+        busqueda_generica = BusquedaGenerica()
+        object_list = Matricula.objects.filter(grupo=grupo_academico).order_by('estudiante__primer_apellido')
+        query_string = request.GET.get('q')
+
+        if query_string and grupo_academico:
+            consulta = busqueda_generica.get_query(query_string, campos)
+            object_list = Matricula.objects.filter(consulta).order_by('estudiante__primer_apellido').filter(grupo=grupo_academico)
+
+        page = request.GET.get('page')
+        paginator = Paginator(object_list, 1000)
+
+        try:
+            matriculas = paginator.page(page)
+        except PageNotAnInteger:
+            matriculas = paginator.page(1)
+        except EmptyPage:
+            matriculas = paginator.page(paginator.num_pages)
+
+    tipo_general = TipoDocente.objects.get(tipo='General')
+    tipo_especializado = TipoDocente.objects.get(tipo='Especializado')
+    context = {}
+    try:
+        grupo_academico = GrupoAcademico.objects.get(pk=grupoacademico)
+    except GrupoAcademico.DoesNotExist:
+        grupo_academico = None
+
+    if request.method == 'GET':
+        docentes_generales_actual = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico, tipo_docente=tipo_general).all().order_by('docente__persona__primer_apellido', 'docente__persona__primer_nombre')
+        docentes_especializados_actual = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico, tipo_docente=tipo_especializado).all().order_by('docente__persona__numero_documento', 'docente__persona__primer_nombre')
+        form = AsignarSalonDocenteAGrupoForm(grupo_academico.id)
+
+        salones = grupo_academico.salones.all()
+        observaciones = grupo_academico.observaciones
+        context = {'docentes_generales_actual': docentes_generales_actual, 'docentes_especializados_actual': docentes_especializados_actual,
+                   'salones_asignados': salones, 'grupo': grupo_academico, 'observaciones': observaciones, 'form': form}
+
+    return render(request, 'administracion/grupos/correoGrupo.html',
+                {'object_list': matriculas, 'grupo': grupo_academico, 'docentes': docentes,
+                'salones': salones, 'total': len(object_list)})
+
+
+@login_required
 def asignarDocenteSalonAGrupo(request, grupoacademico):
 
     tipo_general = TipoDocente.objects.get(tipo='General')

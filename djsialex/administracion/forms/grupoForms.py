@@ -9,7 +9,7 @@ from ..models import GrupoAcademico, Matricula, Docente, Salon, Edificio, Docent
 class GrupoAcademicoForm(forms.ModelForm):
     class Meta:
         model = GrupoAcademico
-        fields = ('nombre', 'horarioCurso')
+        fields = ('nombre', 'codigo_proyecto', 'horarioCurso')
         widgets = {'horarioCurso': forms.HiddenInput()}
 
     def __init__(self, *args, **kwargs):
