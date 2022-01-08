@@ -128,15 +128,25 @@
                 {% if comprobantes_banco %}
                     {% for comprobante in comprobantes_banco %}
                             <li class="list-group-item list-group-flush row">
-                              <div class="col-md-3"><h3><b>Tipo: </b>{{ comprobante.get_tipo_comprobante_display }}</h3></div>
+                              <div class="col-md-3"><h4><b>Tipo: </b>{{ comprobante.get_tipo_comprobante_display }}</h4></div>
                               <div class="col-md-3"><h3><b>Número recibo: </b> <span>{{ comprobante.numero_recibo }}</span></h3></div>
-                              <div class="col-md-3"><h3><b>Valor: $</b> <span>{{ comprobante.valor }}</span></h3></div>
+                              <div class="col-md-3"><h3><b>Valor: $</b> <span pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$">{{ comprobante.valor }}</span></h3></div>
                               <div class="col-md-3">
                                 {% if comprobante.estado_pago == 1 %}
                                     <button class="comprobante_pago_update btn btn-primary btn-xs" data-id="{% url 'comprobante_pago_update' comprobante.id preinscripcionhorariocurso.id %}">
                                         <span class="glyphicon glyphicon-pencil">
                                         </span>
                                     </button>
+
+
+                                    <a href="{% url 'comprobante_pago_delete' comprobante.id %}">
+                                        <button class="btn btn-danger btn-xs">
+                                            <span class="glyphicon glyphicon-trash">
+                                            </span>
+                                        </button>
+                                    </a>
+
+
                                 {% endif %}
                                 </div>
                             </li>                            

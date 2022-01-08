@@ -7,7 +7,8 @@ from django.shortcuts import render
 from django.views.generic.edit import CreateView
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from bootstrap_modal_forms.generic import BSModalUpdateView
+from bootstrap_modal_forms.generic import BSModalUpdateView, BSModalDeleteView
+
 
 class ComprobantePagoCreateView(LoginRequiredMixin,CreateView):
     template_name = 'administracion/comprobanteBanco/comprobante_banco_form.html'
@@ -60,11 +61,28 @@ class ComprobantePagoCreateView(LoginRequiredMixin,CreateView):
         else:
             return reverse_lazy('formalizar-curso', kwargs={'pk': self.object.preinscripcion_generada_id})
 
+
 class ComprobantePagoUpdateView(LoginRequiredMixin,BSModalUpdateView):
     model = ComprobanteBanco
     template_name = 'administracion/comprobanteBanco/comprobante_banco_update.html'
     form_class = PagoBancoFormUpdate
     success_message = 'Actualizados Pagos Banco.'
+
+    def get_success_url(self):
+        try:
+            examen = PreinscripcionExamen.objects.get(id=self.object.preinscripcion_generada_id)
+        except PreinscripcionExamen.DoesNotExist:
+            examen = None
+        if examen:
+            return reverse_lazy('formalizar-examen', kwargs={'pk': self.object.preinscripcion_generada_id})
+        else:
+            return reverse_lazy('formalizar-curso', kwargs={'pk': self.object.preinscripcion_generada_id})
+
+
+class ComprobantePagoDeleteView(LoginRequiredMixin, BSModalDeleteView):
+    model = ComprobanteBanco
+    template_name = 'administracion/comprobanteBanco/comprobante_banco_delete.html'
+    success_message = 'Comprobante de pago borrado.'
 
     def get_success_url(self):
         try:
