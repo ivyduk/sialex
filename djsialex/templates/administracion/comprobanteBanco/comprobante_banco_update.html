@@ -1,5 +1,4 @@
 {% load widget_tweaks %}
-
 {% block form %}
 <form method="post" action="">
   {% csrf_token %}
@@ -22,9 +21,9 @@
     {% for field in form %}
       <div class="form-group">
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {% render_field field class="form-control" placeholder=field.label %}
+        {% render_field field placeholder=field.label %}
+          {% if field.name == 'valor' %}<label id='valor_label' style="font-size:25px;color:olive">$</label>{% endif %}
         <div class="{% if field.errors %} invalid{% endif %}">
-        {% if field.name == 'valor' %}<label id='valor_label' style="font-size:25px;color:olive">$</label>{% endif %}
           {% for error in field.errors %}
             <p class="help-block">{{ error }}</p>
           {% endfor %}
@@ -38,6 +37,13 @@
   </div>
 
 </form>
+
+<style>
+label {
+  display: inline-block;
+  width: 140px;
+  text-align: right;
+}
 
 </style>
     <script>
