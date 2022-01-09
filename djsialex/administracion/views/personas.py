@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 
 from django.views.generic import ListView, DetailView, UpdateView
+from django.urls import reverse_lazy
 
 from administracion.views.busqueda_list import BusquedaGenerica
 from ..forms import PersonaContactoForm, BasePersonaContactoFormSet, EditProfileForm, \
@@ -146,3 +147,14 @@ class EditarPersona(LoginRequiredMixin, UpdateView):
         form.save()
 
         return HttpResponseRedirect(self.get_success_url())
+
+
+class EditarPersonaDocumentoEntregado(LoginRequiredMixin, UpdateView):
+    model = Profile
+    template_name = 'administracion/persona/persona_documento_entregado_form.html'
+    fields = ["documento_identificacion_entregado"]
+    success_message = 'Actualizados documentos de identificación.'
+
+    """def get_success_url(self):
+        return reverse_lazy('formalizar-curso',
+                            kwargs={'pk': self.object.descuento_aplicado.preinscripcion_generada_id})"""

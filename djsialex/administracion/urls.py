@@ -261,6 +261,7 @@ urlpatterns = [
 	url(r'^administracion/persona/$', personas_list, name='personas'),
 	url(r'^administracion/persona/(?P<pk>[0-9a-f-]+)$', PersonaDetailView.as_view(), name='persona-detail'),
 	url(r'^administracion/persona/editar/(?P<pk>[0-9a-f-]+)$', EditarPersona.as_view(), name='persona-detail-update'),
+	url(r'^administracion/persona/editar_documento/(?P<pk>[0-9a-f-]+)$', EditarPersonaDocumentoEntregado.as_view(), name='persona-document-update'),
 
 
 	#Documentos requeridos
