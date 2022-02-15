@@ -17,6 +17,7 @@ from django.contrib.auth.models import Group
 from itertools import chain
 
 from administracion.forms.inscripcionForm import PreinscripcionCursoForm, PreinscripcionCursoLoteForm
+from administracion.forms.requiereFacturacionForms import RequiereFacturacionForm
 
 from administracion.util.Barcode import *
 from ..models import PreinscripcionHorarioCurso, ProgramaAcademico, Nivel, OfertaAcademica, Curso, HorarioCurso, \
@@ -568,6 +569,7 @@ def formalizar_vista(request, pk):
     validar_descuento = True
     saldo_flag = check_saldo_cargado(recibopreinscripcion)
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionhorariocurso)
+    facturacion_form = RequiereFacturacionForm()
 
     if descuento_aplicado:
         documentos = DocumentosDescuentoSolicitado.objects.filter(descuento_aplicado=descuento_aplicado[0])
@@ -592,6 +594,7 @@ def formalizar_vista(request, pk):
 
     tarifa_plena = recibopreinscripcion.valor_requerido - preinscripcionhorariocurso.horario_cupo.curso.nivel.costo_materiales
     if request.method == 'POST':
+        facturacion_form = RequiereFacturacionForm(request.POST)
         if preinscripcionhorariocurso.estado_preinscripcion == 5:
             preinscripcionhorariocurso.estado_preinscripcion = 3
             preinscripcionhorariocurso.save()
@@ -630,9 +633,25 @@ def formalizar_vista(request, pk):
             preinscripcionhorariocurso.estado_preinscripcion = 1
             preinscripcionhorariocurso.save()
         return HttpResponseRedirect(request.path_info)
-    return render(request, "administracion/inscripcion/formalizar_preinscripcion_curso.html", {'preinscripcionhorariocurso' : preinscripcionhorariocurso, \
-        'recibo' : recibopreinscripcion, 'descuento_aplicado' : descuento_aplicado, 'documentos' : documentos, 'beca' : beca, 'valor_descuento' : valor_descuento, 'reservas' : reservas_saldos,\
-        'matricula' : matricula, 'pagos' : pagos, 'pagado': pagado, 'sobrante' : sobrante, 'pendiente' : pendiente, 'comprobantes_banco' : comprobantes_banco, 'tarifa_plena' : tarifa_plena, 'saldo_flag' : saldo_flag})
+    return render(request, "administracion/inscripcion/formalizar_preinscripcion_curso.html",
+                  {
+                      'preinscripcionhorariocurso': preinscripcionhorariocurso,
+                      'recibo': recibopreinscripcion,
+                      'descuento_aplicado': descuento_aplicado,
+                      'documentos': documentos,
+                      'beca': beca,
+                      'valor_descuento': valor_descuento,
+                      'reservas': reservas_saldos,
+                      'matricula': matricula,
+                      'pagos': pagos,
+                      'pagado': pagado,
+                      'sobrante': sobrante,
+                      'pendiente': pendiente,
+                      'comprobantes_banco': comprobantes_banco,
+                      'tarifa_plena': tarifa_plena,
+                      'saldo_flag': saldo_flag,
+                      'facturacion_form': facturacion_form
+                  })
 
 @login_required()
 @csrf_exempt

@@ -48,12 +48,19 @@ label {
 </style>
     <script>
     $("[name='valor']").on('change click keyup input paste',(function (event) {
-    $(this).val(function (index, value) {
-        value2 = value
-        value2 = '$' + value2.replace(/(?!\.)\D/g, "").replace(/(?<=\..*)\./g, "").replace(/(?<=\.\d\d).*/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        $('#valor_label').text(value2);
-        return value
-    });
-}))
+        $(this).val(function (index, value) {
+            value2 = value
+            value2 = '$' + value2.replace(/(?!\.)\D/g, "").replace(/(?<=\..*)\./g, "").replace(/(?<=\.\d\d).*/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            $('#valor_label').text(value2);
+            return value
+        });
+    }))
+
+    $("[name='numero_recibo']").on('change click keyup input paste',(function (event) {
+        $(this).val(function (index, value) {
+            $('#id_concepto_pago').val(value);
+            return value
+        });
+    }))
     </script>
 {% endblock %}

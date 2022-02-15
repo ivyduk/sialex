@@ -228,6 +228,7 @@ urlpatterns = [
 	url(r'^inscripcion/examen/formalizar/(?P<pk>[0-9]+)$', formalizar_vista_examen, name='formalizar-examen'),
 	path('inscripcion/curso/borrar/<pk>', CancelPreinscripcion.as_view(), name='preinscripcion_delete'),
 	path('inscripcion/descuento/borrar/<pk>', CancelDescuento.as_view(), name='descuento_aplicado_borrar'),
+	path('inscripcion/descuento/editar/<pk>', ModificarDescuento.as_view(), name='descuento_aplicado_editar'),
 	path('ajax/cargar-programas/', cargar_programas_academicos, name='ajax_cargar_programas'),  # <-- this one here
 	path('ajax/cargar-niveles/', cargar_niveles, name='ajax_cargar_niveles'),  # <-- this one here
 	path('ajax/cargar-horarios/', cargar_horarios_disponibles, name='ajax_cargar_horarios'),  # <-- this one here
@@ -261,7 +262,8 @@ urlpatterns = [
 	url(r'^administracion/persona/$', personas_list, name='personas'),
 	url(r'^administracion/persona/(?P<pk>[0-9a-f-]+)$', PersonaDetailView.as_view(), name='persona-detail'),
 	url(r'^administracion/persona/editar/(?P<pk>[0-9a-f-]+)$', EditarPersona.as_view(), name='persona-detail-update'),
-	url(r'^administracion/persona/editar_documento/(?P<pk>[0-9a-f-]+)$', EditarPersonaDocumentoEntregado.as_view(), name='persona-document-update'),
+	url(r'^administracion/persona/editar_documento/(?P<pk>[0-9a-f-]+)/(?P<preinscripcionhorariocurso>[-\w]+)',
+		EditarPersonaDocumentoEntregado.as_view(), name='persona-document-update-pre'),
 
 
 	#Documentos requeridos
