@@ -11,14 +11,42 @@
     {% if form %}
         <div class="col-sm-6">
         <form action={% url 'aplazar-curso' preinscripcionhorariocurso.id %} method="post">
-            {{ form }}
+            <div class="modal-body">
+            {% for field in form %}
+                <div class="form-group{% if field.errors %} invalid{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.name == 'valor_saldo_a_favor' %}
+                        <label id='label_valor_saldo_a_favor' style="font-size:25px;color:olive">$</label>
+                    {% endif %}
+                    {{ field }}
+                {% for error in field.errors %}
+                  <p class="help-block">{{ error }}</p>
+                {% endfor %}
+                </div>
+            {% endfor %}
+            </div>
             <input type="submit" class="btn btn-primary" value="Guardar" id="aplazar">
          {% csrf_token %}
         </form>
         </div>
     {% endif %}
+    <style>
+    label {
+      display: inline-block;
+      width: 140px;
+      text-align: right;
+    }
 
+    </style>
     <script type="text/javascript">
+        $("[name='valor_saldo_a_favor']").on('change click keyup input paste',(function (event) {
+    $(this).val(function (index, value) {
+        value2 = value
+        value2 = '$' + value2.replace(/(?!\.)\D/g, "").replace(/(?<=\..*)\./g, "").replace(/(?<=\.\d\d).*/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        $('#label_valor_saldo_a_favor').text(value2);
+        return value
+        });
+    }))
     $(document).on('click', '#aplazar', function(){
         return confirm('¿Está seguro de aplicar esta cancelación?');
     })

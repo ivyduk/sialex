@@ -36,8 +36,8 @@ class DescuentoDelete(LoginRequiredMixin, DeleteView):
 
 class CancelDescuento(LoginRequiredMixin, DeleteView):
 
-    model = PreinscripcionHorarioCurso
-    template_name = 'administracion/inscripcion/descuento_confirm_delete.html'
+    model = DescuentoAplicado
+    template_name = 'administracion/inscripcion/descuento_confirm_update.html'
     success_url = reverse_lazy('buscar-preinscripciones')
 
     def delete(self, request, *args, **kwargs):
@@ -53,4 +53,27 @@ class CancelDescuento(LoginRequiredMixin, DeleteView):
                 self.object.save()
         except DescuentoAplicado.DoesNotExist:
             descuento_solicitado = None      
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class ModificarDescuento(LoginRequiredMixin, UpdateView):
+
+    model = PreinscripcionHorarioCurso
+    template_name = 'administracion/inscripcion/descuento_confirm_update.html'
+    success_url = reverse_lazy('buscar-preinscripciones')
+
+    def update(self, request, *args, **kwargs):
+        print("Ivanoff")
+        self.object = self.get_object()
+        self.object.descuento_solicitado
+        preinscripcion_id = self.object.id
+        try:
+            descuento_solicitado = DescuentoAplicado.objects.get(preinscripcion_generada_id=preinscripcion_id)
+            if descuento_solicitado.estado_descuento == 1:
+                descuento_solicitado.estado_descuento = 3
+                descuento_solicitado.save()
+                self.object.valor_preinscripcion += descuento_solicitado.valor
+                self.object.save()
+        except DescuentoAplicado.DoesNotExist:
+            descuento_solicitado = None
         return HttpResponseRedirect(self.get_success_url())

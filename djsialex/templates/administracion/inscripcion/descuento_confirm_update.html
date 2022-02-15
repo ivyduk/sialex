@@ -1,0 +1,24 @@
+{% extends "administracion/home.html" %}
+
+{% block content %}
+
+<h1>Cancelar Descuento</h1>
+
+<h3>Preinscripción: {{ preinscripcionhorariocurso.horario_cupo.nombre }}</h3>
+<h3>¿Está Seguro de modificar el descuento para el usuario: {{ preinscripcionhorariocurso.persona.numero_documento }}?</h3>
+
+    {% if form %}
+        <div class="col-sm-6">
+        <form action={% url 'aplazar-examen' preinscripcionexamen.id %} method="post">
+            {{ form }}
+            <input type="submit" class="btn btn-primary" value="Guardar" id="aplazar">
+         {% csrf_token %}
+        </form>
+        </div>
+    {% endif %}
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-danger" value="SI, Cancelar.">
+</form>
+
+{% endblock %}
