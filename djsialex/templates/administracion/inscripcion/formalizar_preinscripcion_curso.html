@@ -102,10 +102,10 @@
                     <li class="list-group-item row">
                               <div class="col-md-4"><h3><b>Descuento: </b>{{ descuento_aplicado.descuento.nombre }}</h3></div>
                               <div class="col-md-4"><h3><b>Estado: </b> <span>{{ descuento_aplicado.get_estado_descuento_display }}</span></h3></div>
-                               <!--- {% if descuento_aplicado.estado_descuento == 1 %}
-                                  <div class="col-md-4"><a href="{% url 'descuento_aplicado_editar' preinscripcionhorariocurso.id %}" ><input type="button" class="btn btn-primary btn-xs" value="Modificar descuento"></a>
+                                {% if descuento_aplicado.estado_descuento == 1 %}
+                                  <div class="col-md-4"><a href="{% url 'descuento_aplicado_editar' descuento_aplicado.id %}" ><input type="button" class="btn btn-primary btn-xs" value="Modificar descuento"></a>
                                     <a href="{% url 'descuento_aplicado_borrar' preinscripcionhorariocurso.id %}" ><input type="button" class="btn btn-danger btn-xs btn-cancelar" value="Cancelar descuento"></a></div>
-                                {% endif %}--->
+                                {% endif %}
                     </li>
                     {% if documentos %}
                         {% for documento in documentos %}

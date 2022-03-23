@@ -12,6 +12,12 @@ class EditProfileForm(forms.ModelForm):
     segundo_apellido = forms.CharField(help_text='Ingrese el primer apellido', required=False)
     segundo_nombre = forms.CharField(help_text='Ingrese el segundo apellido', required=False)
     eps = forms.ModelChoiceField(queryset=EPS.objects.order_by('nombre'))
+    es_egresado = forms.TypedChoiceField(
+        initial='No',
+        coerce=lambda x: x == 'True',
+        choices=((False, 'No'), (True, 'Si'))
+    )
+    telefono_celular = forms.CharField(widget=forms.TextInput(attrs={'pattern': '[0-9]{10}'}))
 
     def clean_telefono_fijo(self):
         tel_fijo = str(self.cleaned_data['telefono_fijo']).split('+')[1]
@@ -48,11 +54,13 @@ class EditProfileForm(forms.ModelForm):
             'tipo_sangre': 'Tipo de sangre',
             'eps': 'EPS',
             'tipo_vinculacion_un': 'Tipo de vinculación UN',
-            'nivel_formacion': 'Nivel de formación'
+            'es_egresado': 'Es egresado UN',
+            'estado_civil': 'Estado civil'
         }
 
         FORMAT = '%Y-%m-%d'
         widgets = {'fecha_nacimiento': DateTimePickerInput(format=FORMAT),}
+
 
 
 class PersonaContactoForm(forms.ModelForm):

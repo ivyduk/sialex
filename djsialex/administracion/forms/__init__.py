@@ -13,3 +13,4 @@ from .aplazarForm import *
 from .ofertaForms import *
 from .encuestaForms import *
 from .devolucionForms import *
+from .DescuentoAplicadoForm import *

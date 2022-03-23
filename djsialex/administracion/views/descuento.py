@@ -1,11 +1,15 @@
 from django.views import generic
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.shortcuts import redirect
 
-from ..models import Descuento, DescuentoAplicado, PreinscripcionHorarioCurso
+from ..models import Descuento, DescuentoAplicado, PreinscripcionHorarioCurso, DocumentosDescuentoSolicitado
+from ..forms import DescuentoAplicadoForm
 
 from django.http import HttpResponseRedirect
+
 
 class DescuentoListView(LoginRequiredMixin, generic.ListView):
     model = Descuento
@@ -35,10 +39,8 @@ class DescuentoDelete(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('descuentos')
 
 class CancelDescuento(LoginRequiredMixin, DeleteView):
-
-    model = DescuentoAplicado
-    template_name = 'administracion/inscripcion/descuento_confirm_update.html'
-    success_url = reverse_lazy('buscar-preinscripciones')
+    model = PreinscripcionHorarioCurso
+    template_name = 'administracion/inscripcion/descuento_confirm_delete.html'
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -55,25 +57,49 @@ class CancelDescuento(LoginRequiredMixin, DeleteView):
             descuento_solicitado = None      
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_success_url(self, *args, **kwargs):
+        return reverse_lazy('formalizar-curso',
+                            kwargs={'pk': self.object.id})
+
 
 class ModificarDescuento(LoginRequiredMixin, UpdateView):
-
-    model = PreinscripcionHorarioCurso
+    model = DescuentoAplicado
+    form_class = DescuentoAplicadoForm
     template_name = 'administracion/inscripcion/descuento_confirm_update.html'
     success_url = reverse_lazy('buscar-preinscripciones')
 
-    def update(self, request, *args, **kwargs):
-        print("Ivanoff")
-        self.object = self.get_object()
-        self.object.descuento_solicitado
-        preinscripcion_id = self.object.id
-        try:
-            descuento_solicitado = DescuentoAplicado.objects.get(preinscripcion_generada_id=preinscripcion_id)
-            if descuento_solicitado.estado_descuento == 1:
-                descuento_solicitado.estado_descuento = 3
-                descuento_solicitado.save()
-                self.object.valor_preinscripcion += descuento_solicitado.valor
-                self.object.save()
-        except DescuentoAplicado.DoesNotExist:
-            descuento_solicitado = None
+    def form_valid(self, form):
+        nuevo_descuento = form.data['descuento']
+        if nuevo_descuento:
+            descuento = Descuento.objects.get(pk=int(nuevo_descuento))
+        else:
+            descuento = None
+        if not descuento:
+            messages.warning(self.request, 'Se requiere seleccionar al menos un descuento')
+            return redirect(reverse('descuento_aplicado_editar', kwargs={'pk': self.object.id}))
+        else:
+            anterior_valor = self.object.valor
+            self.object.preinscripcion_generada.valor_preinscripcion += anterior_valor
+            self.object.preinscripcion_generada.save()
+
+            valor_descuento = (self.object.preinscripcion_generada.valor_preinscripcion * descuento.porcentaje) / 100
+            self.object.preinscripcion_generada.valor_preinscripcion -= valor_descuento
+            self.object.preinscripcion_generada.save()
+            self.object.valor = valor_descuento
+            self.object.descuento_solicitado = descuento
+            self.object.save()
+            documentos_descuento = DocumentosDescuentoSolicitado.objects.filter(descuento_aplicado=self.object.id)
+            for doc in documentos_descuento:
+                doc.delete()
+            for doc in descuento.documentos_requeridos.filter(activo=True):
+                documento_descuento = DocumentosDescuentoSolicitado(
+                    descuento_aplicado=self.object,
+                    documento_requerido=doc
+                )
+                documento_descuento.save()
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self, *args, **kwargs):
+        descuento_aplicado = DescuentoAplicado.objects.get(id=self.kwargs["pk"])
+        return reverse_lazy('formalizar-curso',
+                            kwargs={'pk': descuento_aplicado.preinscripcion_generada_id})

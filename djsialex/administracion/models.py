@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.http import request
 from django.db.models.signals import post_save, m2m_changed
 from django.conf import settings
-from datetime import datetime
+from datetime import date
 
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
@@ -394,6 +394,10 @@ class ProgramaAcademico(models.Model):
     edad_maxima = models.IntegerField(default=1, help_text='Edad máxima permitida')
     nivel = models.ManyToManyField(Nivel, help_text="Seleccione nivel para el Programa Academico")
     activo = models.BooleanField(default=False, help_text='Determina disponibilidad del programa académico')
+    descuento_obligatorio = models.BooleanField(
+        default=False,
+        help_text='Determina si se requiere selección de descuento obligatorio'
+    )
 
     class Meta:
         verbose_name = "Programa Academico"
@@ -688,13 +692,22 @@ class Profile(models.Model):
     cuenta_duplicada_desactivada = models.BooleanField(default=False)
     acepta_habeas_data = models.BooleanField(default=False)
     documento_identificacion_entregado = models.BooleanField(default=False)
-    tipo_vinculacion_un = models.IntegerField(choices=TIPOS_VINCULACION, null=False, default=1) #Ninguna
+    es_egresado = models.BooleanField(default=False)
+    tipo_vinculacion_un = models.IntegerField(choices=TIPOS_VINCULACION, null=False, default=7) #Ninguna
     nivel_formacion = models.IntegerField(choices=NIVEL_FORMACION, null=False, default=1) #No Aplica
+    estado_civil = models.IntegerField(choices=ESTADO_CIVIL, null=False, default=7) #Ninguna
 
     class Meta:
         verbose_name = "Persona"
         verbose_name_plural = "Personas"
         ordering = ['-id']
+
+    @property
+    def es_menor_de_edad(self):
+        hoy = date.today()
+        edad = hoy.year - self.fecha_nacimiento.year - \
+               ((hoy.month, hoy.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
+        return edad < 18
 
     def get_absolute_url(self):
         """

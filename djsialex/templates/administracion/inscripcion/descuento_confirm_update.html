@@ -1,24 +1,22 @@
 {% extends "administracion/home.html" %}
 
 {% block content %}
+    <h1>Modificar Descuento</h1>
 
-<h1>Cancelar Descuento</h1>
+    <h3>Preinscripción: {{ descuentoaplicado.preinscripcion_generada.preinscripcionhorariocurso.horario_cupo.nombre }}</h3>
+    <h3>¿Está Seguro de modificar el descuento {{ descuentoaplicado.descuento.nombre }} para el usuario:
+        {{ descuentoaplicado.preinscripcion_generada.preinscripcionhorariocurso.persona.numero_documento }}?</h3>
 
-<h3>Preinscripción: {{ preinscripcionhorariocurso.horario_cupo.nombre }}</h3>
-<h3>¿Está Seguro de modificar el descuento para el usuario: {{ preinscripcionhorariocurso.persona.numero_documento }}?</h3>
+    {% block form %}
 
-    {% if form %}
-        <div class="col-sm-6">
-        <form action={% url 'aplazar-examen' preinscripcionexamen.id %} method="post">
-            {{ form }}
-            <input type="submit" class="btn btn-primary" value="Guardar" id="aplazar">
-         {% csrf_token %}
+        <form method="post">
+        {% csrf_token %}
+                {{ form.as_ul }}
+            <div class="form-group">
+                <button type="submit" class="btn btn-success pull-right">
+                    <span class="glyphicon glyphicon-ok-sign"></span> Guardar
+                </button>
+            </div>
         </form>
-        </div>
-    {% endif %}
-<form action="" method="POST">
-  {% csrf_token %}
-  <input type="submit" class="btn btn-danger" value="SI, Cancelar.">
-</form>
-
+    {% endblock %}
 {% endblock %}

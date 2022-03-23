@@ -8,10 +8,17 @@ class PersonaAdministracionForm(forms.ModelForm):
 
     segundo_nombre = forms.CharField(required=False)
     segundo_apellido = forms.CharField(required=False)
+    es_egresado = forms.TypedChoiceField(
+        initial='No',
+        coerce=lambda x: x == 'True',
+        choices=((False, 'No'), (True, 'Si'))
+    )
 
     class Meta:
         model = Profile
-        exclude = ['usuario', 'numero_documento','profile_completed', 'cuenta_duplicada', 'cuenta_duplicada_desactivada', 'acepta_habeas_data', 'indicativo_celular', 'indicativo_fijo', 'email_confirmed']
+        exclude = ['usuario', 'numero_documento','profile_completed', 'cuenta_duplicada',
+                   'cuenta_duplicada_desactivada', 'acepta_habeas_data', 'indicativo_celular',
+                   'indicativo_fijo', 'email_confirmed']
 
         FORMAT = '%Y-%m-%d'
 
@@ -35,7 +42,9 @@ class PersonaAdministracionForm(forms.ModelForm):
             'nivel_formacion': 'Nivel de formación',
             'numero_documento': 'Documento de identidad',
             'profile_active': 'Perfil Activo',
-            'documento_identificacion_entregado': 'Documento identificación entregado'
+            'documento_identificacion_entregado': 'Documento identificación entregado',
+            'es_egresado': 'Es egresado UN',
+            'estado_civil': 'Estado civil'
         }
 
     def clean(self):
