@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 from ..models import Answer, Question, Response, AsociarEncuesta, ProgramaAcademico
-from ..encuesta_signals import  survey_completed
+from ..encuesta_signals import survey_completed
 
 LOGGER = logging.getLogger(__name__)
 

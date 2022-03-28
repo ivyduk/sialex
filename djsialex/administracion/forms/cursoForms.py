@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import  inlineformset_factory, BaseModelFormSet
+from django.forms import inlineformset_factory, BaseModelFormSet
 
 from ..models import Curso, OfertaAcademica, Nivel, ConjuntoNotas, HorarioCurso, Horario
 

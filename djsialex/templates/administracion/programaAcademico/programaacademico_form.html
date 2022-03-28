@@ -74,6 +74,17 @@
                 {{ form.activo|add_class:'form-control' }}
             </div>
         </div>
+        <div class="form-group" id="descuento_obligatorio">
+            <label class="col-md-3 control-label">{{ form.descuento_obligatorio.label }}
+                <span class="help-block">
+                    <i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="Ayuda SiALEX" data-content="{{ form.descuento_obligatorio.help_text }}" >
+                    </i>
+                </span>
+            </label>
+            <div class="col-md-9">
+                {{ form.descuento_obligatorio|add_class:'form-control' }}
+            </div>
+        </div>
 
 
         <div class="form-group">

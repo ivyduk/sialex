@@ -52,6 +52,11 @@
     <div class="wrap-preinscripcion">
         <h2 class="title-project">Preinscripción a cursos de idiomas</h2>
 
+        <div class="alert alert-info">
+                Recuerde revisar la información sobre los descuentos especificados en el siguiente
+            <a target="_blank" href="https://www.humanas.unal.edu.co/extension_lenguas/tarifas/descuentos">enlace</a>
+                para que lo seleccione en el formulario de preinscripción en caso que aplique
+            </div>
         <div class="alert alert-warning"><b>Señor aspirante: </b> Tenga en cuenta que si algún filtro no muestra opciones es debido a:
             <ol class="center">
                 <li>Usted no cuenta con la edad requerida para el <b>programa académico</b></li>
@@ -59,6 +64,11 @@
                 <li>Usted no ha aprobado los niveles necesarios para preinscribirse a un nivel</li>
             </ol>
         </div>
+        {% if user.profile.es_menor_de_edad %}
+            <div class="alert alert-info">
+                Recuerde seleccionar el descuento de menores de edad en caso que aplique para el curso de su elección
+            </div>
+        {% endif %}
         {% if form.errors %}
         <!-- Error messaging -->
         <div id="errors" class="alert alert-warning" role="alert">

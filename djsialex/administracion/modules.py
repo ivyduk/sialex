@@ -1,5 +1,6 @@
 from .models import SaldoAFavor, Beca, DescuentoAplicado, DocumentosDescuentoSolicitado, Pago, ReservasSaldo
 
+
 class AyudanteFinancieros(object):
     """Clase que realiza operaciones de consulta y actualización de financieros"""
 
@@ -9,7 +10,6 @@ class AyudanteFinancieros(object):
         self.saldos = []
         self.beca = None
         self.descuento_aplicado = None
-    
     
     def calcular_valor_preinscripcion_curso(self, tarifa_plena, nivel, descuento, valor_materiales):
         valor = tarifa_plena
@@ -122,10 +122,19 @@ class AyudanteFinancieros(object):
                 pass
         if "descuento" in detallado:
             try:
-                descuento = DescuentoAplicado(beneficiario=self.persona, periodo_generado=self.periodo, valor=detallado['descuento']['valor'],descuento_id=detallado['descuento']['id'], preinscripcion_generada=recibo_preinscripcion.preinscripcion)
+                descuento = DescuentoAplicado(
+                    beneficiario=self.persona,
+                    periodo_generado=self.periodo,
+                    valor=detallado['descuento']['valor'],
+                    descuento_id=detallado['descuento']['id'],
+                    preinscripcion_generada=recibo_preinscripcion.preinscripcion
+                )
                 descuento.save()
                 for doc in descuento.descuento.documentos_requeridos.filter(activo=True):
-                    documento_descuento = DocumentosDescuentoSolicitado(descuento_aplicado=descuento, documento_requerido=doc)
+                    documento_descuento = DocumentosDescuentoSolicitado(
+                        descuento_aplicado=descuento,
+                        documento_requerido=doc
+                    )
                     documento_descuento.save()
             except DescuentoAplicado.ValidationError:
                 pass
@@ -171,12 +180,14 @@ class AyudanteFinancieros(object):
         except DescuentoAplicado.DoesNotExist:
             self.descuento_aplicado = None
 
+
 def check_saldo_cargado(recibo):
     saldo_flag = False
     saldo = SaldoAFavor.objects.filter(recibo_preinscripcion_generado=recibo, activo=True)
     if saldo:
         saldo_flag = True
     return saldo_flag
+
 
 class CalcularPagosRecibo(object):
     """Clase que realiza calculo de pagos, pendiente y sobrante por recibo de preinscripción"""

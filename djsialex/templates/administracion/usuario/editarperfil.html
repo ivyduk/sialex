@@ -74,7 +74,10 @@
                     <span class="label-input100">{{ form.nivel_formacion.label }}</span>
                         {{ form.nivel_formacion|add_class:'form-control' }}
                 </div>
-
+                <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.es_egresado.label }}</span>
+                        {{ form.es_egresado|add_class:'form-control' }}
+                </div>
                 <div class="form-group col-md-6">
                     <span class="label-input100">{{ form.tipo_vinculacion_un.label }}</span>
                         {{ form.tipo_vinculacion_un|add_class:'form-control' }}
@@ -83,6 +86,11 @@
                 <div class="form-group col-md-6">
                     <span class="label-input100">{{ form.genero_sexual.label }}</span>
                         {{ form.genero_sexual|add_class:'form-control' }}
+                </div>
+
+            <div class="form-group col-md-6">
+                    <span class="label-input100">{{ form.estado_civil.label }}</span>
+                        {{ form.estado_civil|add_class:'form-control' }}
                 </div>
 
                 {% for field in form %}

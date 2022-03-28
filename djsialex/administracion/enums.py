@@ -130,12 +130,11 @@ ESTADOS_PAGO = [
 ]
 
 TIPOS_VINCULACION = [
-    (1, ("NINGUNA")),
+    (1, ("PARTICULAR")),
     (2, ("ESTUDIANTE PREGRADO O POSGRADO")),
     (4, ("EGRESADO")),
     (5, ("PROFESOR")),
-    (6, ("ADMINISTRATIVO")),
-    (7, ("PARTICULAR"))
+    (6, ("ADMINISTRATIVO"))
 ]
 
 NIVEL_FORMACION = [
@@ -164,4 +163,14 @@ COHORTE = [
 ESTADOS_GRUPO_ACADEMICO = [
     (0, ('Regular')),
     (1, ('Aplazado'))
+]
+
+ESTADO_CIVIL = [
+    (1, ("SOLTERO(A)")),
+    (2, ("CASADO(A)")),
+    (3, ("DIVORCIADO(A)")),
+    (4, ("VIUDO(A)")),
+    (5, ("UNIÓN LIBRE")),
+    (6, ("RELIGIOSO(A)")),
+    (7, ("SEPARADO(A)"))
 ]

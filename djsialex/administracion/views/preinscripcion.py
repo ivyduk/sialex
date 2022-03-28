@@ -12,8 +12,6 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.models import Group
 
-
-
 from itertools import chain
 
 from administracion.forms.inscripcionForm import PreinscripcionCursoForm, PreinscripcionCursoLoteForm
@@ -143,11 +141,12 @@ def preinscripcionView(request):
         descuento_id = request.POST['descuento']
         periodo_id = request.session["periodo_contextualizado_id"]
         hash_code = request.POST["hash"]
-        if descuento_id:
-            descuento = Descuento.objects.get(pk=descuento_id)
-        else:
-            descuento = None
+
         if form.is_valid():
+            if descuento_id:
+                descuento = Descuento.objects.get(pk=descuento_id)
+            else:
+                descuento = None
             try:
                 preinscrito = Profile.objects.get(pk = request.user.profile.id)
             except Profile.DoesNotExist:
@@ -161,20 +160,23 @@ def preinscripcionView(request):
             except Periodo.DoesNotExist:
                 periodo = None
 
+            if horario.curso.oferta_academica.programa.descuento_obligatorio and not descuento_id:
+                form.add_error('idioma',
+                               'Es necesario agregar un descuento para este programa académico')
+                return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
+
             mensaje_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
 
             if preinscrito and horario and periodo:
 
-                ofertas_periodo = OfertaAcademica.objects.filter(periodo=periodo)
-
                 niveles = Nivel.objects.filter(idioma_id=idioma)
-                preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],horario_cupo=horario, persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo) #Estado 6: Cancelado
+                preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],horario_cupo=horario, persona=preinscrito) #Estado 6: Cancelado
                 preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
                                                                                   horario_cupo__curso__nivel__in=niveles,
-                                                                                  persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
+                                                                                  persona=preinscrito)
                 preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
                                                                                   horario_cupo__horario=horario.horario,
-                                                                                  persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
+                                                                                  persona=preinscrito)
                 if not preinscripcion_previa and not preinscripcion_mismo_idioma and not preinscripcion_horario_existente:
                     ayudante = AyudanteFinancieros(preinscrito, periodo)
                     tarifa_curso = horario.curso.oferta_academica.tarifa
@@ -237,11 +239,11 @@ def preinscripcionView(request):
                         form.add_error('idioma', '¡Lo sentimos, la asignación de cupos ha finalizado!')
                 else:
                     if preinscripcion_previa:
-                        form.add_error('idioma', 'Ya existe una preinscripción para este usuario, curso y horario en el presente periodo')
+                        form.add_error('idioma', 'Ya existe una preinscripción para este usuario, en el mismo curso y horario')
                     if preinscripcion_mismo_idioma:
-                        form.add_error('idioma','Ya existe una preinscripción para este idioma en el presente periodo')
+                        form.add_error('idioma','Ya existe una preinscripción para este idioma')
                     if preinscripcion_horario_existente:
-                        form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria en el presente periodo')
+                        form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria')
     return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
 
 class PreinscripcionCursoUpdate(LoginRequiredMixin, UpdateView):
@@ -402,8 +404,7 @@ def cargar_horarios_disponibles(request):
     error = False
     if request.user.is_authenticated:
         nivel_id = request.GET.get('nivel')
-        periodo_id = request.session["periodo_contextualizado_id"]
-        cursos = Curso.objects.filter(nivel = nivel_id, oferta_academica__periodo=periodo_id).all()
+        cursos = Curso.objects.filter(nivel=nivel_id, oferta_academica__periodo__activo=True).all()
         horarios = HorarioCurso.objects.filter(curso__in=cursos, cupo_disponible__gt=0).order_by('nombre').all()
         autorizaciones_dict = request.session.get('autorizaciones_dict')
         cursos_ids = [str(curso) for curso in cursos.values_list('id', flat=True)]
