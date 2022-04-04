@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.4.1
+- Arreglo a la validacion de preinscripciones en el mismo período donde se va a crear una preinscripcion
+
 ## 1.4.0
 - Agregados campos es egresado y estado civil a formulario de personas
 - Validación para teléfonos celulares
