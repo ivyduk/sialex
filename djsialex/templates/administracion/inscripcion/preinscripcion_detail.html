@@ -86,46 +86,30 @@
         <p>Código generado</p>
         <p>{{ preinscripcionhorariocurso.codigo_hash}}</p>
         <div class="blockquote">
-                <h2>Instrucciones:</h2>
-
-                <p>Tome en cuenta la siguiente información para realizar su formalización</p>
                 <div>
                         <ul>
                           <li>
                             <h3>Documentos a presentar para pago</h3>
-                            <p>{{ mensaje_formalizacion.documentos_pago }}</p>
+                            <p>{{ documentos_mensaje }}</p>
 
-                            {% if preinscripcion_curso.descuento_solicitado %}
-                                <br/>Descuento aplicado: <strong>{{ preinscripcion_curso.descuento_solicitado }}</strong>
+                            {% if preinscripcionhorariocurso.descuento_solicitado %}
+                                <br/>Descuento aplicado: <strong>{{ preinscripcionhorariocurso.descuento_solicitado }}</strong>
                                 <br/>
                                 <br/>Recuerde que para poder aplicar como beneficiario de este descuento deberá presentar los siguientes
                                 documentos:
                             <ul>
                                 {% for documento in documentos_requeridos %}
-                                    <li>{{ documento }}</li>
+                                    <li> - {{ documento }}</li>
                                 {% endfor %}
                             </ul>
                             {% endif %}
                           </li>
-
-                          <li>
-                            <h3>Datos para realizar el pago</h3>
-                            <p>{{ mensaje_formalizacion.datos_pago }}</p>
-                          </li>
-
-                          <li>
-                            <h3>Fecha de citación</h3>
-                            <p>{{ mensaje_formalizacion.fecha_citacion }}</p>
-                          </li>
-
-                          <li>
-                            <h3>Lugar de citación</h3>
-                            <p>{{ mensaje_formalizacion.lugar_citacion }}</p>
-                          </li>
-
-                          <h3>Horario de citación</h3>
-                            <p>{{ mensaje_formalizacion.horario_citacion }}</p>
                         </ul>
+                    <h2>Instrucciones:</h2>
+                    <div>
+                    {{ mensaje_formalizacion|safe}}
+                    </div>
+
                       </div>
                         <div class="container-fluid">
                               <div class="row vertical-align">

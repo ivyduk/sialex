@@ -14,9 +14,20 @@
             <li class="list-group-item">Cupos autorizados disponibles: {{ examenclasificacion.cupo_disponible_autorizado }} / {{ examenclasificacion.cupo_autorizado }}</li>
             <li class="list-group-item">Edad mínima: {{ examenclasificacion.edad_minima}}</li>
             <li class="list-group-item">Tarifa: {{ examenclasificacion.tarifa }} COP</li>
-            <li class="list-group-item">Lugar de Aplicación: {{ examenclasificacion.lugar_aplicacion }}</li>
+            <li class="list-group-item">Lugar de aplicación:
+                    {{ examenclasificacion.lugar_aplicacion }}
+            </li>
             <li class="list-group-item">Fecha-Hora Aplicación: {{ examenclasificacion.fecha_hora|date:"Y-m-d, H:i" }}</li>
-            <li class="list-group-item">Lugar y fecha Recepción documentos: {{ examenclasificacion.fecha_hora_recepcion_documentos }}</li>
+            <li class="list-group-item">Instrucciones:
+                {% if examenclasificacion.mensaje_formalizacion %}
+                    {{ examenclasificacion.mensaje_formalizacion|safe }}
+                {% elif examenclasificacion.fecha_hora_recepcion_documentos %}
+                    {{ examenclasificacion.fecha_hora_recepcion_documentos }}
+                {% else %}
+                    <strong>
+                        No tiene mensaje con información de formalización y/o entrega de documentos
+                    </strong>
+                {% endif %}</li>
         </ul>
 
 

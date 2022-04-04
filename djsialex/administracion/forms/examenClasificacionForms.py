@@ -7,8 +7,8 @@ from datetime import datetime
 import pytz
 from django.db.models import Q
 
-class ExamenClasificacionForm(forms.ModelForm):
 
+class ExamenClasificacionForm(forms.ModelForm):
 
     class Meta:
         model = ExamenClasificacion
@@ -21,7 +21,7 @@ class ExamenClasificacionForm(forms.ModelForm):
                   'edad_minima',
                   'lugar_aplicacion',
                   'fecha_hora',
-                  'fecha_hora_recepcion_documentos',
+                  'mensaje_formalizacion',
                   'docentes_evaluadores')
 
         labels = {
@@ -30,13 +30,14 @@ class ExamenClasificacionForm(forms.ModelForm):
             'cupo_autorizado': 'Cupos autorizados',
             'lugar_aplicacion': 'Lugar aplicación',
             'fecha_hora': 'Fecha y hora examen',
-            'fecha_hora_recepcion_documentos': 'Información acerca del examen y de la recepción de documentos'
+            'mensaje_formalizacion': 'Información acerca del examen y de la recepción de documentos'
         }
 
         FORMAT = '%Y-%m-%d %H:%M'
 
-        widgets = {'fecha_hora': DateTimePickerInput(format=FORMAT),
-                   }
+        widgets = {
+            'fecha_hora': DateTimePickerInput(format=FORMAT),
+        }
 
     def __init__(self, *args, **kwargs):
         super(ExamenClasificacionForm, self).__init__(*args, **kwargs)
@@ -57,6 +58,7 @@ class ExamenClasificacionForm(forms.ModelForm):
 
 
         return cleaned_data
+
 
 class SeleccionarIdiomaForm(forms.Form):
 

@@ -12,6 +12,7 @@ class MensajeFormalizacionCreate(LoginRequiredMixin, CreateView):
     form_class = MensajeFormalizacionForm
     success_url = reverse_lazy('mensajeformalizacion_list')
 
+
 class MensajeFormalizacionUpdate(LoginRequiredMixin, UpdateView):
     model = InformacionPreinscripcionFormalizacion
     template_name = 'administracion/configuracion/mensaje_formalizacion_form.html'
@@ -23,6 +24,7 @@ class MensajeFormalizacionUpdate(LoginRequiredMixin, UpdateView):
         instance = self.object
         context['periodo'] = instance.periodo
         return context
+
 
 class MensajeFormalizacionList(LoginRequiredMixin, ListView):
     model = InformacionPreinscripcionFormalizacion

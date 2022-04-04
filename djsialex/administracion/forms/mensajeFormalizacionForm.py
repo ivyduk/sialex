@@ -7,4 +7,4 @@ from ..models import InformacionPreinscripcionFormalizacion
 class MensajeFormalizacionForm(forms.ModelForm):
     class Meta:
         model = InformacionPreinscripcionFormalizacion
-        exclude = ['periodo']
+        exclude = ['periodo', 'datos_pago', 'fecha_citacion', 'lugar_citacion', 'horario_citacion']

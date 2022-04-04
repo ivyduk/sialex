@@ -16,6 +16,7 @@
 
     <form class="form-horizontal" method="post">
     {% csrf_token %}
+    {{ form.media }}
 
         {% if form.non_field_errors %}
         <div class="error-form text-center">
