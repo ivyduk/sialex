@@ -166,17 +166,29 @@ def preinscripcionView(request):
                 return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
 
             mensaje_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
+            ofertas_periodo = OfertaAcademica.objects.filter(periodo=periodo)
 
             if preinscrito and horario and periodo:
 
                 niveles = Nivel.objects.filter(idioma_id=idioma)
-                preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],horario_cupo=horario, persona=preinscrito) #Estado 6: Cancelado
-                preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
-                                                                                  horario_cupo__curso__nivel__in=niveles,
-                                                                                  persona=preinscrito)
-                preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
-                                                                                  horario_cupo__horario=horario.horario,
-                                                                                  persona=preinscrito)
+                preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(
+                    estado_preinscripcion__in=[1, 3, 5],
+                    horario_cupo=horario,
+                    persona=preinscrito,
+                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
+                ) #Estado 6: Cancelado
+                preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(
+                    estado_preinscripcion__in=[1, 3, 5],
+                    horario_cupo__curso__nivel__in=niveles,
+                    persona=preinscrito,
+                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
+                )
+                preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(
+                    estado_preinscripcion__in=[1, 3, 5],
+                    horario_cupo__horario=horario.horario,
+                    persona=preinscrito,
+                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
+                )
                 if not preinscripcion_previa and not preinscripcion_mismo_idioma and not preinscripcion_horario_existente:
                     ayudante = AyudanteFinancieros(preinscrito, periodo)
                     tarifa_curso = horario.curso.oferta_academica.tarifa
