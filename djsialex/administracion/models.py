@@ -54,6 +54,7 @@ class DatosEstudiantesModel(models.Model):
     ciudad_residencia       = models.IntegerField()
     descuento               = models.IntegerField()
     valor_inscripcion       = models.FloatField(null=False)
+    valor_pago              = models.FloatField(null=False)
     fecha_pago              = models.DateField()
     no_soporte_de_pago      = models.CharField(max_length=100)
     tipo_pago               = models.IntegerField()
