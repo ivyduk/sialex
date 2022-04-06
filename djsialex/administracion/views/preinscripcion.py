@@ -121,7 +121,10 @@ class PreinscripcionCursoListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         perfil = Profile.objects.get(usuario=self.request.user)
         periodo_id = self.request.session["periodo_contextualizado_id"]
-        preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(persona=perfil, horario_cupo__curso__oferta_academica__periodo_id=periodo_id)
+        preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(
+            persona=perfil,
+            horario_cupo__curso__oferta_academica__periodo__activo=True
+        )
         preinscripcionesExamen = PreinscripcionExamen.objects.filter(persona=perfil, examen__periodo_id=periodo_id)
         return list(chain(preinscripcionesCurso, preinscripcionesExamen))
 
@@ -176,22 +179,28 @@ def preinscripcionView(request):
                 mensaje_formalizacion = informacion_formalizacion.mensaje_formalizacion
                 documentos_mensaje = informacion_formalizacion.documentos_pago
 
+            ofertas_periodo = OfertaAcademica.objects.filter(periodo__activo=True)
+
             if preinscrito and horario and periodo:
 
                 niveles = Nivel.objects.filter(idioma_id=idioma)
                 preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(
                     estado_preinscripcion__in=[1, 3, 5],
                     horario_cupo=horario,
-                    persona=preinscrito
-                ) #Estado 6: Cancelado
+                    persona=preinscrito,
+                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
+                ) #Estado 1,3, 5: (1, 'Inscrito'), (3, 'Pendiente'), (5, 'Preinscrito')
                 preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(
                     estado_preinscripcion__in=[1, 3, 5],
                     horario_cupo__curso__nivel__in=niveles,
-                    persona=preinscrito
+                    persona=preinscrito,
+                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
                 )
                 preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(
                     estado_preinscripcion__in=[1, 3, 5],
-                    horario_cupo__horario=horario.horario, persona=preinscrito
+                    horario_cupo__horario=horario.horario,
+                    persona=preinscrito,
+                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
                 )
                 if not preinscripcion_previa and not preinscripcion_mismo_idioma and not preinscripcion_horario_existente:
                     ayudante = AyudanteFinancieros(preinscrito, periodo)
@@ -354,9 +363,15 @@ class PreinscripcionCursoDetailView(LoginRequiredMixin, generic.DetailView):
         periodo = Periodo.objects.get(pk=periodo_id)
         reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionhorariocurso)
         try:
-            mensaje_encontrado = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
-            context['mensaje_formalizacion'] = mensaje_encontrado.mensaje_formalizacion
-            context['documentos_mensaje'] = mensaje_encontrado.documentos_pago
+            if preinscripcionhorariocurso.horario_cupo.curso.nivel.mensaje_formalizacion:
+                mensaje = preinscripcionhorariocurso.horario_cupo.curso.nivel.mensaje_formalizacion
+                documentos_mensaje = preinscripcionhorariocurso.horario_cupo.curso.nivel.documentos_pago
+            else:
+                informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
+                mensaje = informacion_formalizacion.mensaje_formalizacion
+                documentos_mensaje = informacion_formalizacion.documentos_pago
+            context['mensaje_formalizacion'] = mensaje
+            context['documentos_mensaje'] = documentos_mensaje
         except InformacionPreinscripcionFormalizacion.DoesNotExist:
             mensaje_encontrado = None
         if reservas_saldos:
@@ -467,7 +482,7 @@ def cargar_niveles(request):
         if examenes_calificados_vigentes:
             for examen in examenes_calificados_vigentes:
                 nivel_aprobado = Nivel.objects.filter(
-                    orden=examen.nivel.orden + 1,
+                    orden=examen.nivel.orden,
                     idioma=examen.nivel.idioma
                 )
                 if nivel_aprobado:
@@ -510,8 +525,14 @@ def cargar_niveles(request):
 def cargar_horarios_disponibles(request):
     error = False
     if request.user.is_authenticated:
+        periodo_id = request.session["periodo_contextualizado_id"]
+        periodo = Periodo.objects.get(pk=periodo_id)
         nivel_id = request.GET.get('nivel')
-        cursos = Curso.objects.filter(nivel=nivel_id, oferta_academica__periodo__activo=True).all()
+        cursos = Curso.objects.filter(
+            nivel=nivel_id,
+            oferta_academica__periodo__activo=True,
+            oferta_academica__periodo__inicio=periodo.inicio
+        ).all()
         horarios = HorarioCurso.objects.filter(curso__in=cursos, cupo_disponible__gt=0).order_by('nombre').all()
         autorizaciones_dict = request.session.get('autorizaciones_dict')
         cursos_ids = [str(curso) for curso in cursos.values_list('id', flat=True)]
