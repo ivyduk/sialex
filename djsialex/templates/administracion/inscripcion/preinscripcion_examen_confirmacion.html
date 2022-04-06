@@ -9,14 +9,17 @@
         <h2 class="title-project">Su preinscripción se ha completado con éxito</h2>
         <h4>Comprobante de preinscripción a Examen de Clasificación</h4>
 
-        <br/><h4>Datos personales:</h4>
+        <h4>Datos personales:</h4>
             <strong>Documento de Identidad: </strong>{{ preinscripcion_examen.persona.tipo_documento }} {{ preinscripcion_examen.persona.numero_documento }}
             <strong>Nombres: {{ preinscripcion_examen.persona.getNombres }} {{ preinscripcion_examen.persona.getApellidos }}</strong>
         <br/><h4>Información del examen:</h4>
             <br/>Examen: <strong>{{ preinscripcion_examen.examen.nombre }} - {{ preinscripcion_examen.examen.periodo }}</strong>
             <br>Idioma: <strong>{{ preinscripcion_examen.examen.idioma.nombre }}</strong>
-            <br/>Fecha de aplicación: <strong>{{ preinscripcion_examen.examen.fecha_hora}}</strong>
-            <br/>Lugar de aplicación: <strong>{{ preinscripcion_examen.examen.lugar_aplicacion }}</strong>
+            <br/>Fecha de aplicación: <strong>{{ preinscripcion_examen.examen.fecha_hora|date:"d/m/Y - h:m"}}</strong>
+            <br/>Lugar de aplicación:
+            <strong>
+                {{ preinscripcion_examen.examen.lugar_aplicacion }}
+            </strong>
 
         <br/> <h4>Costo: </h4>
             <br/>Valor a pagar $: <strong>{{ preinscripcion_examen.valor_preinscripcion }}</strong>
@@ -26,9 +29,11 @@
 
         <h3>Instrucciones:</h3>
 
-        <p>Fecha y hora de recepción de documentos:
-            </br>{{ preinscripcion_examen.examen.fecha_hora_recepcion_documentos }}
-        </p>
+            {% if preinscripcion_examen.examen.mensaje_formalizacion %}
+                {{ preinscripcion_examen.examen.mensaje_formalizacion|safe }}
+            {% else %}
+                {{ preinscripcion_examen.examen.fecha_hora_recepcion_documentos }}
+            {% endif %}
 
         <div class="container-fluid">
             <div class="row vertical-align">

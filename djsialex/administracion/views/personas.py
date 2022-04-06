@@ -16,7 +16,7 @@ from django.urls import reverse_lazy
 from administracion.views.busqueda_list import BusquedaGenerica
 from ..forms import PersonaContactoForm, BasePersonaContactoFormSet, EditProfileForm, \
     ExamenClasificacionForm, PersonaAdministracionForm
-from ..models import Profile, PersonaContacto, Preinscripcion
+from ..models import Profile, PersonaContacto, Preinscripcion, PreinscripcionExamen, PreinscripcionHorarioCurso
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -156,6 +156,12 @@ class EditarPersonaDocumentoEntregado(LoginRequiredMixin, UpdateView):
     success_message = 'Actualizados documentos de identificación.'
 
     def get_success_url(self, *args, **kwargs):
-        preinscripcion_id = self.kwargs["preinscripcionhorariocurso"]
-        return reverse_lazy('formalizar-curso',
-                            kwargs={'pk': preinscripcion_id})
+        preinscripcion_id = self.kwargs["preinscripcion"]
+        preinscripcion = PreinscripcionExamen.objects.filter(id=preinscripcion_id).first()
+        if not preinscripcion:
+            return reverse_lazy('formalizar-curso',
+                                kwargs={'pk': preinscripcion_id})
+        else:
+            return reverse_lazy('formalizar-examen',
+                                kwargs={'pk': preinscripcion_id})
+

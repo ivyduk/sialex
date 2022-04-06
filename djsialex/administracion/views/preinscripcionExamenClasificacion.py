@@ -89,12 +89,25 @@ def preinscripcionExamenView(request):
                 if examen and periodo and preinscrito:
 
                     ofertas_academicas = OfertaAcademica.objects.filter(programa__idioma_id=idioma_id)
-                    examenes_encontrados = PreinscripcionExamen.objects.filter(examen = examen, persona=preinscrito, estado_preinscripcion__in  =[1,3,4,5]).all() #Estado: Inscrito, Pendiente, Aplazado, Preinscrito
-                    preinscripcion_curso = PreinscripcionHorarioCurso.objects.filter(horario_cupo__curso__oferta_academica__in=ofertas_academicas, persona=preinscrito, estado_preinscripcion__in=[1,3,5]).all()
+                    examenes_encontrados = PreinscripcionExamen.objects.filter(
+                        examen=examen,
+                        persona=preinscrito,
+                        estado_preinscripcion__in=[1, 3, 4, 5],
+                        examen__periodo_id=periodo.id,
+                    ).all() #Estado: Inscrito, Pendiente, Aplazado, Preinscrito
+                    preinscripcion_curso = PreinscripcionHorarioCurso.objects.filter(
+                        horario_cupo__curso__oferta_academica__in=ofertas_academicas,
+                        persona=preinscrito, estado_preinscripcion__in=[1, 3, 5],
+                        horario_cupo__curso__oferta_academica__periodo__lte=periodo.inicio - 4
+                    ).first()
                     if preinscripcion_curso or len(examenes_encontrados) > 0:
                         if preinscripcion_curso:
-                            form.add_error('idioma',
-                                           'Ya existe una preinscripción a un curso al mismo idioma en el presente periodo')
+                            form.add_error(
+                                'idioma', 'Ya existe una preinscripción a un curso al mismo idioma'
+                                          ' en el periodo: {}'.format(
+                                    preinscripcion_curso.horario_cupo.curso.oferta_academica.periodo.alias
+                                )
+                            )
                         elif len(examenes_encontrados) > 0:
                             form.add_error('idioma',
                                        'Ya existe una preinscripción a este examen de este usuario en el presente periodo')
@@ -143,9 +156,19 @@ def preinscripcionExamenView(request):
                             ayudante.actualizar_financieros_creacion_recibo(recibo, detallado_preinscripcion)
                             logger.info("Financieros actualizados")
 
-                            html_message = loader.render_to_string('administracion/inscripcion/preinscripcion_examen_email.html', {'preinscripcion_examen': preinscripcion_examen,
-                                    'detallado' : detallado_preinscripcion}, request=request)
-                            send_mail('Confirmación Preinscripción Examen','','sialex_fchbog@unal.edu.co',[preinscrito.usuario.email],fail_silently=True,html_message=html_message)
+                            html_message = loader.render_to_string(
+                                'administracion/inscripcion/preinscripcion_examen_email.html',
+                                {'preinscripcion_examen': preinscripcion_examen,
+                                 'detallado' : detallado_preinscripcion}, request=request
+                            )
+                            send_mail(
+                                'Confirmación Preinscripción Examen',
+                                '',
+                                'sialex_fchbog@unal.edu.co',
+                                [preinscrito.usuario.email],
+                                fail_silently=True,
+                                html_message=html_message
+                            )
 
                             return render(request, 'administracion/inscripcion/preinscripcion_examen_confirmacion.html',
                                     {'preinscripcion_examen': preinscripcion_examen,

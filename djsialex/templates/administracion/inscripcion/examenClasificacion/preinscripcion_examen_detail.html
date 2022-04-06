@@ -15,7 +15,18 @@
             <li class="list-group-item">Estado: {{ preinscripcionexamen.get_estado_preinscripcion_display }}</li>
             <li class="list-group-item">Fecha De Preinscripción: {{ preinscripcionexamen.fecha_preinscripcion }}</li>
             <li class="list-group-item">Valor a Pagar: $ {{ preinscripcionexamen.valor_preinscripcion }}</li>
-            <li class="list-group-item">Información sobre la entrega de documentos: {{ preinscripcionexamen.examen.fecha_hora_recepcion_documentos }}</li>
+            <li class="list-group-item">Instrucciones:
+                {% if preinscripcionexamen.examen.mensaje_formalizacion %}
+                    {{ preinscripcionexamen.examen.mensaje_formalizacion|safe }}
+                {% elif preinscripcionexamen.examen.fecha_hora_recepcion_documentos %}
+                    {{ preinscripcionexamen.examen.fecha_hora_recepcion_documentos }}
+                {% else %}
+                    <strong>
+                        No hay información para formalización y/o entrega de documentos, comuníquese con
+                        el departamento de extensión de lenguas extranjeras
+                    </strong>
+                {% endif %}
+            </li>
             <li class="list-group-item">Fecha de presentación del examen: {{ preinscripcionexamen.examen.getFechaAplicacion }}</li>
         </ul>
     </div>

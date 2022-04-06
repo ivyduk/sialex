@@ -69,7 +69,7 @@ def descargarCalificacionesExamen(request):
 
     data = {}
 
-    for  i in range(len(calificaciones)):
+    for i in range(len(calificaciones)):
         data_calificacion = [calificaciones[i].preinscripcion_examen.persona.tipo_documento.nombre,
                   calificaciones[i].preinscripcion_examen.persona.numero_documento,
                   calificaciones[i].preinscripcion_examen.persona.getNombreCompleto().upper(),
@@ -111,7 +111,7 @@ def descargarPreinscritosExamen(request, examen):
         preinscripciones = PreinscripcionExamen.objects.filter(examen=examen_clasficacion).order_by('persona__primer_nombre', 'fecha_preinscripcion').all()
         data = {}
 
-        for  i in range(len(preinscripciones)):
+        for i in range(len(preinscripciones)):
             data_calificacion = [preinscripciones[i].examen.nombre, preinscripciones[i].examen.idioma.nombre,
                                  preinscripciones[i].examen.periodo.nombreAmigable(), preinscripciones[i].persona.tipo_documento,
                                  preinscripciones[i].persona.numero_documento, preinscripciones[i].persona.getNombreCompleto().upper(),
@@ -132,6 +132,17 @@ class ExamenClasificacionListView(LoginRequiredMixin, generic.ListView):
     template_name = 'administracion/examenClasificacion/examenclasificacion_list.html'
     login_url = '/acceso/login'
     redirect_field_name = 'redirect_to'
+
+    def get_queryset(self):
+        periodo_id = self.request.session["periodo_contextualizado_id"]
+        examenes_list = []
+        try:
+            periodo = Periodo.objects.get(pk=periodo_id)
+        except Periodo.DoesNotExist:
+            periodo = None
+        if periodo:
+            examenes_list = ExamenClasificacion.objects.filter(periodo=periodo).order_by('periodo')
+        return examenes_list
 
 
 class ExamenClasificacionDetailView(LoginRequiredMixin, generic.DetailView):
@@ -169,13 +180,15 @@ class ExamenClasificacionUpdate(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        form.save_m2m()
+        form.save()
         return HttpResponseRedirect(reverse_lazy('examen-clasificacion-detail', args=[instance.id]))
+
 
 class ExamenClasificacionDelete(LoginRequiredMixin, DeleteView):
     model = ExamenClasificacion
     template_name = 'administracion/examenClasificacion/examenclasificacion_confirm_delete.html'
     success_url = reverse_lazy('examenes-clasificacion')
+
 
 def calcularEdad(fechaNacimiento):
 

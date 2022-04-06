@@ -13,6 +13,7 @@
     <form class="form-horizontal" method="post">
 
     {% csrf_token %}
+        {{ form.media }}
         {% for field in form.visible_fields %}
             <div class="form-group small-margin">
              <label for="{{ field.id_for_label }}" class="col-md-3 control-label">{{ field.label }}

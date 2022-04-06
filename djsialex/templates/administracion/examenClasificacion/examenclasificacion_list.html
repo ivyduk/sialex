@@ -27,8 +27,8 @@
                 <th scope="col">Cupos autorizados disponibles</th>
                 <th scope="col">Tarifa</th>
                 <th scope="col">Edad Mínima</th>
-                <th scope="col">Lugar Aplicación</th>
-                <th scope="col">Fecha Recepción Documentos</th>
+                <th scope="col">Lugar</th>
+                <th scope="col">Información Recepción Documentos</th>
                 <th scope="col">Fecha-Aplicación</th>
                 <th scope="col">Prinscritos</th>
                 <th scope="col">Editar</th>
@@ -48,8 +48,16 @@
                 <td>{{ examen.cupo_disponible_autorizado }}</td>
                 <td>{{ examen.tarifa }} COP</td>
                 <td>{{ examen.edad_minima }}</td>
-                <td>{{ examen.lugar_aplicacion }}</td>
-                <td>{{ examen.fecha_hora_recepcion_documentos }}</td>
+                <td>
+                    {{ examen.lugar_aplicacion }}
+                </td>
+                <td>
+                    {% if examen.mensaje_formalizacion %}
+                        {{ examen.mensaje_formalizacion|safe }}
+                    {% else %}
+                        {{ examen.fecha_hora_recepcion_documentos }}
+                    {% endif %}
+                </td>
                 <td>{{ examen.getFechaAplicacion }}</td>
 
                 <td>

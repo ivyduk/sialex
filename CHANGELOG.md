@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.5.0
+- agregado mensaje para formalización en niveles y sino período como defecto
+- habilitación a inscripción de estudiantes basado en el resultado del examen de calificación
+- Validación de documento de identidad desde la vista de formalizar examen de calificación
+- Ajustes en filtros de preinscripciones
+
 ## 1.4.1
 - Arreglo a la validacion de preinscripciones en el mismo período donde se va a crear una preinscripcion
 

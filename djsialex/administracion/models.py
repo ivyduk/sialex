@@ -20,6 +20,8 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 
+from ckeditor.fields import RichTextField
+
 
 from administracion.enums import *
 
@@ -155,7 +157,6 @@ class DocumentoRequerido(models.Model):
         return reverse('documento-requerido-detail', args=[str(self.id)])
 
 
-
 class ContenidoNivel(models.Model):
 
     id = models.AutoField(primary_key=True, editable=False)
@@ -178,6 +179,7 @@ class ContenidoNivel(models.Model):
     class Meta:
         verbose_name = "Contenido nivel"
         verbose_name_plural = "Contenido niveles"
+
 
 class ContenidoNivelVersion(models.Model):
 
@@ -211,6 +213,7 @@ class ContenidoNivelVersion(models.Model):
         verbose_name_plural = "Contenido niveles"
         ordering = ['-version']
 
+
 class Nivel(models.Model):
     """
 		Modelo que representa el nivel de un idioma como A1, B2, B3, etc.
@@ -223,17 +226,19 @@ class Nivel(models.Model):
     nombre = models.CharField(max_length=200, help_text='Nombre del nivel')
     alias = models.CharField(max_length=20, help_text='Alias para identificar el nivel fácilmente')
     predecesor = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, help_text='Nivel anterior para periodos regulares')
-    contenido = models.OneToOneField(ContenidoNivel,on_delete=models.CASCADE, null=False, editable=False)
+    contenido = models.OneToOneField(ContenidoNivel, on_delete=models.CASCADE, null=False, editable=False)
     intensidad_horaria = models.IntegerField(default=1, validators=[
             MinValueValidator(0)
-        ], verbose_name="intensidad horaria (horas)",help_text='Indica número de horas totales del nivel')
-    fallas_maximas = models.IntegerField(default=1,validators=[
+        ], verbose_name="intensidad horaria (horas)", help_text='Indica número de horas totales del nivel')
+    fallas_maximas = models.IntegerField(default=1, validators=[
             MinValueValidator(0)
         ], help_text='Número de horas que durará la enseñanza del nivel')
     activo = models.BooleanField(default=True, help_text='Determina si es un nivel está disponible actualmente')
     costo_materiales = models.FloatField(help_text='Valor de materiales', verbose_name="Valor Materiales (COP)", default=0)
     edad_minima = models.IntegerField(default=1, help_text='Edad mínima permitida', null=True)
     edad_maxima = models.IntegerField(default=100, help_text='Edad máxima permitida', null=True)
+    documentos_pago = models.CharField(max_length=300, default='Recibo Original y copia')
+    mensaje_formalizacion = RichTextField(blank=True, null=True)
 
     def get_absolute_url(self):
         """
@@ -260,6 +265,11 @@ class Nivel(models.Model):
         if self.idioma:
             idioma_nombre = self.idioma.nombre
         return idioma_nombre + '-' + self.nombre
+
+    def save(self, *args, **kwargs):
+        if self.mensaje_formalizacion == '':
+            self.mensaje_formalizacion = None
+        super(Nivel, self).save(*args, **kwargs)
 
 class EPS(models.Model):
     """
@@ -957,6 +967,7 @@ class ExamenClasificacion(models.Model):
     lugar_aplicacion = models.CharField(max_length=300, default='')
     fecha_hora = models.DateTimeField(null=True)
     fecha_hora_recepcion_documentos = models.TextField(max_length=3000, default='')
+    mensaje_formalizacion = RichTextField(blank=True, null=True)
 
     def __str__(self):
         """
@@ -980,6 +991,11 @@ class ExamenClasificacion(models.Model):
         TIME_FORMAT = "%H:%M"
 
         return self.fecha_hora.strftime("%s %s" % (DATE_FORMAT, TIME_FORMAT))
+
+    def save(self, *args, **kwargs):
+        if self.mensaje_formalizacion == '':
+            self.mensaje_formalizacion = None
+        super(ExamenClasificacion, self).save(*args, **kwargs)
 
 
 class PreinscripcionExamen(Preinscripcion):
@@ -1225,6 +1241,7 @@ class SingletonModel(models.Model):
     def set_cache(self):
         cache.set(self.__class__.__name__, self)
 
+
 class InformacionPreinscripcionFormalizacion(models.Model):
     documentos_pago = models.CharField(max_length=300, default='Recibo Original y copia')
     datos_pago = models.TextField(max_length=1000, default='Cuenta de ahorros')
@@ -1232,6 +1249,7 @@ class InformacionPreinscripcionFormalizacion(models.Model):
     lugar_citacion = models.CharField(max_length=300, default='Oficina de extensión')
     horario_citacion = models.TextField(max_length=1000, default='De 8 am a 6 pm')
     periodo = models.OneToOneField(Periodo, on_delete=models.PROTECT, help_text='Selección de periodo', unique=True)
+    mensaje_formalizacion = RichTextField(blank=True, null=True)
 
     def __str__(self):
         """

@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'bootstrap_modal_forms',
     'auditlog',
     'explorer',
-    'bootstrapform'
+    'bootstrapform',
+    'ckeditor'
 ]
 
 MIDDLEWARE = [
@@ -119,8 +120,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sialex',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
+        'USER': 'sialex',
+        'PASSWORD': 'sialex',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -210,13 +211,13 @@ MAX_IMAGE_SIZE = '20971520'
 SESSION_COOKIE_AGE = 60*60
 
 
-EMAIL_HOST = '168.176.5.61'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = 'sialex_fchbog@unal.edu.co'
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp-relay.sendinblue.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'iaduquea@unal.edu.co'
+EMAIL_HOST_PASSWORD = '4z0aWsSwUVKj3bqt'
+EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL='sialex_fchbog@unal.edu.co' 
+DEFAULT_FROM_EMA ='sialex_fchbog@unal.edu.co'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
@@ -228,3 +229,16 @@ EXPLORER_CONNECTIONS = { 'Default': 'default' }
 EXPLORER_DEFAULT_CONNECTION = 'default'
 
 CHOICES_SEPARATOR = ","
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source']
+        ],
+        'width': '100%'
+    },
+}
