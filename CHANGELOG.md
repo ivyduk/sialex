@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.5.1
+- Ajustes en validación para preinscripción de antiguos y cambio de fechas para el servicio web con Hermes
+
 ## 1.5.0
 - agregado mensaje para formalización en niveles y sino período como defecto
 - habilitación a inscripción de estudiantes basado en el resultado del examen de calificación

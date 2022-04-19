@@ -4,5 +4,5 @@ from rest_framework import viewsets
 
 
 class DatosEstudiantesAPI(viewsets.ModelViewSet):
-    queryset = DatosEstudiantesModel.objects.raw('select * from datosEstudiantes(\'2021-01-01\',\'2021-12-31\')')
+    queryset = DatosEstudiantesModel.objects.raw('select * from datosEstudiantes(\'2022-01-01\',\'2022-04-30\')')
     serializer_class = DatosEstudiantesSerialize

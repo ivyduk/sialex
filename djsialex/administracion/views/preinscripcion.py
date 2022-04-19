@@ -179,7 +179,10 @@ def preinscripcionView(request):
                 mensaje_formalizacion = informacion_formalizacion.mensaje_formalizacion
                 documentos_mensaje = informacion_formalizacion.documentos_pago
 
-            ofertas_periodo = OfertaAcademica.objects.filter(periodo__activo=True)
+            ofertas_periodo = OfertaAcademica.objects.filter(
+                periodo__inicio=periodo.inicio,
+                periodo__activo=True
+            )
 
             if preinscrito and horario and periodo:
 
@@ -477,7 +480,8 @@ def cargar_niveles(request):
         examenes_calificados_vigentes = CalificacionExamen.objects.filter(
             preinscripcion_examen__examen__periodo__inicio__gte=periodo.inicio-4,
             preinscripcion_examen__persona__id=aspirante.id,
-            preinscripcion_examen__examen__idioma_id=programa_academico.idioma.id
+            preinscripcion_examen__examen__idioma_id=programa_academico.idioma.id,
+            nivel_id__isnull=False
         )
         if examenes_calificados_vigentes:
             for examen in examenes_calificados_vigentes:
