@@ -324,10 +324,20 @@ def cargar_programas_academicos(request):
         if aspirante:
             fecha_nacimiento = aspirante.fecha_nacimiento
             edad_aspirante = calcularEdad(fecha_nacimiento)
-            programas_academicos = ProgramaAcademico.objects.filter(idioma = idioma_id, edad_minima__lte=edad_aspirante, edad_maxima__gt=edad_aspirante, activo=True, ofertaacademica__periodo__id=periodo_id).order_by('nombre').all()
+            programas_academicos = ProgramaAcademico.objects.filter(
+                idioma=idioma_id,
+                edad_minima__lte=edad_aspirante,
+                edad_maxima__gt=edad_aspirante,
+                activo=True,
+                ofertaacademica__periodo__id=periodo_id
+            ).order_by('nombre').all()
             programas_autorizados = []
             if aspirante:
-                autorizaciones = AutorizadoCurso.objects.filter(numero_documento=aspirante.numero_documento, periodo=periodo_id, estado__in=[1,3], curso_autorizado__oferta_academica__programa__in=programas_academicos).all() #Estado: AUTORIZADO o AUTORIZACIÓN CANCELADA
+                autorizaciones = AutorizadoCurso.objects.filter(
+                    numero_documento=aspirante.numero_documento,
+                    periodo=periodo_id,
+                    estado__in=[1, 3],
+                    curso_autorizado__oferta_academica__programa__in=programas_academicos).all() #Estado: AUTORIZADO o AUTORIZACIÓN CANCELADA
                 for autorizacion in autorizaciones:
                     programa_autorizado = ProgramaAcademico.objects.filter(pk=autorizacion.curso_autorizado.oferta_academica.programa.id)
                     if autorizacion.curso_autorizado.id not in autorizaciones_dict:
@@ -569,7 +579,7 @@ def formalizar_vista(request, pk):
     validar_descuento = True
     saldo_flag = check_saldo_cargado(recibopreinscripcion)
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionhorariocurso)
-    facturacion_form = RequiereFacturacionForm()
+    facturacion_form = RequiereFacturacionForm(instance=preinscripcionhorariocurso)
 
     if descuento_aplicado:
         documentos = DocumentosDescuentoSolicitado.objects.filter(descuento_aplicado=descuento_aplicado[0])
@@ -595,6 +605,9 @@ def formalizar_vista(request, pk):
     tarifa_plena = recibopreinscripcion.valor_requerido - preinscripcionhorariocurso.horario_cupo.curso.nivel.costo_materiales
     if request.method == 'POST':
         facturacion_form = RequiereFacturacionForm(request.POST)
+        if facturacion_form.is_valid():
+            preinscripcionhorariocurso.requiere_facturacion = facturacion_form.cleaned_data['requiere_facturacion']
+            preinscripcionhorariocurso.save()
         if preinscripcionhorariocurso.estado_preinscripcion == 5:
             preinscripcionhorariocurso.estado_preinscripcion = 3
             preinscripcionhorariocurso.save()

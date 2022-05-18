@@ -80,7 +80,7 @@ def funcion(report):
         "__grades": calificaciones,
         "__final": str(report['matricula'].calificacionFinal),
         "__abs": str(report['matricula'].total_fallas) + " de 12 horas permitidas",
-        "__result": str(ESTADOS_ACADEMICOS_MATRICULA[d_matricula.estado_matricula][1]),
+        "__result": str(ESTADOS_ACADEMICOS_MATRICULA[d_matricula.estado_matricula-1][1]),
         "sp_cl": doc2,
         "cm_sp_cl": obs2,
         "cm_cl": obs,
