@@ -38,7 +38,7 @@ admin.site.register(Salon , SalonAdmin)
 
 @admin.register(Periodo)
 class PeriodoAdmin(admin.ModelAdmin):
-	list_display = ('alias', 'secuencia', 'anio','secuencia')
+	list_display = ('alias', 'secuencia', 'anio','secuencia', 'nombre')
 
 
 @admin.register(Horario)

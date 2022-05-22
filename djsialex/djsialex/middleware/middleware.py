@@ -17,7 +17,7 @@ class FilterLoginMiddleware(object):
             if 'periodo' in myDict.keys():
                 if not request.POST._mutable:
                     request.POST._mutable = True
-                request.POST['username'] =  myDict['numero_documento'][0]
+                request.POST['username'] = myDict['numero_documento'][0]
                 request.session["periodo_contextualizado_id"] = myDict['periodo'][0]
 
 

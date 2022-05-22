@@ -67,7 +67,8 @@
                                 <td>{{ preinscripcionhorariocurso.horario_cupo.horario.nombre }}</td>
                             </tr>
                         <tr>
-                                    {{facturacion_form}}
+                            <form action = "{% url 'formalizar-curso' preinscripcionhorariocurso.id %}" method = "post">
+                                {{facturacion_form}}
                         </tr>
                         </tbody>
                     </table>
@@ -283,7 +284,6 @@
                     <li class="list-group-item l"><a href="{% url 'preinscripcion_delete' preinscripcionhorariocurso.id %}" class="btn btn-danger btn-cancelar">Cancelar Pre-inscripcion</a></li>
                     {% endif %}
                     {% if preinscripcionhorariocurso.estado_preinscripcion == 5 or preinscripcionhorariocurso.estado_preinscripcion == 3 %}
-                    <form action = "{% url 'formalizar-curso' preinscripcionhorariocurso.id %}" method = "post">
                         <li class="list-group-item l"><input type="submit" class="btn btn-success btn-cancelar" id="formalizar" value="Formalizar"></li>
                     </form>
                     {% endif %}

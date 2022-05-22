@@ -12,7 +12,7 @@
     {% csrf_token %}
         <select name="periodo" id="periodo" class="form-control">
             {% for periodo in periodos %}
-                <option value="{{ periodo.id }}">{{ periodo.alias }}</option>
+                <option value="{{ periodo.id }}">{{ periodo.nombre }}</option>
             {% endfor %}
         </select>
         <br />

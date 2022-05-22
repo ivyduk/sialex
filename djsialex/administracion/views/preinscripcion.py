@@ -12,6 +12,8 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.models import Group
 
+
+
 from itertools import chain
 
 from administracion.forms.inscripcionForm import PreinscripcionCursoForm, PreinscripcionCursoLoteForm
@@ -60,7 +62,7 @@ class CancelPreinscripcion(LoginRequiredMixin, DeleteView):
         try:
             preinscripcion = PreinscripcionHorarioCurso.objects.get(pk=preinscripcion_id)
         except PreinscripcionHorarioCurso.DoesNotExist:
-            preinscripcion = None      
+            preinscripcion = None
         try:
             preinscrito = Profile.objects.get(pk = request.user.profile.id)
         except Profile.DoesNotExist:
@@ -111,7 +113,6 @@ class CancelPreinscripcion(LoginRequiredMixin, DeleteView):
                 pass
         return HttpResponseRedirect(self.get_success_url())
 
-
 class PreinscripcionCursoListView(LoginRequiredMixin, generic.ListView):
     model = PreinscripcionHorarioCurso
     template_name = 'administracion/inscripcion/mis_inscripciones.html'
@@ -121,13 +122,9 @@ class PreinscripcionCursoListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         perfil = Profile.objects.get(usuario=self.request.user)
         periodo_id = self.request.session["periodo_contextualizado_id"]
-        preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(
-            persona=perfil,
-            horario_cupo__curso__oferta_academica__periodo__activo=True
-        )
+        preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(persona=perfil, horario_cupo__curso__oferta_academica__periodo_id=periodo_id)
         preinscripcionesExamen = PreinscripcionExamen.objects.filter(persona=perfil, examen__periodo_id=periodo_id)
         return list(chain(preinscripcionesCurso, preinscripcionesExamen))
-
 
 class PreinscripcionCursoCreate(LoginRequiredMixin, CreateView):
     model = PreinscripcionHorarioCurso
@@ -146,15 +143,13 @@ def preinscripcionView(request):
         descuento_id = request.POST['descuento']
         periodo_id = request.session["periodo_contextualizado_id"]
         hash_code = request.POST["hash"]
-        documentos_mensaje = None
-
+        if descuento_id:
+            descuento = Descuento.objects.get(pk=descuento_id)
+        else:
+            descuento = None
         if form.is_valid():
-            if descuento_id:
-                descuento = Descuento.objects.get(pk=descuento_id)
-            else:
-                descuento = None
             try:
-                preinscrito = Profile.objects.get(pk=request.user.profile.id)
+                preinscrito = Profile.objects.get(pk = request.user.profile.id)
             except Profile.DoesNotExist:
                 preinscrito = None
             try:
@@ -166,56 +161,26 @@ def preinscripcionView(request):
             except Periodo.DoesNotExist:
                 periodo = None
 
-            if horario.curso.oferta_academica.programa.descuento_obligatorio and not descuento_id:
-                form.add_error('idioma',
-                               'Es necesario agregar un descuento para este programa académico')
-                return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
-
-            if horario and horario.curso.nivel.mensaje_formalizacion:
-                mensaje_formalizacion = horario.curso.nivel.mensaje_formalizacion
-                documentos_mensaje = horario.curso.nivel.documentos_pago
-            else:
-                informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
-                mensaje_formalizacion = informacion_formalizacion.mensaje_formalizacion
-                documentos_mensaje = informacion_formalizacion.documentos_pago
-
-            ofertas_periodo = OfertaAcademica.objects.filter(
-                periodo__inicio=periodo.inicio,
-                periodo__activo=True
-            )
+            mensaje_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
 
             if preinscrito and horario and periodo:
 
+                ofertas_periodo = OfertaAcademica.objects.filter(periodo=periodo)
+
                 niveles = Nivel.objects.filter(idioma_id=idioma)
-                preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(
-                    estado_preinscripcion__in=[1, 3, 5],
-                    horario_cupo=horario,
-                    persona=preinscrito,
-                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
-                ) #Estado 1,3, 5: (1, 'Inscrito'), (3, 'Pendiente'), (5, 'Preinscrito')
-                preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(
-                    estado_preinscripcion__in=[1, 3, 5],
-                    horario_cupo__curso__nivel__in=niveles,
-                    persona=preinscrito,
-                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
-                )
-                preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(
-                    estado_preinscripcion__in=[1, 3, 5],
-                    horario_cupo__horario=horario.horario,
-                    persona=preinscrito,
-                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
-                )
+                preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],horario_cupo=horario, persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo) #Estado 6: Cancelado
+                preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
+                                                                                  horario_cupo__curso__nivel__in=niveles,
+                                                                                  persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
+                preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
+                                                                                  horario_cupo__horario=horario.horario,
+                                                                                  persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
                 if not preinscripcion_previa and not preinscripcion_mismo_idioma and not preinscripcion_horario_existente:
                     ayudante = AyudanteFinancieros(preinscrito, periodo)
                     tarifa_curso = horario.curso.oferta_academica.tarifa
                     valor_inscripcion, detallado_preinscripcion = ayudante.calcular_valor_preinscripcion_curso(tarifa_curso, horario.curso.nivel, descuento, horario.curso.nivel.costo_materiales)
                     #buscar si es autorizado
-                    autorizado_curso = AutorizadoCurso.objects.filter(
-                        numero_documento=preinscrito.numero_documento,
-                        periodo=periodo,
-                        curso_autorizado=horario.curso,
-                        estado__in=[1, 3]
-                    ).first()
+                    autorizado_curso = AutorizadoCurso.objects.filter(numero_documento=preinscrito.numero_documento, periodo=periodo, curso_autorizado=horario.curso, estado__in=[1,3]).all().first()
                     if autorizado_curso and horario.cupo_disponible_autorizados > 0:
                         if 'beca' in detallado_preinscripcion:
                             try:
@@ -225,18 +190,12 @@ def preinscripcionView(request):
                                 beca.save()
                             except Beca.DoesNotExist:
                                 beca = None
-                        preinscripcion_curso = PreinscripcionHorarioCurso(
-                            persona=preinscrito,
-                            valor_preinscripcion=valor_inscripcion,
-                            codigo_hash=hash_code,
-                            horario_cupo=horario,
-                            descuento_solicitado=descuento
-                        )
+                        preinscripcion_curso = PreinscripcionHorarioCurso(persona=preinscrito, valor_preinscripcion = valor_inscripcion, codigo_hash=hash_code, horario_cupo = horario, descuento_solicitado=descuento)
                         preinscripcion_curso.save()
                         recibo = ReciboPreinscripcion.objects.create(preinscrito=preinscrito,preinscripcion=preinscripcion_curso, valor_requerido=tarifa_curso+horario.curso.nivel.costo_materiales, estado_recibo=2)
                         logger.info("Recibo preinscripción creado satisfactoriamente")
                         horario.cupo_disponible_autorizados = horario.cupo_disponible_autorizados -1
-                        autorizado_curso.estado = 2 # completa
+                        autorizado_curso.estado = 2 #completa
                         autorizado_curso.save()
                         horario.save()
                         if descuento:
@@ -247,42 +206,17 @@ def preinscripcionView(request):
                         ayudante.actualizar_financieros_creacion_recibo(recibo, detallado_preinscripcion)
                         logger.info("Financieros actualizados")
 
-                        html_message = loader.render_to_string(
-                            'administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
-                            {
-                                'preinscripcion_curso': preinscripcion_curso,
-                                'documentos_requeridos': documentos_requeridos,
-                                'detallado': detallado_preinscripcion,
-                                'mensaje_formalizacion': mensaje_formalizacion,
-                                'documentos_mensaje': documentos_mensaje
-                            },
-                            request=request
-                        )
-                        send_mail(
-                            'Confirmación Preinscripción Curso',
-                            '',
-                            'sialex_fchbog@unal.edu.co',
-                            [preinscrito.usuario.email],
-                            fail_silently=True,
-                            html_message=html_message
-                        )
+                        html_message = loader.render_to_string('administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
+                                    {'preinscripcion_curso': preinscripcion_curso,'documentos_requeridos':documentos_requeridos, 'detallado' : detallado_preinscripcion, 'mensaje_formalizacion': mensaje_formalizacion}, request=request)
+                        send_mail('Confirmación Preinscripción Curso','','sialex_fchbog@unal.edu.co',[preinscrito.usuario.email],fail_silently=True,html_message=html_message)
 
-                        return render(
-                            request,
-                            'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
-                            {
-                                'preinscripcion_curso': preinscripcion_curso,
-                                'documentos_requeridos': documentos_requeridos,
-                                'detallado': detallado_preinscripcion,
-                                'mensaje_formalizacion': mensaje_formalizacion,
-                                'documentos_mensaje': documentos_mensaje
-                            }
-                        )
+                        return render(request, 'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
+                                      {'preinscripcion_curso': preinscripcion_curso,'documentos_requeridos':documentos_requeridos, 'detallado' : detallado_preinscripcion, 'mensaje_formalizacion': mensaje_formalizacion})
                     elif horario.cupo_disponible > 0:
                         preinscripcion_curso = PreinscripcionHorarioCurso(persona=preinscrito, valor_preinscripcion = valor_inscripcion, codigo_hash=hash_code, horario_cupo = horario, descuento_solicitado=descuento)
                         preinscripcion_curso.save()
                         recibo = ReciboPreinscripcion.objects.create(preinscrito=preinscrito,preinscripcion=preinscripcion_curso, valor_requerido=tarifa_curso+horario.curso.nivel.costo_materiales, estado_recibo=2)
-                        logger.info("Recibo preinscripción creado satisfactoriamente")      
+                        logger.info("Recibo preinscripción creado satisfactoriamente")
                         horario.cupo_disponible = horario.cupo_disponible - 1
                         horario.save()
                         if descuento:
@@ -293,47 +227,22 @@ def preinscripcionView(request):
                         ayudante.actualizar_financieros_creacion_recibo(recibo, detallado_preinscripcion)
                         logger.info("Financieros actualizados")
 
-                        html_message = loader.render_to_string(
-                            'administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
-                            {
-                                'preinscripcion_curso': preinscripcion_curso,
-                                'documentos_requeridos': documentos_requeridos,
-                                'detallado': detallado_preinscripcion,
-                                'mensaje_formalizacion': mensaje_formalizacion,
-                                'documentos_mensaje': documentos_mensaje
-                            },
-                            request=request
-                        )
-                        send_mail(
-                            'Confirmación Preinscripción Curso',
-                            '',
-                            'sialex_fchbog@unal.edu.co',
-                            [preinscrito.usuario.email],
-                            fail_silently=True,
-                            html_message=html_message
-                        )
-                        return render(
-                            request,
-                            'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
-                            {
-                                'preinscripcion_curso': preinscripcion_curso,
-                                'documentos_requeridos': documentos_requeridos,
-                                'detallado': detallado_preinscripcion,
-                                'mensaje_formalizacion': mensaje_formalizacion,
-                                'documentos_mensaje': documentos_mensaje
-                            }
-                        )
+                        html_message = loader.render_to_string('administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
+                                    {'preinscripcion_curso': preinscripcion_curso,'documentos_requeridos':documentos_requeridos, 'detallado' : detallado_preinscripcion,
+                                     'mensaje_formalizacion': mensaje_formalizacion}, request=request)
+                        send_mail('Confirmación Preinscripción Curso','','sialex_fchbog@unal.edu.co',[preinscrito.usuario.email],fail_silently=True,html_message=html_message)
+                        return render(request, 'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
+                                      {'preinscripcion_curso': preinscripcion_curso,'documentos_requeridos':documentos_requeridos, 'detallado' : detallado_preinscripcion, 'mensaje_formalizacion': mensaje_formalizacion})
                     else:
                         form.add_error('idioma', '¡Lo sentimos, la asignación de cupos ha finalizado!')
                 else:
                     if preinscripcion_previa:
-                        form.add_error('idioma', 'Ya existe una preinscripción para este usuario, en el mismo curso y horario')
+                        form.add_error('idioma', 'Ya existe una preinscripción para este usuario, curso y horario en el presente periodo')
                     if preinscripcion_mismo_idioma:
-                        form.add_error('idioma','Ya existe una preinscripción para este idioma')
+                        form.add_error('idioma','Ya existe una preinscripción para este idioma en el presente periodo')
                     if preinscripcion_horario_existente:
-                        form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria')
+                        form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria en el presente periodo')
     return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
-
 
 class PreinscripcionCursoUpdate(LoginRequiredMixin, UpdateView):
 
@@ -341,15 +250,13 @@ class PreinscripcionCursoUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'administracion/inscripcion/cursos_opciones.html'
     fields = '__all__'
 
-
 class PreinscripcionCursoDelete(LoginRequiredMixin, DeleteView):
 
     model = PreinscripcionHorarioCurso
-    template_name = 'administracion/inscripcion/prinscripcion_confirm_delete.html'
+    template_name = 'administracion/inscripcion/preinscripcion_confirm_delete.html'
     success_url = reverse_lazy('mis-inscripciones')
 
-
-class PreinscripcionCursoDetailView(LoginRequiredMixin, generic.DetailView):
+class PreinscripcionCursoDetailView(LoginRequiredMixin,generic.DetailView):
     model = PreinscripcionHorarioCurso
     template_name = 'administracion/inscripcion/preinscripcion_detail.html'
     login_url = '/acceso/login'
@@ -366,22 +273,14 @@ class PreinscripcionCursoDetailView(LoginRequiredMixin, generic.DetailView):
         periodo = Periodo.objects.get(pk=periodo_id)
         reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionhorariocurso)
         try:
-            if preinscripcionhorariocurso.horario_cupo.curso.nivel.mensaje_formalizacion:
-                mensaje = preinscripcionhorariocurso.horario_cupo.curso.nivel.mensaje_formalizacion
-                documentos_mensaje = preinscripcionhorariocurso.horario_cupo.curso.nivel.documentos_pago
-            else:
-                informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
-                mensaje = informacion_formalizacion.mensaje_formalizacion
-                documentos_mensaje = informacion_formalizacion.documentos_pago
-            context['mensaje_formalizacion'] = mensaje
-            context['documentos_mensaje'] = documentos_mensaje
+            mensaje_encontrado = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
+            context['mensaje_formalizacion'] = mensaje_encontrado
         except InformacionPreinscripcionFormalizacion.DoesNotExist:
             mensaje_encontrado = None
         if reservas_saldos:
             context['reservas'] = reservas_saldos
         if descuento_aplicado:
             context['descuento_aplicado'] = descuento_aplicado[0]
-            context['documentos_requeridos'] = descuento_aplicado[0].descuento.documentos_requeridos.all()
         try:
             beca = Beca.objects.get(beneficiario=preinscripcionhorariocurso.persona,
                                     periodo_generado__inicio__gte=periodo.inicio - 4,
@@ -407,10 +306,8 @@ def calcularEdad(fechaNacimiento):
 
     return int((diferencia.days + diferencia.seconds/86400.0) / 365.2425)
 
-
 def isAutorizacionNivelMenor():
     pass
-
 
 @login_required()
 def cargar_programas_academicos(request):
@@ -427,10 +324,20 @@ def cargar_programas_academicos(request):
         if aspirante:
             fecha_nacimiento = aspirante.fecha_nacimiento
             edad_aspirante = calcularEdad(fecha_nacimiento)
-            programas_academicos = ProgramaAcademico.objects.filter(idioma = idioma_id, edad_minima__lte=edad_aspirante, edad_maxima__gt=edad_aspirante, activo=True, ofertaacademica__periodo__id=periodo_id).order_by('nombre').all()
+            programas_academicos = ProgramaAcademico.objects.filter(
+                idioma=idioma_id,
+                edad_minima__lte=edad_aspirante,
+                edad_maxima__gt=edad_aspirante,
+                activo=True,
+                ofertaacademica__periodo__id=periodo_id
+            ).order_by('nombre').all()
             programas_autorizados = []
             if aspirante:
-                autorizaciones = AutorizadoCurso.objects.filter(numero_documento=aspirante.numero_documento, periodo=periodo_id, estado__in=[1,3], curso_autorizado__oferta_academica__programa__in=programas_academicos).all() #Estado: AUTORIZADO o AUTORIZACIÓN CANCELADA
+                autorizaciones = AutorizadoCurso.objects.filter(
+                    numero_documento=aspirante.numero_documento,
+                    periodo=periodo_id,
+                    estado__in=[1, 3],
+                    curso_autorizado__oferta_academica__programa__in=programas_academicos).all() #Estado: AUTORIZADO o AUTORIZACIÓN CANCELADA
                 for autorizacion in autorizaciones:
                     programa_autorizado = ProgramaAcademico.objects.filter(pk=autorizacion.curso_autorizado.oferta_academica.programa.id)
                     if autorizacion.curso_autorizado.id not in autorizaciones_dict:
@@ -444,7 +351,6 @@ def cargar_programas_academicos(request):
 
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
-
 
 @login_required()
 def cargar_niveles(request):
@@ -463,37 +369,13 @@ def cargar_niveles(request):
             edad_aspirante = calcularEdad(fecha_nacimiento)
 
         programa_academico_id = request.GET.get('programa_academico')
-        programa_academico = ProgramaAcademico.objects.get(id=programa_academico_id)
         periodo_id = request.session["periodo_contextualizado_id"]
         periodo = Periodo.objects.get(pk=periodo_id)
-        niveles = ProgramaAcademico.objects.get(pk=programa_academico_id).nivel.filter(
-            activo=True,
-            orden=1,
-            edad_minima__lte=edad_aspirante,
-            edad_maxima__gt=edad_aspirante
-        ).all()
-        matriculas = Matricula.objects.filter(
-            estudiante=request.user.profile,
-            grupo__horarioCurso__curso__oferta_academica__periodo__inicio__gte=periodo.inicio-4,
-            grupo__horarioCurso__curso__oferta_academica__programa_id=programa_academico_id
-        )
-        examenes_calificados_vigentes = CalificacionExamen.objects.filter(
-            preinscripcion_examen__examen__periodo__inicio__gte=periodo.inicio-4,
-            preinscripcion_examen__persona__id=aspirante.id,
-            preinscripcion_examen__examen__idioma_id=programa_academico.idioma.id,
-            nivel_id__isnull=False
-        )
-        if examenes_calificados_vigentes:
-            for examen in examenes_calificados_vigentes:
-                nivel_aprobado = Nivel.objects.filter(
-                    orden=examen.nivel.orden,
-                    idioma=examen.nivel.idioma
-                )
-                if nivel_aprobado:
-                    niveles |= nivel_aprobado
+        niveles = ProgramaAcademico.objects.get(pk=programa_academico_id).nivel.filter(activo=True, orden=1, edad_minima__lte=edad_aspirante, edad_maxima__gt=edad_aspirante).all()
+        matriculas = Matricula.objects.filter(estudiante=request.user.profile, grupo__horarioCurso__curso__oferta_academica__periodo__inicio__gte=periodo.inicio-4, grupo__horarioCurso__curso__oferta_academica__programa_id=programa_academico_id)
         if matriculas:
             for matricula in matriculas:
-                if matricula.estado_matricula in (3, 4, 5, 6, 8):
+                if matricula.estado_matricula in (3,4,5,6, 8):
                     nivel_reprobado = Nivel.objects.filter(id=matricula.grupo.horarioCurso.curso.nivel.id)
                     niveles |= nivel_reprobado
                 elif matricula.estado_matricula == 2:
@@ -503,7 +385,7 @@ def cargar_niveles(request):
                         niveles |= nivel_aprobado
         autorizaciones_dict = request.session.get('autorizaciones_dict')
         for autorizacion in autorizaciones_dict:
-            cursos_autorizado = Curso.objects.filter(pk=autorizacion).all()
+            cursos_autorizado =  Curso.objects.filter(pk=autorizacion).all()
             niveles_autorizado = Nivel.objects.filter(curso__in=cursos_autorizado).all().order_by('orden')
 
             if niveles_autorizado not in niveles:
@@ -516,7 +398,7 @@ def cargar_niveles(request):
             for nivel in niveles:
                 max_orden = nivel.orden if nivel.orden > max_orden else max_orden
                 niveles_aux = niveles.exclude(orden__lt=max_orden)
-                
+
         data = {}
         if niveles_aux:
             for i in niveles_aux:
@@ -529,14 +411,9 @@ def cargar_niveles(request):
 def cargar_horarios_disponibles(request):
     error = False
     if request.user.is_authenticated:
-        periodo_id = request.session["periodo_contextualizado_id"]
-        periodo = Periodo.objects.get(pk=periodo_id)
         nivel_id = request.GET.get('nivel')
-        cursos = Curso.objects.filter(
-            nivel=nivel_id,
-            oferta_academica__periodo__activo=True,
-            oferta_academica__periodo__inicio=periodo.inicio
-        ).all()
+        periodo_id = request.session["periodo_contextualizado_id"]
+        cursos = Curso.objects.filter(nivel = nivel_id, oferta_academica__periodo=periodo_id).all()
         horarios = HorarioCurso.objects.filter(curso__in=cursos, cupo_disponible__gt=0).order_by('nombre').all()
         autorizaciones_dict = request.session.get('autorizaciones_dict')
         cursos_ids = [str(curso) for curso in cursos.values_list('id', flat=True)]
@@ -569,6 +446,7 @@ def cargar_descuentos(request):
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
 
+
 @login_required
 def preinscripcion_fase_previa(request):
     error = False
@@ -579,7 +457,7 @@ def preinscripcion_fase_previa(request):
         horario_curso = request.GET['horario_curso']
         programa_academico = request.GET['programa_academico']
 
-    
+
         try:
             preinscrito = Profile.objects.get(pk = request.user.profile.id)
         except Profile.DoesNotExist:
@@ -600,7 +478,7 @@ def preinscripcion_fase_previa(request):
             programa = ProgramaAcademico.objects.get(pk=programa_academico)
         except ProgramaAcademico.DoesNotExist:
             programa = None
-            
+
         if preinscrito and horario and periodo:
             try:
                 if request.GET.get('descuento') != '':
@@ -618,7 +496,7 @@ def preinscripcion_fase_previa(request):
             ayudante = AyudanteFinancieros(preinscrito, periodo)
             tarifa_curso = horario.curso.oferta_academica.tarifa
             valor_inscripcion, detallado_preinscripcion = ayudante.calcular_valor_preinscripcion_curso(tarifa_curso, horario.curso.nivel, descuento, horario.curso.nivel.costo_materiales)
-        
+
             responseObject['primer_nombre']=request.user.profile.primer_nombre
             responseObject['segundo_nombre'] = request.user.profile.segundo_nombre
             responseObject['primer_apellido'] = request.user.profile.primer_apellido
@@ -650,10 +528,8 @@ def preinscripcion_fase_previa(request):
             return render(request, 'webservices/error.html', {'resultset': "Error de servidor"})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
 
-
 class BuscarPreinscripcionesView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'administracion/inscripcion/buscar_preinscripciones.html'
-
 
 class PreinscripcionesPersonaView(LoginRequiredMixin, generic.ListView):
     model = Preinscripcion
@@ -704,7 +580,7 @@ def formalizar_vista(request, pk):
     validar_descuento = True
     saldo_flag = check_saldo_cargado(recibopreinscripcion)
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionhorariocurso)
-    facturacion_form = RequiereFacturacionForm()
+    facturacion_form = RequiereFacturacionForm(instance=preinscripcionhorariocurso)
 
     if descuento_aplicado:
         documentos = DocumentosDescuentoSolicitado.objects.filter(descuento_aplicado=descuento_aplicado[0])
@@ -730,6 +606,9 @@ def formalizar_vista(request, pk):
     tarifa_plena = recibopreinscripcion.valor_requerido - preinscripcionhorariocurso.horario_cupo.curso.nivel.costo_materiales
     if request.method == 'POST':
         facturacion_form = RequiereFacturacionForm(request.POST)
+        if facturacion_form.is_valid():
+            preinscripcionhorariocurso.requiere_facturacion = facturacion_form.cleaned_data['requiere_facturacion']
+            preinscripcionhorariocurso.save()
         if preinscripcionhorariocurso.estado_preinscripcion == 5:
             preinscripcionhorariocurso.estado_preinscripcion = 3
             preinscripcionhorariocurso.save()
@@ -811,7 +690,7 @@ def formalizar_vista_examen(request, pk):
     calcularPagos = CalcularPagosRecibo(recibopreinscripcion)
     pagado, sobrante, pendiente, pagos = calcularPagos.calcular_pagos()
 
-    tarifa_plena = recibopreinscripcion.valor_requerido 
+    tarifa_plena = recibopreinscripcion.valor_requerido
     if request.method == 'POST':
         #Buscar calificacion examen
         try:
@@ -1144,7 +1023,3 @@ def aplicarBecaPago(request,pk):
             pago.save()
             return redirect('formalizar-curso', pk=preinscripcion.id)
     return render(request, 'administracion/inscripcion/confirmar_beca_pago.html', {'beca': beca})
-
-
-
-

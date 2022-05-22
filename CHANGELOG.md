@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.5.2
+- ajustes en validación para preinscripción de idiomas
+- ajustes en actualizacion de campo requiere_facturacion
+- arreglado reporte de notas en estado final del curso
+- Agregado campo nombre a periodo
+
 ## 1.5.1
 - Ajustes en validación para preinscripción de antiguos y cambio de fechas para el servicio web con Hermes
 
