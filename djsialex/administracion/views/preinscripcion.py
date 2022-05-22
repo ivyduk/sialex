@@ -446,6 +446,7 @@ def cargar_descuentos(request):
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
 
+
 @login_required
 def preinscripcion_fase_previa(request):
     error = False

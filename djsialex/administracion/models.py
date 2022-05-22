@@ -357,6 +357,7 @@ class Periodo(models.Model):
     anio = models.IntegerField(verbose_name="año", help_text="Ingrese un año entre 2019 y 2050")
     secuencia = models.IntegerField(help_text="Semestral: 1-2, Bimestral: 1-4", blank=True)
     alias = models.CharField(max_length=20, unique=True, help_text="Se puede autogenerar o editar manualmente")
+    nombre = models.CharField(max_length=100, unique=True, help_text="Nombre del período")
     activo = models.BooleanField(default=False, help_text="Determina si se pueden crear elementos en el periodo")
     inicio = models.IntegerField(editable=False, null=True)
     fin = models.IntegerField(editable=False, null=True)
@@ -379,7 +380,7 @@ class Periodo(models.Model):
 		:return: alias
 		"""
 
-        return self.alias
+        return self.nombre
 
     def save(self, *args, **kwargs):
             if self.abierto:
@@ -1823,6 +1824,8 @@ class Answer(models.Model):
         return "{} to '{}' : '{}'".format(
             self.__class__.__name__, self.question, self.body
         )
+
+
 class AsociarEncuesta(models.Model):
     periodo = models.ForeignKey(Periodo, on_delete=models.PROTECT, help_text='Selección de periodo')
     plantilla = models.ForeignKey(Survey, on_delete=models.PROTECT, help_text='Selección de plantilla de encuesta')
@@ -1838,6 +1841,7 @@ class AsociarEncuesta(models.Model):
         return "{} - {}".format(
             self.periodo.alias, self.plantilla.name
         )
+
 
 class Encuesta(Survey):
     programa = models.ForeignKey(ProgramaAcademico, on_delete=models.PROTECT)
