@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from administracion.models import Profile, Docente, GrupoAcademico, Matricula, Periodo, NotaParcial, Calificacion, \
     DocentesGrupoAcademico, TipoDocente, FallaAsistencia, usuarioTieneGrupo, Observacion, getEstadoMatricula, \
@@ -12,7 +12,10 @@ from administracion.models import Profile, Docente, GrupoAcademico, Matricula, P
 import json
 
 from administracion.util import CSVWriter
-
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 def isDocente(user):
     persona = Profile.objects.filter(usuario__id = user.id).first()
@@ -166,6 +169,36 @@ def listadoCalificacionesPorGrupo(request, grupoacademico):
 
     return render(request, "administracion/docente/matriculas_list.html", context)
 
+
+@login_required
+def listadoCalificacionesPlanilla(request, *args, **kwargs):
+   pk = kwargs.get('grupoacademico')
+   grupo = get_object_or_404(GrupoAcademico, pk=pk)
+
+   template_path = 'administracion/docente/mis_cursos_export.html'
+   context = {'grupo': grupo}
+   # Create a Django response object, and specify content_type as pdf
+   response = HttpResponse(content_type='application/pdf')
+
+   # to directly download the pdf we need attachment
+   # response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+
+   # to view on browser we can remove attachment
+   response['Content-Disposition'] = 'filename="report.pdf"'
+
+   # find the template and render it.
+   template = get_template(template_path)
+   html = template.render(context)
+
+   # create a pdf
+   pisa_status = pisa.CreatePDF(
+      html, dest=response)
+   # if error then show some funy view
+   if pisa_status.err:
+      return HttpResponse('We had some errors <pre>' + html + '</pre>')
+   return response
+
+
 def asignarCalificacion(matricula_nota, nota_parcial, calificacion, escala_notas):
 
     errores = ''
@@ -194,6 +227,7 @@ def asignarCalificacion(matricula_nota, nota_parcial, calificacion, escala_notas
 
     return errores
 
+
 def asignarCalificacionFinal(matricula_nota, escala_notas):
 
     calificaciones_matricula = Calificacion.objects.filter(matricula=matricula_nota).all()
@@ -202,6 +236,7 @@ def asignarCalificacionFinal(matricula_nota, escala_notas):
         calificacion_final += calificacion.calificacion * calificacion.nota.ponderacion / 100
     matricula_nota.calificacionFinal = round(calificacion_final, escala_notas.numero_decimales)
     matricula_nota.save()
+
 
 @login_required
 @csrf_exempt
@@ -256,6 +291,7 @@ def calificarGrupo(request, grupoacademico):
         return HttpResponse(json.dumps(response), content_type='application/json')
 
     return render(request, 'administracion/docente/mis_cursos_list.html')
+
 
 def actualizarEstadoMatriculasPorGrupo(grupo_academico, ofertas_periodo):
 

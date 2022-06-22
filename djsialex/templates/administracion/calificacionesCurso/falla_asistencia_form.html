@@ -1,4 +1,12 @@
 {% load widget_tweaks %}
+{% block extrahead %}
+    {% load bootstrap3 %}
+{% bootstrap_javascript jquery='full' %}
+    {{ form.media }}
+    {% load static %}
+
+
+{% endblock %}
 {% block form %}
     <form method="post" action="{% url 'falla_asistencia_create' matricula.id %}">
     {% csrf_token %}
@@ -27,7 +35,4 @@
 
     </form>
 
-    <script>
-
-    </script>
 {% endblock %}
