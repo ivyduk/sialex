@@ -12,6 +12,7 @@ from administracion.models import Matricula, Profile, FallaAsistencia, Observaci
 
 from datetime import datetime
 
+
 class ObservacionMatriculaCreateView(LoginRequiredMixin, CreateView):
 
     template_name = 'administracion/calificacionesCurso/observacion_matricula_form.html'
@@ -42,6 +43,7 @@ class ObservacionMatriculaCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('mis-estudiantes', kwargs={'grupoacademico': self.object.matricula.grupo.id})
 
+
 class ObservacionMatriculaListView(LoginRequiredMixin, ListView):
 
     template_name = 'administracion/calificacionesCurso/observacion_matricula_list.html'
@@ -60,6 +62,7 @@ class ObservacionMatriculaListView(LoginRequiredMixin, ListView):
 
         return render(self.request, self.template_name, context)
 
+
 class ObservacionMatriculaUpdateView(LoginRequiredMixin,BSModalUpdateView):
     model = Observacion
     template_name = 'administracion/calificacionesCurso/observacion_matricula_update.html'
@@ -73,6 +76,7 @@ class ObservacionMatriculaUpdateView(LoginRequiredMixin,BSModalUpdateView):
         self.object.fecha_actualizacion = datetime.now()
         self.object = form.save()
         return HttpResponseRedirect(self.get_success_url())
+
 
 @login_required
 def eliminarObservacionMatricula(request, observacion):

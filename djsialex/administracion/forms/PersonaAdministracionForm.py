@@ -22,7 +22,7 @@ class PersonaAdministracionForm(forms.ModelForm):
 
         FORMAT = '%Y-%m-%d'
 
-        widgets = {'fecha_nacimiento' : DatePickerInput(format = FORMAT),
+        widgets = {'fecha_nacimiento' : DatePickerInput(format=FORMAT),
                    }
 
         labels = {
