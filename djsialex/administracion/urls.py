@@ -19,7 +19,7 @@ from administracion.views.calificaciones_curso.fallasAsistencia import FallaAsis
 from administracion.views.calificarExamenClasificacion import calificarExamen, seleccionarIdiomaExamen
 from administracion.views.calificaciones_curso.notasCurso import cursosAsociadosList, \
 	listadoCalificacionesPorGrupo, calificarGrupo, listadoEstudiantesPorGrupo, actualizarEstadoMatriculas, \
-	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos, listadoCalificacionesPlanilla
+	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos
 from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, cursoCalificacionesDetallePDF
 from administracion.views.preinscripcionExamenClasificacion import preinscripcionExamenView, \
 	preinscripcion_examen_fase_previa, PreinscripcionExamenDetailView, PreinscripcionExamenDelete
@@ -300,7 +300,6 @@ urlpatterns = [
 	url(r'^docente/cursos/mis-cursos', cursosAsociadosList, name='mis-cursos'),
     url(r'^docente/cursos/mis-estudiantes/(?P<grupoacademico>[-\w]+)', listadoEstudiantesPorGrupo, name='mis-estudiantes'),
     url(r'^docente/cursos/calificaciones-estudiantes/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPorGrupo, name='calificaciones-estudiantes'),
-	url(r'^docente/cursos/calificaciones-listas/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPlanilla, name='calificaciones-listas'),
 	url(r'^docente/cursos/calificar-grupo/(?P<grupoacademico>[-\w]+)', calificarGrupo, name='calificar-grupo'),
 	url(r'^docente/cursos/actualizar-estados-todos', actualizarEstadoMatriculasGrupos, name='actualizar-estados-todos'),
 	url(r'^docente/cursos/actualizar-estados/(?P<grupoacademico>[-\w]+)', actualizarEstadoMatriculas,name='actualizar-estados'),
