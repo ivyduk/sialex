@@ -18,6 +18,7 @@
               <th scope="col">Periodicidad</th>
               <th scope="col">Año</th>
               <th scope="col">Activo</th>
+              <th scope="col">Finalizado</th>
               <th scope="col">Editar</th>
               <th scope="col">Borrar</th>
           </tr>
@@ -30,6 +31,12 @@
                 <td>{{ periodo.periodicidad }}</td>
                 <td>{{ periodo.anio }}</td>
                 <td>{% if periodo.activo %}
+                    Sí
+                    {% else %}
+                    No
+                    {% endif %}
+                </td>
+                <td>{% if periodo.finalizado %}
                     Sí
                     {% else %}
                     No

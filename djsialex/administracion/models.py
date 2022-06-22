@@ -359,6 +359,7 @@ class Periodo(models.Model):
     alias = models.CharField(max_length=20, unique=True, help_text="Se puede autogenerar o editar manualmente")
     nombre = models.CharField(max_length=100, unique=True, help_text="Nombre del período")
     activo = models.BooleanField(default=False, help_text="Determina si se pueden crear elementos en el periodo")
+    finalizado = models.BooleanField(default=False, help_text="Determina si el periodo ya no será visible para los usuarios al autenticarse")
     inicio = models.IntegerField(editable=False, null=True)
     fin = models.IntegerField(editable=False, null=True)
 

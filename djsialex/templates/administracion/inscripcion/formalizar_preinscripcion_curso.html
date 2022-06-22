@@ -69,6 +69,7 @@
                         <tr>
                             <form action = "{% url 'formalizar-curso' preinscripcionhorariocurso.id %}" method = "post">
                                 {{facturacion_form}}
+                            </form>
                         </tr>
                         </tbody>
                     </table>
@@ -370,7 +371,7 @@ input[type='button']
         $(".comprobante_pago_update").each(function () {
             $(this).modalForm({formURL: $(this).data('id')});
         });
-        
+
     });
     </script>
 {% endblock %}
