@@ -1,1 +1,1 @@
-web: gunicorn djsialex.wsgi.application --log-file=-
+web: gunicorn djsialex.djsialex.wsgi.application --log-file -
