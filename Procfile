@@ -1,1 +1,0 @@
-web: gunicorn --pythonpath djsialex djsialex.wsgi.application --log-file -
