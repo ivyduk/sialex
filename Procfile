@@ -1,1 +1,1 @@
-web: gunicorn ddah.wsgi --log-file=-
+web: gunicorn djsialex.wsgi --log-file=-
