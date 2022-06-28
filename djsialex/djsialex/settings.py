@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+
+import django_heroku
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -25,9 +27,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '-plag545x0!5y9&v7jclhy@o!&ekam7_!lt38736c8-e84c(34'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
-
-ALLOWED_HOSTS = ['168.176.18.33','127.0.0.1', 'localhost','168.176.84.35', '168.176.18.15','http://www.extensionidiomas.unal.edu.co','www.extensionidiomas.unal.edu.co','extensionidiomas.unal.edu.co']
+DEBUG = True
+""" # Prod
+DEBUG = False 
+"""
+ALLOWED_HOSTS = [
+    '168.176.18.33',
+    '127.0.0.1',
+    'localhost',
+    '168.176.84.35',
+    '168.176.18.15',
+    'http://www.extensionidiomas.unal.edu.co',
+    'www.extensionidiomas.unal.edu.co',
+    'extensionidiomas.unal.edu.co',
+    'sialex-dev.herokuapp.com'
+]
 DJANGO_EASY_AUDIT_WATCH_REQUEST_EVENTS = False
 
 
@@ -42,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     #'jquery',
+    'rest_framework',
     'django.contrib.admin',
     'widget_tweaks',
     'bootstrap3',
@@ -76,7 +91,7 @@ ROOT_URLCONF = 'djsialex.urls'
 
 TEMPLATES = [
     {
-        'APP_DIRS' : False,
+        'APP_DIRS': False,
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates/'), r'templates/'],
         'OPTIONS': {
@@ -88,15 +103,17 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
             'libraries':{
-            'profile_tags': 'administracion.templatetags.profile_tags',
-
+                'profile_tags': 'administracion.templatetags.profile_tags',
             },
-        'loaders': [
-            ('django.template.loaders.cached.Loader', [
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-            ]),
-        ],
+            'loaders': [
+                (
+                    'django.template.loaders.cached.Loader',
+                    [
+                        'django.template.loaders.filesystem.Loader',
+                        'django.template.loaders.app_directories.Loader',
+                    ]
+                ),
+            ],
         },
     },
 ]
@@ -121,22 +138,22 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sialex',
         'USER': 'sialex',
-        'PASSWORD': 'sialex',
-        'HOST': 'localhost',
+        'PASSWORD': 'adminsialex',
+        'HOST': 'database-1-slx.co1rl716txsf.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
-"""
-
+""" # dev
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sialex',
         'USER': 'sialex',
         'PASSWORD': 'sialex',
-        'HOST': 'dbhost',
-        'PORT': '',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
+}
 }"""
 
 
@@ -173,7 +190,10 @@ LOCALE_PATHS = (
 )
 
 
+TIME_ZONE = 'UTC'
+""" #dev
 TIME_ZONE = 'America/Bogota'
+"""
 
 USE_I18N = True
 
@@ -185,9 +205,14 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+# heroku variables
+django_heroku.settings(locals())
+
 STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR+"/../static_deployed/"
+
+CKEDITOR_BASEPATH = BASE_DIR+"/../static_deployed/ckeditor/ckeditor/"
 
 LOGIN_REDIRECT_URL = '/administracion'
 
@@ -210,6 +235,14 @@ MAX_IMAGE_SIZE = '20971520'
 
 SESSION_COOKIE_AGE = 60*60
 
+""" # prod
+EMAIL_HOST = 'smtp-relay.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'sialex_fchbog@unal.edu.co'
+EMAIL_HOST_PASSWORD = 'Unal2021'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'sialex_fchbog@unal.edu.co'
+"""
 
 EMAIL_HOST = 'smtp-relay.sendinblue.com'
 EMAIL_PORT = 587
@@ -219,13 +252,11 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMA ='sialex_fchbog@unal.edu.co'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 LOGIN_URL = '/acceso/login'
 
-EXPLORER_CONNECTIONS = { 'Default': 'default' }
+EXPLORER_CONNECTIONS = {'Default': 'default'}
 EXPLORER_DEFAULT_CONNECTION = 'default'
 
 CHOICES_SEPARATOR = ","

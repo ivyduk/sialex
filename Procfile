@@ -1,0 +1,1 @@
+web: gunicorn ddah.wsgi --log-file=-
