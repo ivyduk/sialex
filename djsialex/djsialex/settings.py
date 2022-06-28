@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     #'jquery',
-    'rest_framework',
     'django.contrib.admin',
     'widget_tweaks',
     'bootstrap3',
