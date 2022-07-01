@@ -1,1 +1,0 @@
-web: gunicorn --chdir djsialex djsialex.wsgi.application --log-file -

@@ -369,10 +369,36 @@ def cargar_niveles(request):
             edad_aspirante = calcularEdad(fecha_nacimiento)
 
         programa_academico_id = request.GET.get('programa_academico')
+        programa_academico = ProgramaAcademico.objects.get(id=programa_academico_id)
         periodo_id = request.session["periodo_contextualizado_id"]
         periodo = Periodo.objects.get(pk=periodo_id)
-        niveles = ProgramaAcademico.objects.get(pk=programa_academico_id).nivel.filter(activo=True, orden=1, edad_minima__lte=edad_aspirante, edad_maxima__gt=edad_aspirante).all()
-        matriculas = Matricula.objects.filter(estudiante=request.user.profile, grupo__horarioCurso__curso__oferta_academica__periodo__inicio__gte=periodo.inicio-4, grupo__horarioCurso__curso__oferta_academica__programa_id=programa_academico_id)
+        niveles = ProgramaAcademico.objects.get(
+            pk=programa_academico_id
+        ).nivel.filter(
+            activo=True,
+            orden=1,
+            edad_minima__lte=edad_aspirante,
+            edad_maxima__gt=edad_aspirante
+        ).all()
+        matriculas = Matricula.objects.filter(
+            estudiante=request.user.profile,
+            grupo__horarioCurso__curso__oferta_academica__periodo__inicio__gte=periodo.inicio-4,
+            grupo__horarioCurso__curso__oferta_academica__programa_id=programa_academico_id
+        )
+        examenes_calificados_vigentes = CalificacionExamen.objects.filter(
+            preinscripcion_examen__examen__periodo__inicio__gte=periodo.inicio-4,
+            preinscripcion_examen__persona__id=aspirante.id,
+            preinscripcion_examen__examen__idioma_id=programa_academico.idioma.id,
+            nivel_id__isnull=False
+        )
+        if examenes_calificados_vigentes:
+            for examen in examenes_calificados_vigentes:
+                nivel_aprobado = Nivel.objects.filter(
+                    orden=examen.nivel.orden,
+                    idioma=examen.nivel.idioma
+                )
+                if nivel_aprobado:
+                    niveles |= nivel_aprobado
         if matriculas:
             for matricula in matriculas:
                 if matricula.estado_matricula in (3,4,5,6, 8):
@@ -385,7 +411,7 @@ def cargar_niveles(request):
                         niveles |= nivel_aprobado
         autorizaciones_dict = request.session.get('autorizaciones_dict')
         for autorizacion in autorizaciones_dict:
-            cursos_autorizado =  Curso.objects.filter(pk=autorizacion).all()
+            cursos_autorizado = Curso.objects.filter(pk=autorizacion).all()
             niveles_autorizado = Nivel.objects.filter(curso__in=cursos_autorizado).all().order_by('orden')
 
             if niveles_autorizado not in niveles:
