@@ -56,7 +56,10 @@ class PeriodoDelete(LoginRequiredMixin, DeleteView):
 
 def contextualizarPeriodo(request):
     error = False
-    periodos = Periodo.objects.filter(activo=True)
+    periodos = Periodo.objects.filter(activo=True, finalizado=False)
+    if request.user.is_authenticated and request.user.groups.filter(
+            name__in=['Administrativo', "Funcionario", 'Coordinador']).exists():
+        periodos = Periodo.objects.filter(activo=True)
     if 'periodo' in request.POST:
         id = request.POST['periodo']
         if not id:
