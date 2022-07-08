@@ -384,9 +384,8 @@ class Periodo(models.Model):
         return self.nombre
 
     def save(self, *args, **kwargs):
-            if self.abierto:
-                self.inicio = self.periodo_anterior.fin
-                self.fin = self.inicio + self.periodicidad.meses
+            self.inicio = self.periodo_anterior.fin
+            self.fin = self.inicio + self.periodicidad.meses
             super(Periodo, self).save(*args, **kwargs)
 
     def nombreAmigable(self):
