@@ -161,7 +161,13 @@ def preinscripcionView(request):
             except Periodo.DoesNotExist:
                 periodo = None
 
-            mensaje_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
+            if horario and horario.curso.nivel.mensaje_formalizacion:
+                mensaje_formalizacion = horario.curso.nivel.mensaje_formalizacion
+                documentos_mensaje = horario.curso.nivel.documentos_pago
+            else:
+                informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
+                mensaje_formalizacion = informacion_formalizacion.mensaje_formalizacion
+                documentos_mensaje = informacion_formalizacion.documentos_pago
 
             if preinscrito and horario and periodo:
 
@@ -202,20 +208,51 @@ def preinscripcionView(request):
                             documentos_requeridos = preinscripcion_curso.descuento_solicitado.documentos_requeridos.all()
                         else:
                             documentos_requeridos = []
-                        #actualizar Financieros utilizados
+                        # actualizar Financieros utilizados
                         ayudante.actualizar_financieros_creacion_recibo(recibo, detallado_preinscripcion)
                         logger.info("Financieros actualizados")
 
-                        html_message = loader.render_to_string('administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
-                                    {'preinscripcion_curso': preinscripcion_curso,'documentos_requeridos':documentos_requeridos, 'detallado' : detallado_preinscripcion, 'mensaje_formalizacion': mensaje_formalizacion}, request=request)
-                        send_mail('Confirmación Preinscripción Curso','','sialex_fchbog@unal.edu.co',[preinscrito.usuario.email],fail_silently=True,html_message=html_message)
+                        html_message = loader.render_to_string(
+                            'administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
+                            {
+                                'preinscripcion_curso': preinscripcion_curso,
+                                'documentos_requeridos': documentos_requeridos,
+                                'detallado': detallado_preinscripcion,
+                                'mensaje_formalizacion': mensaje_formalizacion,
+                                'documentos_mensaje': documentos_mensaje
+                            },
+                            request=request
+                        )
+                        send_mail(
+                            'Confirmación Preinscripción Curso',
+                            '',
+                            'sialex_fchbog@unal.edu.co',
+                            [preinscrito.usuario.email],
+                            fail_silently=True,
+                            html_message=html_message
+                        )
 
-                        return render(request, 'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
-                                      {'preinscripcion_curso': preinscripcion_curso,'documentos_requeridos':documentos_requeridos, 'detallado' : detallado_preinscripcion, 'mensaje_formalizacion': mensaje_formalizacion})
+                        return render(
+                            request,
+                            'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
+                            {
+                                'preinscripcion_curso': preinscripcion_curso,
+                                'documentos_requeridos': documentos_requeridos,
+                                'detallado': detallado_preinscripcion,
+                                'mensaje_formalizacion': mensaje_formalizacion,
+                                'documentos_mensaje': documentos_mensaje
+                            }
+                        )
                     elif horario.cupo_disponible > 0:
-                        preinscripcion_curso = PreinscripcionHorarioCurso(persona=preinscrito, valor_preinscripcion = valor_inscripcion, codigo_hash=hash_code, horario_cupo = horario, descuento_solicitado=descuento)
+                        preinscripcion_curso = PreinscripcionHorarioCurso(persona=preinscrito,
+                                                                          valor_preinscripcion=valor_inscripcion,
+                                                                          codigo_hash=hash_code, horario_cupo=horario,
+                                                                          descuento_solicitado=descuento)
                         preinscripcion_curso.save()
-                        recibo = ReciboPreinscripcion.objects.create(preinscrito=preinscrito,preinscripcion=preinscripcion_curso, valor_requerido=tarifa_curso+horario.curso.nivel.costo_materiales, estado_recibo=2)
+                        recibo = ReciboPreinscripcion.objects.create(preinscrito=preinscrito,
+                                                                     preinscripcion=preinscripcion_curso,
+                                                                     valor_requerido=tarifa_curso + horario.curso.nivel.costo_materiales,
+                                                                     estado_recibo=2)
                         logger.info("Recibo preinscripción creado satisfactoriamente")
                         horario.cupo_disponible = horario.cupo_disponible - 1
                         horario.save()
@@ -223,26 +260,52 @@ def preinscripcionView(request):
                             documentos_requeridos = preinscripcion_curso.descuento_solicitado.documentos_requeridos.all()
                         else:
                             documentos_requeridos = []
-                        #actualizar Financieros utilizados
+                        # actualizar Financieros utilizados
                         ayudante.actualizar_financieros_creacion_recibo(recibo, detallado_preinscripcion)
                         logger.info("Financieros actualizados")
 
-                        html_message = loader.render_to_string('administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
-                                    {'preinscripcion_curso': preinscripcion_curso,'documentos_requeridos':documentos_requeridos, 'detallado' : detallado_preinscripcion,
-                                     'mensaje_formalizacion': mensaje_formalizacion}, request=request)
-                        send_mail('Confirmación Preinscripción Curso','','sialex_fchbog@unal.edu.co',[preinscrito.usuario.email],fail_silently=True,html_message=html_message)
-                        return render(request, 'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
-                                      {'preinscripcion_curso': preinscripcion_curso,'documentos_requeridos':documentos_requeridos, 'detallado' : detallado_preinscripcion, 'mensaje_formalizacion': mensaje_formalizacion})
+                        html_message = loader.render_to_string(
+                            'administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
+                            {
+                                'preinscripcion_curso': preinscripcion_curso,
+                                'documentos_requeridos': documentos_requeridos,
+                                'detallado': detallado_preinscripcion,
+                                'mensaje_formalizacion': mensaje_formalizacion,
+                                'documentos_mensaje': documentos_mensaje
+                            },
+                            request=request
+                        )
+                        send_mail(
+                            'Confirmación Preinscripción Curso',
+                            '',
+                            'sialex_fchbog@unal.edu.co',
+                            [preinscrito.usuario.email],
+                            fail_silently=True,
+                            html_message=html_message
+                        )
+                        return render(
+                            request,
+                            'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
+                            {
+                                'preinscripcion_curso': preinscripcion_curso,
+                                'documentos_requeridos': documentos_requeridos,
+                                'detallado': detallado_preinscripcion,
+                                'mensaje_formalizacion': mensaje_formalizacion,
+                                'documentos_mensaje': documentos_mensaje
+                            }
+                        )
                     else:
                         form.add_error('idioma', '¡Lo sentimos, la asignación de cupos ha finalizado!')
                 else:
                     if preinscripcion_previa:
-                        form.add_error('idioma', 'Ya existe una preinscripción para este usuario, curso y horario en el presente periodo')
+                        form.add_error('idioma',
+                                       'Ya existe una preinscripción para este usuario, en el mismo curso y horario')
                     if preinscripcion_mismo_idioma:
-                        form.add_error('idioma','Ya existe una preinscripción para este idioma en el presente periodo')
+                        form.add_error('idioma', 'Ya existe una preinscripción para este idioma')
                     if preinscripcion_horario_existente:
-                        form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria en el presente periodo')
-    return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
+                        form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria')
+                return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
+
 
 class PreinscripcionCursoUpdate(LoginRequiredMixin, UpdateView):
 
@@ -401,7 +464,7 @@ def cargar_niveles(request):
                     niveles |= nivel_aprobado
         if matriculas:
             for matricula in matriculas:
-                if matricula.estado_matricula in (3,4,5,6, 8):
+                if matricula.estado_matricula in (3, 4, 5, 6, 8):
                     nivel_reprobado = Nivel.objects.filter(id=matricula.grupo.horarioCurso.curso.nivel.id)
                     niveles |= nivel_reprobado
                 elif matricula.estado_matricula == 2:
