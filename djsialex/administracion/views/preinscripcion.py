@@ -304,7 +304,7 @@ def preinscripcionView(request):
                         form.add_error('idioma', 'Ya existe una preinscripción para este idioma')
                     if preinscripcion_horario_existente:
                         form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria')
-                return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
+    return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
 
 
 class PreinscripcionCursoUpdate(LoginRequiredMixin, UpdateView):

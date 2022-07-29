@@ -20,7 +20,8 @@ from administracion.views.calificarExamenClasificacion import calificarExamen, s
 from administracion.views.calificaciones_curso.notasCurso import cursosAsociadosList, \
 	listadoCalificacionesPorGrupo, calificarGrupo, listadoEstudiantesPorGrupo, actualizarEstadoMatriculas, \
 	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos
-from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, cursoCalificacionesDetallePDF
+from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, \
+	cursoCalificacionesDetallePDF, misCursosList
 from administracion.views.preinscripcionExamenClasificacion import preinscripcionExamenView, \
 	preinscripcion_examen_fase_previa, PreinscripcionExamenDetailView, PreinscripcionExamenDelete
 
@@ -320,6 +321,7 @@ urlpatterns = [
 
 	# historia academica
 	url(r'^administracion/historia-academica', miHistoriaAcademica, name='mi_historia_academica'),
+	url(r'^administracion/cursos-activos', misCursosList, name='mis_cursos_activos'),
 	url(r'^administracion/mis-calificaciones/(?P<matricula>[-\w]+)/(?P<opcion>[0-9]+)', cursoCalificacionesDetalle, name='calificaciones-detalle'),
 	url(r'^administracion/mis-calificaciones-pdf/(?P<matricula>[-\w]+)/(?P<opcion>[0-9]+)', cursoCalificacionesDetallePDF, name='calificaciones-detalle-pdf'),
 

@@ -1,6 +1,10 @@
 # Change Log
 
 ## 1.5.2
+- agregada lista para visualizar cursos activos en vista de estudiante
+- agregados enlaces al website de extension en pagina principal
+
+## 1.5.2
 - ajustes en validación para preinscripción de idiomas
 - ajustes en actualizacion de campo requiere_facturacion
 - arreglado reporte de notas en estado final del curso
