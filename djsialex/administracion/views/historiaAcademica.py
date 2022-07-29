@@ -8,20 +8,20 @@ from ..report import funcion
 
 
 @login_required
-def misCursosList(request, periodo):
+def misCursosList(request):
 
+    template_name = 'administracion/historiaAcademica/mis_cursos.html'
+    context = {}
     estudiante = Profile.objects.get(usuario=request.user)
-    try:
-        periodo_seleccionado = Periodo.objects.get(pk=periodo)
-    except Periodo.DoesNotExist:
-        periodo_seleccionado = None
 
-    if request.method == 'GET':
+    if request.method == 'GET' and estudiante:
+        matriculas = Matricula.objects.filter(
+            estudiante=estudiante,
+            estado_matricula__in=[7, 9]  # 7 En curso 9 Aprobado - Pendiente en formalizacion
+        )
+        context = {'matriculas': matriculas}
 
-        if estudiante and periodo_seleccionado:
-
-            cursos = Curso.objects.filter(oferta_academica__periodo=periodo_seleccionado).all()
-            matriculas = Matricula.objects.filter(estudiante=estudiante, grupo__horarioCurso__curso__in=cursos).all()
+    return render(request, template_name, context)
 
 
 @login_required
@@ -38,6 +38,7 @@ def miHistoriaAcademica(request):
         context = {'matriculas': matriculas, 'calificaciones_examen': calificaciones_examen}
 
     return render(request, template_name, context)
+
 
 @login_required
 def cursoCalificacionesDetalle(request, matricula, opcion):

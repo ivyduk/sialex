@@ -12,8 +12,18 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
-import django_heroku
 from django.utils.translation import ugettext_lazy as _
+
+"""from sshtunnel import SSHTunnelForwarder
+
+# Connect to a server using the ssh keys. See the sshtunnel documentation for using password authentication
+ssh_tunnel = SSHTunnelForwarder(
+    ('168.176.18.15', 33000),
+    ssh_username='extdevelop',
+    ssh_password="2022/IDuque",
+    remote_bind_address=('localhost', 5432),
+)
+ssh_tunnel.start()"""
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -40,7 +50,9 @@ ALLOWED_HOSTS = [
     'http://www.extensionidiomas.unal.edu.co',
     'www.extensionidiomas.unal.edu.co',
     'extensionidiomas.unal.edu.co',
-    'sialex-dev.herokuapp.com'
+    '3.89.102.66',
+    'ec2-3-89-102-66.compute-1.amazonaws.com'
+
 ]
 DJANGO_EASY_AUDIT_WATCH_REQUEST_EVENTS = False
 
@@ -131,18 +143,6 @@ WSGI_APPLICATION = 'djsialex.wsgi.application'
 #    }
 #}
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sialex',
-        'USER': 'sialex',
-        'PASSWORD': 'adminsialex',
-        'HOST': 'database-1-slx.co1rl716txsf.us-east-1.rds.amazonaws.com',
-        'PORT': '5432',
-    }
-}
-""" # dev
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -150,6 +150,17 @@ DATABASES = {
         'USER': 'sialex',
         'PASSWORD': 'sialex',
         'HOST': 'localhost',
+        'PORT': '5432',
+    },
+}
+""" # dev
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sialex',
+        'USER': 'sialex',
+        'PASSWORD': 'adminsialex',
+        'HOST': 'database-1-slx.co1rl716txsf.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
@@ -204,14 +215,9 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-# heroku variables
-django_heroku.settings(locals())
-
 STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR+"/../static_deployed/"
-
-CKEDITOR_BASEPATH = BASE_DIR+"/../static_deployed/ckeditor/ckeditor/"
 
 LOGIN_REDIRECT_URL = '/administracion'
 

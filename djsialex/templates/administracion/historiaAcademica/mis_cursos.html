@@ -1,0 +1,50 @@
+{% extends "administracion/home.html" %}
+{% load profile_tags %}
+{% block content %}
+
+     <div class="col-sm-9 col-md-9">
+    <h1 class="title-project">Mis Cursos Activos</h1>
+    <div class="well">
+        Estimado estudiante.
+        <br>A continuación se relacionan los cursos a los que se encuentra activo en el presente período.
+    </div>
+    <h1 class="title-project">Cursos</h1>
+    {% if matriculas %}
+        <div class="table-responsive">
+        <table class="table table-striped table-border">
+            <thead class="table-head">
+            <tr>
+                <th scope="col">Curso</th>
+                <th scope="col">Grupo</th>
+                <th scope="col">Idioma</th>
+                <th scope="col">Nivel</th>
+                <th scope="col">Periodo</th>
+                <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for matricula in matriculas %}
+            <tr>
+                <td><a href="{% url 'calificaciones-detalle' matricula.id 1 %}">{{ matricula.grupo.horarioCurso.curso.nombre }}</a></td>
+                <td>{{ matricula.grupo.codigo }}</td>
+                <td>{{ matricula.grupo.horarioCurso.curso.nivel.idioma.nombre }}</td>
+                <td>{{ matricula.grupo.horarioCurso.curso.nivel.nombre }}</td>
+                <td>{{ matricula.grupo.horarioCurso.curso.oferta_academica.periodo }}</td>
+
+                <td><span class="{% if matricula.estado_matricula|getColorEstadoMatricula == 1 %} alert-success
+                        {% elif matricula.estado_matricula|getColorEstadoMatricula == 2 %}  alert-danger
+                        {% endif %}">
+                        {{ matricula.estado_matricula|getEstadoMatricula }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            Usted no cuenta con cursos activos en el presente período
+        </div>
+    {% endif %}
+     </div>
+{% endblock %}
