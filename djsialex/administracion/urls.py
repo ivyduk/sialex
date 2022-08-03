@@ -321,7 +321,7 @@ urlpatterns = [
 
 	# historia academica
 	url(r'^administracion/historia-academica', miHistoriaAcademica, name='mi_historia_academica'),
-	url(r'^administracion/cursos-activos', misCursosList, name='mis_cursos_activos'),
+	url(r'^administracion/cursos-progreso', misCursosList, name='mis_cursos_en_progreso'),
 	url(r'^administracion/mis-calificaciones/(?P<matricula>[-\w]+)/(?P<opcion>[0-9]+)', cursoCalificacionesDetalle, name='calificaciones-detalle'),
 	url(r'^administracion/mis-calificaciones-pdf/(?P<matricula>[-\w]+)/(?P<opcion>[0-9]+)', cursoCalificacionesDetallePDF, name='calificaciones-detalle-pdf'),
 
