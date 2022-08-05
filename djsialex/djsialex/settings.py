@@ -143,6 +143,7 @@ WSGI_APPLICATION = 'djsialex.wsgi.application'
 #    }
 #}
 
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -153,7 +154,8 @@ DATABASES = {
         'PORT': '5432',
     },
 }
-""" # dev
+"""
+# dev
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -164,7 +166,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-}"""
 
 
 # Password validation

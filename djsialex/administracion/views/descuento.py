@@ -87,15 +87,34 @@ class CrearDescuento(LoginRequiredMixin, UpdateView):
             self.object.descuento_id=nuevo_descuento
             self.object.save()
             
+            periodo = periodo.objects.get(pk=self.request.session["periodo_contextualizado_id"])
+            descuento_solicitado = DescuentoAplicado(
+                    beneficiario=self.object.persona,
+                    periodo_generado=periodo,
+                    valor=self.object.valor_preinscripcion - valor_descuento,
+                    descuento_id=nuevo_descuento,
+                    preinscripcion_generada=self.object
+                )
+            descuento_solicitado.save()
+        
+
+
+            """    for doc in descuento.descuento.documentos_requeridos.filter(activo=True):
+                    documento_descuento = DocumentosDescuentoSolicitado(
+                        descuento_aplicado=descuento,
+                        documento_requerido=doc
+                    )
+                    documento_descuento.save()
+            except DescuentoAplicado.ValidationError:
+                pass
+            """
             
-            #descuento.save()
-                
-                #for doc in descuento.descuento.documentos_requeridos.filter(activo=True):
-                #    documento_descuento = DocumentosDescuentoSolicitado(
-                #        descuento_aplicado=descuento,
-                #        documento_requerido=doc
-                #    )
-                #    documento_descuento.save()
+            #for doc in descuento.documentos_requeridos.filter(activo=True):
+            #    documento_descuento = DocumentosDescuentoSolicitado(
+            #        descuento_aplicado=descuento.id,
+            #        documento_requerido=doc
+            #    )
+            #    documento_descuento.save()
 
         return HttpResponseRedirect(self.get_success_url())
 
