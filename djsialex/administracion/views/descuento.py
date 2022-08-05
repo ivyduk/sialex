@@ -127,7 +127,7 @@ class ModificarDescuento(LoginRequiredMixin, UpdateView):
             self.object.preinscripcion_generada.valor_preinscripcion -= valor_descuento
             self.object.preinscripcion_generada.save()
             self.object.valor = valor_descuento
-            self.object.descuento_aplicado = descuento
+            self.object.descuento_solicitado = descuento
             self.object.save()
             documentos_descuento = DocumentosDescuentoSolicitado.objects.filter(descuento_aplicado=self.object.id)
             for doc in documentos_descuento:
