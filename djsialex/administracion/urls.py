@@ -20,8 +20,7 @@ from administracion.views.calificarExamenClasificacion import calificarExamen, s
 from administracion.views.calificaciones_curso.notasCurso import cursosAsociadosList, \
 	listadoCalificacionesPorGrupo, calificarGrupo, listadoEstudiantesPorGrupo, actualizarEstadoMatriculas, \
 	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos
-from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, \
-	cursoCalificacionesDetallePDF, misCursosList
+from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, cursoCalificacionesDetallePDF
 from administracion.views.preinscripcionExamenClasificacion import preinscripcionExamenView, \
 	preinscripcion_examen_fase_previa, PreinscripcionExamenDetailView, PreinscripcionExamenDelete
 
@@ -229,6 +228,7 @@ urlpatterns = [
 	url(r'^inscripcion/examen/formalizar/(?P<pk>[0-9]+)$', formalizar_vista_examen, name='formalizar-examen'),
 	path('inscripcion/curso/borrar/<pk>', CancelPreinscripcion.as_view(), name='preinscripcion_delete'),
 	path('inscripcion/descuento/borrar/<pk>', CancelDescuento.as_view(), name='descuento_aplicado_borrar'),
+	path('inscripcion/descuento/crear/<pk>', CrearDescuento.as_view(), name='descuento_aplicado_crear'),
 	path('inscripcion/descuento/editar/<pk>', ModificarDescuento.as_view(), name='descuento_aplicado_editar'),
 	path('ajax/cargar-programas/', cargar_programas_academicos, name='ajax_cargar_programas'),  # <-- this one here
 	path('ajax/cargar-niveles/', cargar_niveles, name='ajax_cargar_niveles'),  # <-- this one here
@@ -321,7 +321,6 @@ urlpatterns = [
 
 	# historia academica
 	url(r'^administracion/historia-academica', miHistoriaAcademica, name='mi_historia_academica'),
-	url(r'^administracion/cursos-activos', misCursosList, name='mis_cursos_activos'),
 	url(r'^administracion/mis-calificaciones/(?P<matricula>[-\w]+)/(?P<opcion>[0-9]+)', cursoCalificacionesDetalle, name='calificaciones-detalle'),
 	url(r'^administracion/mis-calificaciones-pdf/(?P<matricula>[-\w]+)/(?P<opcion>[0-9]+)', cursoCalificacionesDetallePDF, name='calificaciones-detalle-pdf'),
 
@@ -371,7 +370,4 @@ urlpatterns = [
 	#Preinscritos cursos
 	url(r'^administracion/grupos/ver-preinscritos/(?P<horario_curso>[0-9a-f-]+)$', verPreinscritosCurso, name='horario-curso-preinscritos'),
 	url(r'^administracion/grupos/preinscritos-sin-matricula/(?P<horario_curso>[0-9a-f-]+)$', verPreinscritosSinMatriculaCurso, name='preinscritos-sin-matricula'),
-
 ]
-
-
