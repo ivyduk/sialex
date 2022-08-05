@@ -100,15 +100,22 @@
                             <div class="col-md-4">{% if beca.estado_beca == 2 %}<a href="{% url 'beca_aplicar' preinscripcionhorariocurso.id %}" class="btn btn-primary">Aplicar beca</a>{% endif %}</div>
                     </li>
                 {% endif %}
-                {% if descuento_aplicado %}
+                {% if not descuento_aplicado %}
                     <li class="list-group-item row">
-                              <div class="col-md-4"><h3><b>Descuento: </b>{{ descuento_aplicado.descuento.nombre }}</h3></div>
-                              <div class="col-md-4"><h3><b>Estado: </b> <span>{{ descuento_aplicado.get_estado_descuento_display }}</span></h3></div>
-                                {% if descuento_aplicado.estado_descuento == 1 %}
-                                  <div class="col-md-4"><a href="{% url 'descuento_aplicado_editar' descuento_aplicado.id %}" ><input type="button" class="btn btn-primary btn-xs" value="Modificar descuento"></a>
-                                    <a href="{% url 'descuento_aplicado_borrar' preinscripcionhorariocurso.id %}" ><input type="button" class="btn btn-danger btn-xs btn-cancelar" value="Cancelar descuento"></a></div>
-                                {% endif %}
+                              <div class="col-md-4"><h3><b>Descuento: </b> Sin Descuento </h3></div>
+                              <div class="col-md-4"><h3><b>Estado: </b> <span>Sin Descuento </span></h3></div>
+                              <div class="col-md-4"><a href="{% url 'descuento_aplicado_crear' preinscripcionhorariocurso.id %}" ><input type="button" class="btn btn-primary btn-xs" value="Ingresar descuento"></a>                                    
                     </li>
+                {% else %}
+                    <li class="list-group-item row">
+                        <div class="col-md-4"><h3><b>Descuento: </b>{{ descuento_aplicado.descuento.nombre }}</h3></div>
+                        <div class="col-md-4"><h3><b>Estado: </b> <span>{{ descuento_aplicado.get_estado_descuento_display }}</span></h3></div>
+                          {% if descuento_aplicado.estado_descuento == 1 %}
+                            <div class="col-md-4"><a href="{% url 'descuento_aplicado_editar' descuento_aplicado.id %}" ><input type="button" class="btn btn-primary btn-xs" value="Modificar descuento"></a>
+                              <a href="{% url 'descuento_aplicado_borrar' preinscripcionhorariocurso.id %}" ><input type="button" class="btn btn-danger btn-xs btn-cancelar" value="Cancelar descuento"></a></div>
+                          {% endif %}
+                    </li>  
+
                     {% if documentos %}
                         {% for documento in documentos %}
                             <li class="list-group-item row">
@@ -128,6 +135,7 @@
                         {% endfor %}
                     {% endif %}
                 {% endif %}
+                
                 {% if reservas %}
                     {% for reserva in reservas %}
                         <li class="list-group-item row">

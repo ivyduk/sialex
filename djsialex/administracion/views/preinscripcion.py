@@ -1,4 +1,3 @@
-from re import S
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views import generic
@@ -395,6 +394,7 @@ def cargar_programas_academicos(request):
                 edad_minima__lte=edad_aspirante,
                 edad_maxima__gt=edad_aspirante,
                 activo=True,
+                ofertaacademica__periodo__id=periodo_id
             ).order_by('nombre').all()
              
             if not programas_academicos: 
@@ -451,8 +451,7 @@ def cargar_niveles(request):
             activo=True,
             orden=1,
             edad_minima__lte=edad_aspirante,
-            edad_maxima__gt=edad_aspirante,
-            ofertaacademica__periodo__id=periodo_id
+            edad_maxima__gt=edad_aspirante
         ).all()
         
         if not niveles: 
