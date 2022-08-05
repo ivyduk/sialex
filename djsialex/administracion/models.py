@@ -616,7 +616,7 @@ class HorarioCurso(models.Model):
     cupo_inicial = models.IntegerField(help_text='Cupo a ofertarse para público en general')
     cupo_autorizados = models.IntegerField(default=0)
     cupo_disponible_autorizados = models.IntegerField(default=0)
-    
+
     def save(self, *args, **kwargs):
         self.nombre = str(self.horario.nombre) + '-' + str(self.curso.nombre)
         super(HorarioCurso, self).save(*args, **kwargs)
@@ -901,7 +901,7 @@ class Preinscripcion(models.Model):
 class PreinscripcionHorarioCurso(Preinscripcion):
     horario_cupo = models.ForeignKey(HorarioCurso, on_delete=models.CASCADE, null=True)
     descuento_solicitado = models.ForeignKey(Descuento, on_delete=models.CASCADE, null=True)
-    
+
     def get_absolute_url(self):
         """
         Devuelve la url para acceder a una instancia particular de preinscripcion.
