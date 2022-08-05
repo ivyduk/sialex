@@ -113,6 +113,7 @@ class Idioma(models.Model):
     class Meta:
         verbose_name = "Idioma"
         verbose_name_plural = "Idiomas"
+        ordering = ["nombre"]
 
     def get_absolute_url(self):
         """
@@ -249,7 +250,7 @@ class Nivel(models.Model):
     class Meta:
         verbose_name = "Nivel"
         verbose_name_plural = "Niveles"
-
+        ordering = ["orden","nombre"]
 
     def __str__(self):
         """
@@ -414,6 +415,7 @@ class ProgramaAcademico(models.Model):
     class Meta:
         verbose_name = "Programa Academico"
         verbose_name_plural = "Programas"
+        ordering = ["nombre", "idioma"]
 
     def get_absolute_url(self):
         """
@@ -614,7 +616,7 @@ class HorarioCurso(models.Model):
     cupo_inicial = models.IntegerField(help_text='Cupo a ofertarse para público en general')
     cupo_autorizados = models.IntegerField(default=0)
     cupo_disponible_autorizados = models.IntegerField(default=0)
-
+    
     def save(self, *args, **kwargs):
         self.nombre = str(self.horario.nombre) + '-' + str(self.curso.nombre)
         super(HorarioCurso, self).save(*args, **kwargs)
@@ -899,7 +901,7 @@ class Preinscripcion(models.Model):
 class PreinscripcionHorarioCurso(Preinscripcion):
     horario_cupo = models.ForeignKey(HorarioCurso, on_delete=models.CASCADE, null=True)
     descuento_solicitado = models.ForeignKey(Descuento, on_delete=models.CASCADE, null=True)
-
+    
     def get_absolute_url(self):
         """
         Devuelve la url para acceder a una instancia particular de preinscripcion.

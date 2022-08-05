@@ -124,7 +124,7 @@ class AyudanteFinancieros(object):
             try:
                 descuento = DescuentoAplicado(
                     beneficiario=self.persona,
-                    periodo_generado=self.periodo,
+                    periodo_generado=self.qperiodo,
                     valor=detallado['descuento']['valor'],
                     descuento_id=detallado['descuento']['id'],
                     preinscripcion_generada=recibo_preinscripcion.preinscripcion
