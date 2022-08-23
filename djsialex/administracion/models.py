@@ -113,6 +113,7 @@ class Idioma(models.Model):
     class Meta:
         verbose_name = "Idioma"
         verbose_name_plural = "Idiomas"
+        ordering = ["nombre"]
 
     def get_absolute_url(self):
         """
@@ -249,6 +250,7 @@ class Nivel(models.Model):
     class Meta:
         verbose_name = "Nivel"
         verbose_name_plural = "Niveles"
+        ordering = ["orden", "nombre"]
 
 
     def __str__(self):
@@ -414,6 +416,7 @@ class ProgramaAcademico(models.Model):
     class Meta:
         verbose_name = "Programa Academico"
         verbose_name_plural = "Programas"
+        ordering = ["nombre", "idioma"]
 
     def get_absolute_url(self):
         """
@@ -890,7 +893,7 @@ class Preinscripcion(models.Model):
     estado_preinscripcion = models.IntegerField(choices=ESTADOS_ADMINISTRATIVOS_PREINSCRIPCION, default=5)
     fecha_preinscripcion = models.DateTimeField(auto_now_add=True)
     valor_preinscripcion = models.FloatField(default=0)
-    codigo_hash = models.CharField(max_length=100,default='')
+    codigo_hash = models.CharField(max_length=100, default='')
     requiere_facturacion = models.BooleanField(
         default=True,
         help_text='Determina si esta preinscripción requiere facturación electrónica'

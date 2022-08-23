@@ -174,7 +174,12 @@ def preinscripcionView(request):
                 ofertas_periodo = OfertaAcademica.objects.filter(periodo=periodo)
 
                 niveles = Nivel.objects.filter(idioma_id=idioma)
-                preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],horario_cupo=horario, persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo) #Estado 6: Cancelado
+                preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(
+                    estado_preinscripcion__in=[1, 3, 5],
+                    horario_cupo__curso__nivel__in=niveles,
+                    persona=preinscrito,
+                    horario_cupo__curso__oferta_academica__in=ofertas_periodo
+                ) #Estado 6: Cancelado
                 preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
                                                                                   horario_cupo__curso__nivel__in=niveles,
                                                                                   persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
@@ -394,7 +399,10 @@ def cargar_programas_academicos(request):
                 activo=True,
                 ofertaacademica__periodo__id=periodo_id
             ).order_by('nombre').all()
-            programas_autorizados = []
+
+            if not programas_academicos:
+                RejectedError = "ERROR|Usted no cuenta con la edad requerida para el PROGRAMA ACADEMICO."
+
             if aspirante:
                 autorizaciones = AutorizadoCurso.objects.filter(
                     numero_documento=aspirante.numero_documento,
@@ -407,9 +415,15 @@ def cargar_programas_academicos(request):
                         autorizaciones_dict[str(autorizacion.curso_autorizado.id)] = str(autorizacion.horario_curso_autorizado_id) if autorizacion.horario_curso_autorizado_id else None
                         programas_academicos |= programa_autorizado
                 request.session['autorizaciones_dict'] = autorizaciones_dict
-        data={}
+        data = {}
+        if programas_academicos:
+            for i in programas_academicos:
+                data[str(i.id)] = i.nombre
+        else:
+            data[str(id)] = RejectedError
+
         for i in programas_academicos:
-            data[str(i.id)]=i.nombre
+            data[str(i.id)] = i.nombre
         serialized_obj = json.dumps(data)
 
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
@@ -417,7 +431,6 @@ def cargar_programas_academicos(request):
 
 @login_required()
 def cargar_niveles(request):
-    error = False
     if request.user.is_authenticated:
 
         try:
@@ -435,6 +448,10 @@ def cargar_niveles(request):
         programa_academico = ProgramaAcademico.objects.get(id=programa_academico_id)
         periodo_id = request.session["periodo_contextualizado_id"]
         periodo = Periodo.objects.get(pk=periodo_id)
+
+        nivelesPre = None
+
+        # retornar niveles de ingreso orden=1
         niveles = ProgramaAcademico.objects.get(
             pk=programa_academico_id
         ).nivel.filter(
@@ -443,6 +460,10 @@ def cargar_niveles(request):
             edad_minima__lte=edad_aspirante,
             edad_maxima__gt=edad_aspirante
         ).all()
+
+        if not niveles:
+            RejectedError = "ERROR|Usted no cuenta con la edad requerida para los niveles disponibles."
+
         matriculas = Matricula.objects.filter(
             estudiante=request.user.profile,
             grupo__horarioCurso__curso__oferta_academica__periodo__inicio__gte=periodo.inicio-4,
@@ -461,7 +482,7 @@ def cargar_niveles(request):
                     idioma=examen.nivel.idioma
                 )
                 if nivel_aprobado:
-                    niveles |= nivel_aprobado
+                    nivelesPre |= nivel_aprobado
         if matriculas:
             for matricula in matriculas:
                 if matricula.estado_matricula in (3, 4, 5, 6, 8):
@@ -471,7 +492,7 @@ def cargar_niveles(request):
                     orden_superior = matricula.grupo.horarioCurso.curso.nivel.orden + 1
                     nivel_aprobado = Nivel.objects.filter(orden=orden_superior, idioma=matricula.grupo.horarioCurso.curso.nivel.idioma)
                     if nivel_aprobado:
-                        niveles |= nivel_aprobado
+                        nivelesPre |= nivel_aprobado
         autorizaciones_dict = request.session.get('autorizaciones_dict')
         for autorizacion in autorizaciones_dict:
             cursos_autorizado = Curso.objects.filter(pk=autorizacion).all()
@@ -479,6 +500,14 @@ def cargar_niveles(request):
 
             if niveles_autorizado not in niveles:
                 niveles |= niveles_autorizado
+
+        if nivelesPre:
+            niveles |= nivelesPre
+        elif niveles:
+            pass
+        elif not nivelesPre:
+            RejectedError = "ERROR|Usted no ha aprobado los NIVELES necesarios para preinscribirse a un NIVEL."
+
 
         niveles_aux = None
 
@@ -492,18 +521,30 @@ def cargar_niveles(request):
         if niveles_aux:
             for i in niveles_aux:
                 data[str(i.id)] = i.nombre
+        else:
+            data[str(id)] = RejectedError
         serialized_obj = json.dumps(data)
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
 
+
 @login_required()
 def cargar_horarios_disponibles(request):
-    error = False
     if request.user.is_authenticated:
         nivel_id = request.GET.get('nivel')
         periodo_id = request.session["periodo_contextualizado_id"]
-        cursos = Curso.objects.filter(nivel = nivel_id, oferta_academica__periodo=periodo_id).all()
-        horarios = HorarioCurso.objects.filter(curso__in=cursos, cupo_disponible__gt=0).order_by('nombre').all()
+        cursos = Curso.objects.filter(
+            nivel=nivel_id,
+            oferta_academica__periodo=periodo_id
+        ).all()
+        horarios = HorarioCurso.objects.filter(
+            curso__in=cursos,
+            cupo_disponible__gt=0
+        ).order_by('nombre').all()
+
+        if not horarios:
+            RejectedError = "ERROR|No existen HORARIOS con cupos disponibles."
+
         autorizaciones_dict = request.session.get('autorizaciones_dict')
         cursos_ids = [str(curso) for curso in cursos.values_list('id', flat=True)]
         for autorizacion in autorizaciones_dict:
@@ -515,8 +556,11 @@ def cargar_horarios_disponibles(request):
                     if horario not in horarios:
                         horarios |= horario
         data = {}
-        for i in horarios:
-            data[str(i.id)] = i.nombre
+        if horarios:
+            for i in horarios:
+                data[str(i.id)] = i.nombre
+        else:
+            data[str(id)] = RejectedError
         serialized_obj = json.dumps(data)
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})

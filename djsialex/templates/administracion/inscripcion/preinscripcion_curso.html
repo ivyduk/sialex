@@ -57,13 +57,6 @@
             <a target="_blank" href="https://www.humanas.unal.edu.co/extension_lenguas/tarifas/descuentos">enlace</a>
                 para que lo seleccione en el formulario de preinscripción en caso que aplique
             </div>
-        <div class="alert alert-warning"><b>Señor aspirante: </b> Tenga en cuenta que si algún filtro no muestra opciones es debido a:
-            <ol class="center">
-                <li>Usted no cuenta con la edad requerida para el <b>programa académico</b></li>
-                <li>No existen <b>horarios</b> con cupos disponibles</li>
-                <li>Usted no ha aprobado los niveles necesarios para preinscribirse a un nivel</li>
-            </ol>
-        </div>
         {% if user.profile.es_menor_de_edad %}
             <div class="alert alert-info">
                 Recuerde seleccionar el descuento de menores de edad en caso que aplique para el curso de su elección
@@ -96,6 +89,8 @@
                     </div>
                 </div>
                 <div class="form-group row stepByStep" id="bloque_programa">
+                    <div id="id_programa_academico_error" class="alert alert-warning" style="display: none">
+                    </div>
                     <label class="col-md-3">Programa académico</label>
                     <div class="col-md-9">
                         <select name="programa_academico" required="" id="id_programa_academico" class="form-control cascadeDropDown" nextfield="#id_nivel" nextblock="#bloque_nivel" dataurl="{% url 'ajax_cargar_niveles' %}" parametro="programa_academico"  datafield="0">
@@ -104,6 +99,8 @@
                     </div>
                 </div>
                 <div class="form-group row stepByStep" id="bloque_nivel">
+                    <div id="id_nivel_error" class="alert alert-warning" style="display: none">
+                    </div>
                     <label class="col-md-3">Nivel</label>
                     <div class="col-md-9">
                         <select name="nivel" required="" id="id_nivel" class="form-control cascadeDropDown" nextfield="#id_horario_curso" nextblock="#bloque_horario" dataurl="{% url 'ajax_cargar_horarios' %}" parametro="nivel" datafield="0">
@@ -112,6 +109,8 @@
                     </div>
                 </div>
                 <div class="form-group row stepByStep" id="bloque_horario" >
+                    <div id="id_horario_curso_error" class="alert alert-warning" style="display: none">
+                    </div>
                     <label class="col-md-3">Horario</label>
                     <div class="col-md-9">
                         <select name="horario_curso" required="" id="id_horario_curso" class="form-control cascadeDropDown" nextfield="#id_descuento" nextblock="#bloque_descuento,#bloque_enviar" dataurl="{% url 'ajax_cargar_descuentos' %}" parametro="programa_academico" datafield="#id_programa_academico">
@@ -120,6 +119,8 @@
                     </div>
                 </div>
                 <div id="bloque_descuento" class="stepByStep form-group row">
+                    <div id="id_descuento_error" class="alert alert-warning" style="display: none">
+                    </div>
                     <label class="col-md-3">Descuento</label>
                     <div class="col-md-9">
                         <select name="descuento" required="" id="id_descuento" class="form-control cascadeDropDown" nextblock="#bloque_enviar" dataurl="">
@@ -218,7 +219,7 @@
                                                                         <td class="text-right"><span id="n_precio"></span></td>
                                                                     </tr>
                                                                     <tr>
-                                                                        <td class="emptyrow"></td> 
+                                                                        <td class="emptyrow"></td>
                                                                         <td class="emptyrow text-center"><strong>Total</strong></td>
                                                                         <td class="emptyrow text-right"><h2>$ <span id="n_valor_a_cancelar" class="label label-success"></span></h2></td>
                                                                     </tr>
@@ -256,6 +257,7 @@
         dependenceCascade["id_descuento"]="bloque_descuento";
         dependenceCascade["enviar"]="bloque_enviar";
 
+
         $(".cascadeDropDown").change(function () {
             var url = $(this).attr("dataurl");
             var parametro = $(this).attr("parametro");
@@ -266,6 +268,16 @@
             var dataObject = {
                 "randomval": Math.random(),
             };
+
+            if (nextfield != null) {
+                var elem = document.getElementById(nextfield.replace("#","") + "_error");
+                var styl = window.getComputedStyle(elem, null);
+                if (styl.getPropertyValue("display") != 'none') {
+                   elem.style.display = 'none';
+                }
+                elem.innerHTML = "";
+            }
+
             var list = $(nextfield);
             for (var key in dependenceCascade) {
                 if(key==$(this).attr("id")||skipElement){
@@ -286,10 +298,24 @@
             skipElement=false
             $.getJSON(url, dataObject, function(data) {
                 $.each(data, function(index, label) {
-                    list.append('<option value=' + index + '>' + label + '</option>');
+                    if (label.indexOf('ERROR') > -1){
+                        elem.style.display = 'block';
+                        const errorList = label.split("|");
+                        let i = 1;
+                        while (i < errorList.length) {
+                            const para = document.createElement("p");
+                            const node = document.createTextNode(errorList[i]);
+                            para.appendChild(node);
+                            elem.appendChild(para);
+                            i++;
+                        }
+                    }
+                    else
+                        list.append('<option value=' + index + '>' + label + '</option>');
                 });
                 $(nextblock).show("fast");
             })
+
             if(url==''){
                 $(nextblock).show("fast");
             }
