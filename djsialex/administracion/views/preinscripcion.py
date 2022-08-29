@@ -374,8 +374,10 @@ def calcularEdad(fechaNacimiento):
 
     return int((diferencia.days + diferencia.seconds/86400.0) / 365.2425)
 
+
 def isAutorizacionNivelMenor():
     pass
+
 
 @login_required()
 def cargar_programas_academicos(request):
@@ -408,9 +410,12 @@ def cargar_programas_academicos(request):
                     numero_documento=aspirante.numero_documento,
                     periodo=periodo_id,
                     estado__in=[1, 3],
-                    curso_autorizado__oferta_academica__programa__in=programas_academicos).all() #Estado: AUTORIZADO o AUTORIZACIÓN CANCELADA
+                    curso_autorizado__oferta_academica__programa__in=programas_academicos
+                ).all() #Estado: AUTORIZADO o AUTORIZACIÓN CANCELADA
                 for autorizacion in autorizaciones:
-                    programa_autorizado = ProgramaAcademico.objects.filter(pk=autorizacion.curso_autorizado.oferta_academica.programa.id)
+                    programa_autorizado = ProgramaAcademico.objects.filter(
+                        pk=autorizacion.curso_autorizado.oferta_academica.programa.id
+                    )
                     if autorizacion.curso_autorizado.id not in autorizaciones_dict:
                         autorizaciones_dict[str(autorizacion.curso_autorizado.id)] = str(autorizacion.horario_curso_autorizado_id) if autorizacion.horario_curso_autorizado_id else None
                         programas_academicos |= programa_autorizado
@@ -428,6 +433,7 @@ def cargar_programas_academicos(request):
 
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
 
 @login_required()
 def cargar_niveles(request):
@@ -550,7 +556,9 @@ def cargar_horarios_disponibles(request):
         for autorizacion in autorizaciones_dict:
             if autorizacion in cursos_ids:
                 if not autorizaciones_dict[autorizacion]:
-                    horarios = HorarioCurso.objects.filter(curso__in=cursos, cupo_disponible_autorizados__gt=0).order_by('nombre').all()
+                    horarios = HorarioCurso.objects.filter(
+                        curso__in=cursos, cupo_disponible_autorizados__gt=0
+                    ).order_by('nombre').all()
                 else:
                     horario = HorarioCurso.objects.filter(pk=autorizaciones_dict[autorizacion])
                     if horario not in horarios:
@@ -564,6 +572,7 @@ def cargar_horarios_disponibles(request):
         serialized_obj = json.dumps(data)
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
 
 @login_required()
 def cargar_descuentos(request):
