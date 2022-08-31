@@ -64,7 +64,7 @@ class CancelPreinscripcion(LoginRequiredMixin, DeleteView):
         except PreinscripcionHorarioCurso.DoesNotExist:
             preinscripcion = None
         try:
-            preinscrito = Profile.objects.get(pk = request.user.profile.id)
+            preinscrito = Profile.objects.get(pk=request.user.profile.id)
         except Profile.DoesNotExist:
             preinscrito = None
         try:
@@ -403,7 +403,7 @@ def cargar_programas_academicos(request):
             ).order_by('nombre').all()
 
             if not programas_academicos:
-                RejectedError = "ERROR|Usted no cuenta con la edad requerida para el PROGRAMA ACADEMICO."
+                RejectedError = "ERROR|Usted no cuenta con la edad requerida para ningún Programa Académico disponible."
 
             if aspirante:
                 autorizaciones = AutorizadoCurso.objects.filter(
@@ -539,6 +539,21 @@ def cargar_horarios_disponibles(request):
     if request.user.is_authenticated:
         nivel_id = request.GET.get('nivel')
         periodo_id = request.session["periodo_contextualizado_id"]
+        periodo = Periodo.objects.get(pk=periodo_id)
+        preinscrito = Profile.objects.get(pk=request.user.profile.id)
+
+        # Validar si ya cuenta con una preinscripción a ese nivel en otro periodo
+        nivel = Nivel.objects.get(pk=nivel_id)
+        preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(
+            estado_preinscripcion__in=[1, 3, 5],
+            horario_cupo__curso__nivel=nivel,
+            persona=preinscrito,
+            horario_cupo__curso__oferta_academica__periodo__inicio=periodo.inicio
+        ).first()
+
+        if preinscripcion_mismo_idioma:
+           RejectedError = "ERROR|Ya cuenta con una preinscripción activa a este nivel en otro período."
+
         cursos = Curso.objects.filter(
             nivel=nivel_id,
             oferta_academica__periodo=periodo_id
@@ -564,7 +579,7 @@ def cargar_horarios_disponibles(request):
                     if horario not in horarios:
                         horarios |= horario
         data = {}
-        if horarios:
+        if horarios and not preinscripcion_mismo_idioma:
             for i in horarios:
                 data[str(i.id)] = i.nombre
         else:
@@ -670,8 +685,10 @@ def preinscripcion_fase_previa(request):
             return render(request, 'webservices/error.html', {'resultset': "Error de servidor"})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
 
+
 class BuscarPreinscripcionesView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'administracion/inscripcion/buscar_preinscripciones.html'
+
 
 class PreinscripcionesPersonaView(LoginRequiredMixin, generic.ListView):
     model = Preinscripcion
