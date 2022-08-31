@@ -395,7 +395,7 @@ def cargar_programas_academicos(request):
             fecha_nacimiento = aspirante.fecha_nacimiento
             edad_aspirante = calcularEdad(fecha_nacimiento)
             programas_academicos = ProgramaAcademico.objects.filter(
-                idioma=idioma_id,
+                idioma_id=idioma_id,
                 edad_minima__lte=edad_aspirante,
                 edad_maxima__gt=edad_aspirante,
                 activo=True,

@@ -12,6 +12,14 @@ class OfertaAcademicaListView(LoginRequiredMixin, generic.ListView):
     login_url = '/acceso/login'
     redirect_field_name = 'redirect_to'
 
+    def get_queryset(self):
+        periodo_id = self.request.session.get('periodo_contextualizado_id')
+        new_context = OfertaAcademica.objects.filter(
+            periodo_id=periodo_id,
+        ).all()
+        return new_context
+
+
 class OfertaAcademicaDetailView(LoginRequiredMixin,generic.DetailView):
     model = OfertaAcademica
     template_name = 'administracion/ofertaAcademica/oferta_detail.html'
