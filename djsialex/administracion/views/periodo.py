@@ -1,19 +1,22 @@
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect
 from django.views import generic
+from django_filters.views import FilterView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, render
+from administracion.util.filters import PeriodoFilter
 
 from ..models import Periodo, InformacionPreinscripcionFormalizacion
 from ..forms import PeriodoForm
 
 
-class PeriodoListView(LoginRequiredMixin,generic.ListView):
+class PeriodoListView(LoginRequiredMixin, FilterView):
     model = Periodo
     template_name = 'administracion/periodo/periodo_list.html'
     login_url = '/acceso/login'
     redirect_field_name = 'redirect_to'
+    filterset_class = PeriodoFilter
 
 
 class PeriodoDetailView(LoginRequiredMixin,generic.DetailView):

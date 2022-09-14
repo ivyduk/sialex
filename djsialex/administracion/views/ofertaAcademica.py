@@ -1,16 +1,20 @@
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django_filters.views import FilterView
 from django.urls import reverse_lazy
+from administracion.util.filters import OfertaFilter
 
 from ..models import OfertaAcademica, Descuento
 from ..forms.ofertaForms import OfertaAcademicaCreateForm
 
-class OfertaAcademicaListView(LoginRequiredMixin, generic.ListView):
+
+class OfertaAcademicaListView(LoginRequiredMixin, FilterView):
     model = OfertaAcademica
     template_name = 'administracion/ofertaAcademica/oferta_list.html'
     login_url = '/acceso/login'
     redirect_field_name = 'redirect_to'
+    filterset_class = OfertaFilter
 
     def get_queryset(self):
         periodo_id = self.request.session.get('periodo_contextualizado_id')
@@ -25,6 +29,7 @@ class OfertaAcademicaDetailView(LoginRequiredMixin,generic.DetailView):
     template_name = 'administracion/ofertaAcademica/oferta_detail.html'
     login_url = '/acceso/login'
     redirect_field_name = 'redirect_to'
+
 
 class OfertaAcademicaCreate(LoginRequiredMixin, CreateView):
     model = OfertaAcademica
