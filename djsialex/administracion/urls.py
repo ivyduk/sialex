@@ -229,6 +229,7 @@ urlpatterns = [
 	url(r'^inscripcion/examen/formalizar/(?P<pk>[0-9]+)$', formalizar_vista_examen, name='formalizar-examen'),
 	path('inscripcion/curso/borrar/<pk>', CancelPreinscripcion.as_view(), name='preinscripcion_delete'),
 	path('inscripcion/descuento/borrar/<pk>', CancelDescuento.as_view(), name='descuento_aplicado_borrar'),
+	path('inscripcion/descuento/crear/<pk>', CrearDescuento.as_view(), name='descuento_aplicado_crear'),
 	path('inscripcion/descuento/editar/<pk>', ModificarDescuento.as_view(), name='descuento_aplicado_editar'),
 	path('ajax/cargar-programas/', cargar_programas_academicos, name='ajax_cargar_programas'),  # <-- this one here
 	path('ajax/cargar-niveles/', cargar_niveles, name='ajax_cargar_niveles'),  # <-- this one here

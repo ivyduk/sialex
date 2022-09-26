@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.6.0
+- Ajustes de validaciones e incluidos errores en formulario de preinscripción
+- Desactivado boton de envío de preisncripción una vez se ha hecho click
+- Agregados filtros para periodo, oferta académica y examen de clasificación
+- Agregada función de creación de descuento en vista de formalización
+
 ## 1.5.2
 - agregada lista para visualizar cursos activos en vista de estudiante
 - agregados enlaces al website de extension en pagina principal

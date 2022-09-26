@@ -7,6 +7,7 @@ from django.views import generic
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.utils import timezone
 from django.http import HttpResponseRedirect
+from django_filters.views import FilterView
 
 from administracion.forms.examenClasificacionForms import ExamenClasificacionForm
 from administracion.models import ExamenClasificacion, Profile, Periodo, AutorizadoExamen, CalificacionExamen, \
@@ -15,6 +16,7 @@ from datetime import datetime
 
 import json
 
+from administracion.util.filters import ExamenFilter
 from administracion.util import CSVWriter
 from administracion.views.busqueda_list import BusquedaGenerica
 
@@ -127,11 +129,12 @@ def descargarPreinscritosExamen(request, examen):
         return response
 
 
-class ExamenClasificacionListView(LoginRequiredMixin, generic.ListView):
+class ExamenClasificacionListView(LoginRequiredMixin, FilterView):
     model = ExamenClasificacion
     template_name = 'administracion/examenClasificacion/examenclasificacion_list.html'
     login_url = '/acceso/login'
     redirect_field_name = 'redirect_to'
+    filterset_class = ExamenFilter
 
     def get_queryset(self):
         periodo_id = self.request.session["periodo_contextualizado_id"]

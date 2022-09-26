@@ -14,3 +14,5 @@ from .ofertaForms import *
 from .encuestaForms import *
 from .devolucionForms import *
 from .DescuentoAplicadoForm import *
+from .DescuentoSolicitadoForm import *
+

@@ -1,3 +1,4 @@
+
 """
 Django settings for djsialex project.
 
@@ -14,17 +15,6 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
-"""from sshtunnel import SSHTunnelForwarder
-
-# Connect to a server using the ssh keys. See the sshtunnel documentation for using password authentication
-ssh_tunnel = SSHTunnelForwarder(
-    ('168.176.18.15', 33000),
-    ssh_username='extdevelop',
-    ssh_password="2022/IDuque",
-    remote_bind_address=('localhost', 5432),
-)
-ssh_tunnel.start()"""
-
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,7 +29,7 @@ SECRET_KEY = '-plag545x0!5y9&v7jclhy@o!&ekam7_!lt38736c8-e84c(34'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 """ # Prod
-DEBUG = False 
+DEBUG = False
 """
 ALLOWED_HOSTS = [
     '168.176.18.33',
@@ -52,7 +42,6 @@ ALLOWED_HOSTS = [
     'extensionidiomas.unal.edu.co',
     '3.89.102.66',
     'ec2-3-89-102-66.compute-1.amazonaws.com'
-
 ]
 DJANGO_EASY_AUDIT_WATCH_REQUEST_EVENTS = False
 
@@ -83,7 +72,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',    
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'djsialex.middleware.middleware.FilterLoginMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -133,25 +122,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'djsialex.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#    }
-#}
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sialex',
         'USER': 'sialex',
-        'PASSWORD': 'sialex',
-        'HOST': 'localhost',
+        'PASSWORD': 'adminsialex',
+        'HOST': 'database-1-slx.co1rl716txsf.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
-    },
+    }
 }
 
 
