@@ -1,5 +1,9 @@
 {% extends 'administracion/home.html' %}
 {% load widget_tweaks  profile_tags %}
+{% block extrahead %}
+    {{ form.media }}
+    {% load static %}
+{% endblock %}
 {% block content %}
 
     <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
@@ -39,9 +43,6 @@
                     </li>
                 {% endfor %}
             </ul>
-        </div>
-
-        <div class="col-sm-6">
             <h3 class="title-project">Salones asignados actualmente </h3>
             <ul class="list-group">
                 {% for salon in salones_asignados %}
@@ -55,10 +56,33 @@
                     </li>
                 {% endfor %}
             </ul>
-            <h3 class="title-project">Observaciones (información para estudiantes): </h3>
-            {% if observaciones %}
-                {{ observaciones }}
-            {% endif %}
+        </div>
+
+        <div class="col-sm-6">
+            <div>
+                <h3 class="title-project">Código del Proyecto: </h3>
+                {% if codigo_proyecto %}
+                    {{ codigo_proyecto }}
+                {% endif %}
+            </div>
+            <div>
+                <h3 class="title-project">Fecha Inicial: </h3>
+                {% if fecha_inicio %}
+                    {{ fecha_inicio }}
+                {% endif %}
+            </div>
+            <div>
+                <h3 class="title-project">Fecha Final: </h3>
+                {% if fecha_final %}
+                    {{ fecha_final }}
+                {% endif %}
+            </div>
+            <div>
+                <h3 class="title-project">Observaciones (información para estudiantes): </h3>
+                {% if observaciones %}
+                    {{ observaciones }}
+                {% endif %}
+            </div>
         </div>
         </div>
 
@@ -80,6 +104,14 @@
                     {{ form.docentes_generales}}
                 <h3 class="title-project">{{ form.docentes_especializados.label }}</h3>
                     {{ form.docentes_especializados}}
+                <div class="form-group">
+                    <h3 class="title-project">{{ form.fecha_inicio.label }}</h3>
+                    {{ form.fecha_inicio|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    <h3 class="title-project">{{ form.fecha_final.label }}</h3>
+                    {{ form.fecha_final|add_class:"form-control" }}
+                </div>
             </div>
             <div class="col-sm-6">
                 <div class="form-group" id="id_edificio">
@@ -92,10 +124,13 @@
                     {{ form.salones }}
                 </div>
                 <div class="form-group">
+                    <h3 class="title-project">{{ form.codigo_proyecto.label }}</h3>
+                    {{ form.codigo_proyecto|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
                     <h3 class="title-project">{{ form.observaciones.label }}</h3>
                     {{ form.observaciones|add_class:"form-control" }}
                 </div>
-
             </div>
             <div class="form-group">
                     <button type="submit" class="btn btn-success pull-right">
@@ -154,6 +189,7 @@
                 $("#id_salones").multiSelect("refresh")
             }
         });
+       
     </script>
 
     {% endblock %}

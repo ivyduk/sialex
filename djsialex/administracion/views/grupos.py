@@ -1,3 +1,4 @@
+from queue import Empty
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.db import transaction, IntegrityError
@@ -5,6 +6,7 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, Max
 from django.contrib import messages
+from datetime import date
 
 from administracion.util import CSVWriter
 from administracion.views import BusquedaGenerica
@@ -204,14 +206,20 @@ class GrupoAcademicoCreateView(LoginRequiredMixin,CreateView):
         horariocurso = HorarioCurso.objects.get(id=self.kwargs['horariocurso'])
         grupos_existentes = GrupoAcademico.objects.filter(horarioCurso_id=horariocurso.id)
         len_grupos = len(grupos_existentes)
+        fecha_inicio = horariocurso.curso.oferta_academica.periodo.fecha_inicio
+        fecha_final = horariocurso.curso.oferta_academica.periodo.fecha_final
+        if fecha_inicio is None or fecha_final is None :
+            fecha_inicio = date.today()
+            fecha_final = date.today()
         nombre_curso = horariocurso.curso.nivel.nombre + '-' + horariocurso.curso.nivel.idioma.nombre + '-' + horariocurso.horario.nombre + '-' + horariocurso.curso.oferta_academica.periodo.alias
         grupo_nombre = 'GRU-' + str(len_grupos+1) + '-' + nombre_curso
-        form = GrupoAcademicoForm(initial={'nombre': grupo_nombre, 'horarioCurso' : horariocurso})
+        form = GrupoAcademicoForm(initial={'nombre': grupo_nombre, 'horarioCurso' : horariocurso, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final })
         context = {'form': form, 'horariocurso': horariocurso.id}
         data['html_form'] = render_to_string('administracion/grupos/grupo_form.html',
         context, request=request)
-        return JsonResponse(data)
 
+        return JsonResponse(data)
+   
     def form_valid(self, form):
         context = self.get_context_data()
         grupo_form = context['form']
@@ -285,7 +293,9 @@ def matriculaPorGrupoAcademicoList(request, grupoacademico):
             grupo_academico = None
 
         if grupo_academico:
-
+            DATE_FORMAT = "%d-%m-%Y"
+            fecha_inicio = grupo_academico.fecha_inicio.strftime("%s" % (DATE_FORMAT))
+            fecha_final = grupo_academico.fecha_final.strftime("%s" % (DATE_FORMAT))
             docentes = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico).all()
             salones = grupo_academico.salones.all()
 
@@ -309,7 +319,8 @@ def matriculaPorGrupoAcademicoList(request, grupoacademico):
 
             return render(request, 'administracion/grupos/matriculas_por_grupo.html',
                       {'object_list': matriculas, 'grupo': grupo_academico, 'docentes': docentes,
-                       'salones': salones, 'total': len(object_list)})
+                       'salones': salones, 'fecha_inicio': fecha_inicio,'fecha_final': fecha_final, 
+                       'total': len(object_list)})
 
         return redirect('seleccion_oferta')
 
@@ -389,6 +400,7 @@ def informacionDocenteSalonAGrupo(request, grupoacademico):
 
         salones = grupo_academico.salones.all()
         observaciones = grupo_academico.observaciones
+        
         context = {'docentes_generales_actual': docentes_generales_actual, 'docentes_especializados_actual': docentes_especializados_actual,
                    'salones_asignados': salones, 'grupo': grupo_academico, 'observaciones': observaciones, 'form': form}
 
@@ -409,16 +421,20 @@ def asignarDocenteSalonAGrupo(request, grupoacademico):
         grupo_academico = None
 
     if request.method == 'GET':
-
+        DATE_FORMAT = "%d-%m-%Y"
         docentes_generales_actual = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico, tipo_docente=tipo_general).all().order_by('docente__persona__primer_apellido', 'docente__persona__primer_nombre')
         docentes_especializados_actual = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico, tipo_docente=tipo_especializado).all().order_by('docente__persona__numero_documento', 'docente__persona__primer_nombre')
         form = AsignarSalonDocenteAGrupoForm(grupo_academico.id)
 
         salones = grupo_academico.salones.all()
         observaciones = grupo_academico.observaciones
+        codigo_proyecto = grupo_academico.codigo_proyecto
+        fecha_inicio = grupo_academico.fecha_inicio.strftime("%s" % (DATE_FORMAT))
+        fecha_final = grupo_academico.fecha_final.strftime("%s" % (DATE_FORMAT))
         context = {'docentes_generales_actual': docentes_generales_actual, 'docentes_especializados_actual': docentes_especializados_actual,
-                   'salones_asignados': salones, 'grupo': grupo_academico, 'observaciones': observaciones, 'form': form}
-
+                   'salones_asignados': salones, 'grupo': grupo_academico, 'observaciones': observaciones, 'codigo_proyecto' : codigo_proyecto, 
+                   'fecha_inicio': fecha_inicio, 'fecha_final': fecha_final , 'form': form}
+        
     elif request.method == 'POST':
 
         form = AsignarSalonDocenteAGrupoForm(grupoacademico, request.POST)
@@ -428,6 +444,9 @@ def asignarDocenteSalonAGrupo(request, grupoacademico):
             docentes_especializados = request.POST.getlist('docentes_especializados')
             salones = request.POST.getlist('salones')
             observaciones = request.POST.get('observaciones')
+            codigo_proyecto = request.POST.get('codigo_proyecto')
+            fecha_inicio = request.POST.get('fecha_inicio')
+            fecha_final = request.POST.get('fecha_final')
 
             for docente_id in docentes_generales:
                 docente_general = DocentesGrupoAcademico(docente_id=docente_id, grupo_academico=grupo_academico, tipo_docente=tipo_general)
@@ -447,6 +466,15 @@ def asignarDocenteSalonAGrupo(request, grupoacademico):
 
             grupo_academico.observaciones = str(observaciones).strip()
             grupo_academico.save()
+            grupo_academico.codigo_proyecto = str(codigo_proyecto).strip()
+            grupo_academico.save()
+            grupo_academico.fecha_inicio = fecha_inicio
+            grupo_academico.save()
+            grupo_academico.fecha_final = fecha_final
+            grupo_academico.save()
+            print(grupo_academico.fecha_inicio)
+            
+            
 
         return redirect('grupo-detail', grupoacademico=grupoacademico)
 
