@@ -1,0 +1,169 @@
+{% extends 'administracion/base_form.html' %}
+{% load widget_tweaks %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "css/base_preinscripcion.css" %}">
+{% block form %}
+    <div class="wrap-preinscripcion">
+
+        <h2 class="title-project">Generación listado Preinscritos</h2>
+        <form action="{% url 'curso-list' %}" method="get" target="_blank">
+        <div class="alert alert-info">
+                Seleccione los siguientes filtros para poder generar el listado de los estudiantes inscritos
+                y poder exportarlos.
+            </div>
+        <div class="panel panel-primary tab">
+            <div class="panel-heading">
+                <h3 class="panel-title">Seleccione el curso</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group row">
+                    <label class="col-md-3">{{ form.idioma.label }}:</label>
+                    <div class="col-md-9">
+                        {{ form.idioma|add_class:'form-control cascadeDropDown'|attr:"nextfield:#id_programa_academico"|attr:"nextblock:#bloque_programa"|attr:"dataurl:/ajax/cargar-programas-grl/"|attr:"parametro:idioma"|attr:"datafield:0" }}
+                    </div>
+                </div>
+                <div class="form-group row stepByStep" id="bloque_programa">
+                    <div id="id_programa_academico_error" class="alert alert-warning" style="display: none">
+                    </div>
+                    <label class="col-md-3">Programa académico</label>
+                    <div class="col-md-9">
+                        <select name="programa_academico" required="" id="id_programa_academico" class="form-control cascadeDropDown" nextfield="#id_nivel" nextblock="#bloque_nivel" dataurl="{% url 'ajax_cargar_niveles_grl' %}" parametro="programa_academico"  datafield="0">
+                            <option value="" selected="">---------</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row stepByStep" id="bloque_nivel">
+                    <div id="id_nivel_error" class="alert alert-warning" style="display: none">
+                    </div>
+                    <label class="col-md-3">Nivel</label>
+                    <div class="col-md-9">
+                        <select name="nivel" required="" id="id_nivel" class="form-control cascadeDropDown" nextfield="#id_horario_curso" nextblock="#bloque_horario" dataurl="{% url 'ajax_cargar_horarios_grl' %}" parametro="nivel" datafield="0">
+                            <option value="" selected="">---------</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row stepByStep" id="bloque_horario" >
+                    <div id="id_horario_curso_error" class="alert alert-warning" style="display: none">
+                    </div>
+                    <label class="col-md-3">Horario</label>
+                    <div class="col-md-9">
+                        <select name="horario_curso" required="" id="id_horario_curso" class="form-control cascadeDropDown" nextblock="#bloque_enviar" dataurl="">
+                            <option value="" selected="">---------</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="bloque_enviar" class="stepByStep form-group row">
+                    <div style="text-align: center">
+                        <br />
+                        <button type="submit" class="btn-primary-login">
+                                    Generar Listado
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var dependenceCascade = {}
+        var skipElement=false
+        dependenceCascade["id_idioma"] ="";
+        dependenceCascade["id_programa_academico"] ="bloque_programa";
+        dependenceCascade["id_nivel"]="bloque_nivel";
+        dependenceCascade["id_horario_curso"]="bloque_horario";
+        dependenceCascade["enviar"]="bloque_enviar";
+
+        $(".cascadeDropDown").change(function () {
+            var url = $(this).attr("dataurl");
+            var parametro = $(this).attr("parametro");
+            var id= $(this).prop("value")
+
+            nextblock = $(this).attr("nextblock")
+            nextfield = $(this).attr("nextfield")
+            var dataObject = {
+                "randomval": Math.random(),
+            };
+
+            if (nextfield != null) {
+                var elem = document.getElementById(nextfield.replace("#","") + "_error");
+                var styl = window.getComputedStyle(elem, null);
+                if (styl.getPropertyValue("display") != 'none') {
+                   elem.style.display = 'none';
+                }
+                elem.innerHTML = "";
+            }
+
+            var list = $(nextfield);
+            for (var key in dependenceCascade) {
+                if(key==$(this).attr("id")||skipElement){
+                    if(key!=$(this).attr("id")){
+                        $("#"+dependenceCascade[key]).hide()
+                    }
+                    skipElement=true
+                }
+            }
+            list.empty()
+            list.append('<option value="" selected>------</option>')
+
+            if($(this).attr("datafield")!="0"){
+                datafield=$(this).attr("datafield")
+                id=$(datafield).prop("value")
+            }
+            dataObject[parametro] = id;
+            skipElement=false
+            $.getJSON(url, dataObject, function(data) {
+                $.each(data, function(index, label) {
+                    if (label.indexOf('ERROR') > -1){
+                        elem.style.display = 'block';
+                        const errorList = label.split("|");
+                        let i = 1;
+                        while (i < errorList.length) {
+                            const para = document.createElement("p");
+                            const node = document.createTextNode(errorList[i]);
+                            para.appendChild(node);
+                            elem.appendChild(para);
+                            i++;
+                        }
+                    }
+                    else
+                        list.append('<option value=' + index + '>' + label + '</option>');
+                });
+                $(nextblock).show("fast");
+            })
+
+            if(url==''){
+                $(nextblock).show("fast");
+            }
+        });
+    </script>
+    <style>
+        .height {
+            min-height: 200px;
+        }
+        
+        .icon {
+            font-size: 47px;
+            color: #5CB85C;
+        }
+        
+        .iconbig {
+            font-size: 77px;
+            color: #5CB85C;
+        }
+        
+        .table > tbody > tr > .emptyrow {
+            border-top: none;
+        }
+        
+        .table > thead > tr > .emptyrow {
+            border-bottom: none;
+        }
+        
+        .table > tbody > tr > .highrow {
+            border-top: 3px solid;
+        }
+
+        .center{
+            list-style-position: inside;
+        }
+        </style>
+{% endblock %}

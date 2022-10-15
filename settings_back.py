@@ -226,5 +226,3 @@ LOGIN_URL = '/acceso/login'
 
 EXPLORER_CONNECTIONS = { 'Default': 'default' }
 EXPLORER_DEFAULT_CONNECTION = 'default'
-
-

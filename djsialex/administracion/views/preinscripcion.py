@@ -11,6 +11,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.models import Group
+from administracion.util import CSVWriter
+from administracion.models import getEstadoPreinscripcion
 
 
 
@@ -1182,3 +1184,126 @@ def aplicarBecaPago(request,pk):
             pago.save()
             return redirect('formalizar-curso', pk=preinscripcion.id)
     return render(request, 'administracion/inscripcion/confirmar_beca_pago.html', {'beca': beca})
+
+
+@login_required()
+def cargar_programas_academicos_grl(request):
+    
+    if request.user.is_authenticated:
+        periodo_id = request.session["periodo_contextualizado_id"]
+        idioma_id = request.GET.get('idioma')
+        
+        programas_academicos = ProgramaAcademico.objects.filter(
+            idioma_id=idioma_id,
+            activo=True,
+            ofertaacademica__periodo__id=periodo_id
+            ).order_by('nombre').all()
+
+        data = {}
+        if programas_academicos:
+            for i in programas_academicos:
+                data[str(i.id)] = i.nombre
+
+        for i in programas_academicos:
+            data[str(i.id)] = i.nombre
+        serialized_obj = json.dumps(data)
+
+        return render(request, 'webservices/index.html', {'resultset': serialized_obj})
+    return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
+
+@login_required()
+def cargar_niveles_grl(request):
+    if request.user.is_authenticated:
+
+        programa_academico_id = request.GET.get('programa_academico')
+        periodo_id = request.session["periodo_contextualizado_id"]
+
+        # retornar niveles de ingreso orden=1
+        niveles = ProgramaAcademico.objects.get(
+            pk=programa_academico_id
+        ).nivel.filter(
+            activo=True
+        ).all()
+
+        data = {}
+        if niveles:
+            for i in niveles:
+                data[str(i.id)] = i.nombre
+
+        serialized_obj = json.dumps(data)
+        return render(request, 'webservices/index.html', {'resultset': serialized_obj})
+    return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
+@login_required()
+def cargar_horarios_disponibles_grl(request):
+    if request.user.is_authenticated:
+        nivel_id = request.GET.get('nivel')
+        periodo_id = request.session["periodo_contextualizado_id"]
+        periodo = Periodo.objects.get(pk=periodo_id)
+        
+        # Validar si ya cuenta con una preinscripción a ese nivel en otro periodo
+        nivel = Nivel.objects.get(pk=nivel_id)
+        
+        cursos = Curso.objects.filter(
+            nivel=nivel_id,
+            oferta_academica__periodo_id=periodo_id
+        ).all()
+        horarios = HorarioCurso.objects.filter(
+            curso__in=cursos,
+            cupo_disponible__gt=0
+        ).order_by('nombre').all()
+
+        data = {}
+        if horarios:
+            for i in horarios:
+                data[str(i.id)] = i.nombre
+        serialized_obj = json.dumps(data)
+        return render(request, 'webservices/index.html', {'resultset': serialized_obj})
+    return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
+@login_required
+def preinscripcionFiltros(request):
+    
+    if request.method == 'GET':
+        form = PreinscripcionCursoForm()
+    return render(request, 'administracion/preinscripciones/preinscripciones_filtros.html', {'form': form})
+
+class PreinscritosCursolistView(LoginRequiredMixin, generic.ListView):
+    model = PreinscripcionHorarioCurso
+    template_name = 'administracion/preinscripciones/preinscritos_curso_listado.html'
+    login_url = '/acceso/login'
+    redirect_field_name = 'redirect_to'
+    horario_curso = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        horario_curso = self.request.GET.get('horario_curso')
+        context['horario_curso'] = HorarioCurso.objects.get(pk=horario_curso)
+        return context
+        
+    def get_queryset(self):
+        horario_curso = self.request.GET.get('horario_curso')
+        preinscripciones = PreinscripcionHorarioCurso.objects.filter(horario_cupo_id=horario_curso).order_by('persona__primer_nombre', 'fecha_preinscripcion')
+        return list(preinscripciones)
+
+@login_required
+def descargarListaPreinscritos(request, horario_curso):
+    
+    horario_curso = HorarioCurso.objects.get(pk=horario_curso)
+    try:
+        preinscripcion = PreinscripcionHorarioCurso.objects.filter(horario_cupo_id=horario_curso)
+    except PreinscripcionHorarioCurso.DoesNotExist:
+        horario_curso = None
+
+    data = {i+1: [preinscripcion[i].persona.tipo_documento, 
+                  preinscripcion[i].persona.numero_documento, preinscripcion[i].persona.getNombreCompleto().upper(),
+                  preinscripcion[i].persona.usuario.email, getEstadoPreinscripcion(preinscripcion[i].estado_preinscripcion), 
+                  preinscripcion[i].fecha_preinscripcion, preinscripcion[i].valor_preinscripcion]
+             for i in range(len(preinscripcion))}
+
+    header = ['#','Tipo documento', 'Numero documento', 'Nombre estudiante','Correo electrónico','Estado','Fecha Inscripcion','Valor inscripcion']
+
+    csv_writer = CSVWriter()
+    response = csv_writer.download_csv_file(data, header, 'Preinscritos-' + str(horario_curso.nombre))
+    return response

@@ -357,7 +357,6 @@ urlpatterns = [
 	path('administracion/asociar/editar/<pk>', AsociarEncuestaUpdate.as_view(), name='asociar_update'),
 	path('administracion/asociar/borrar/<pk>', OfertaAcademicaDelete.as_view(), name='asociar_delete'),
 
-
 	#devolucion
 	url(r'^administracion/buscar-saldos/$', BuscarSaldosView.as_view(),name='buscar-saldos'),
 	url(r'^administracion/saldos/$', SaldosAFavorPersonaView.as_view(), name='saldos-persona'),
@@ -372,7 +371,16 @@ urlpatterns = [
 	#Preinscritos cursos
 	url(r'^administracion/grupos/ver-preinscritos/(?P<horario_curso>[0-9a-f-]+)$', verPreinscritosCurso, name='horario-curso-preinscritos'),
 	url(r'^administracion/grupos/preinscritos-sin-matricula/(?P<horario_curso>[0-9a-f-]+)$', verPreinscritosSinMatriculaCurso, name='preinscritos-sin-matricula'),
-
+    url(r'^administracion/preinscripciones/curso/filtros/$',preinscripcionFiltros, name='preinscripcion-curso-list'),
+	path('ajax/cargar-programas-grl/',cargar_programas_academicos_grl, name='ajax_cargar_programas_grl'),  
+	path('ajax/cargar-niveles-grl/',cargar_niveles_grl, name='ajax_cargar_niveles_grl'), 
+	path('ajax/cargar-horarios-grl/',cargar_horarios_disponibles_grl, name='ajax_cargar_horarios_grl'),  
+	url(r'^administracion/preinscripciones/curso/listado/$', PreinscritosCursolistView.as_view(), name='curso-list'),
+    url(r'^administracion/preinscripciones/curso/exportar/(?P<horario_curso>[0-9a-f-]+)$', descargarListaPreinscritos, name='preinscritos-lista-csv'),
+       
+    url(r'^administracion/examen_clasificacion/filtros/$',examenFiltros, name='examen-curso-list'),
+	url(r'^administracion/examen_clasificacion/listado/$', PreinscritosExamenCalificacionlistView.as_view(), name='examen-list'),
+	   
 ]
 
 
