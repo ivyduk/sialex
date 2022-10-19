@@ -364,7 +364,7 @@ class Periodo(models.Model):
     finalizado = models.BooleanField(default=False, help_text="Determina si el periodo ya no será visible para los usuarios al autenticarse")
     inicio = models.IntegerField(editable=False, null=True)
     fin = models.IntegerField(editable=False, null=True)
-
+    fecha_pendientes = models.DateField(default=timezone.now, help_text="Fecha Para envio de pendientes")
 
     class Meta:
         verbose_name = "Periodo"

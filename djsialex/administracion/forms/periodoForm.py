@@ -1,3 +1,4 @@
+from bootstrap_datepicker_plus import DateTimePickerInput
 from django import forms
 from administracion.models import Periodo
 
@@ -6,7 +7,9 @@ class PeriodoForm(forms.ModelForm):
     class Meta:
         model = Periodo
 
-        exclude = ['inicio', 'fin']
+        fields = '__all__'
+        FORMAT = '%Y-%m-%d'
+        widgets = {'fecha_pendientes': DateTimePickerInput(format=FORMAT)}
 
     def clean(self):
         cleaned_data = super(PeriodoForm, self).clean()

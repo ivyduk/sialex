@@ -6,6 +6,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, render
 from administracion.util.filters import PeriodoFilter
+from bootstrap_datepicker_plus import DateTimePickerInput
 
 from ..models import Periodo, InformacionPreinscripcionFormalizacion
 from ..forms import PeriodoForm
@@ -31,6 +32,8 @@ class PeriodoCreate(LoginRequiredMixin, CreateView):
     form_class = PeriodoForm
     template_name = 'administracion/periodo/periodo_form.html'
     exclude = ['inicio', 'fin']
+    FORMAT = '%Y-%m-%d'
+    widgets = {'fecha_pendientes': DateTimePickerInput(format=FORMAT)}
 
     def form_valid(self, form):
         self.object = form.save()
@@ -49,7 +52,8 @@ class PeriodoUpdate(LoginRequiredMixin, UpdateView):
     form_class = PeriodoForm
     template_name = 'administracion/periodo/periodo_form.html'
     exclude = ['inicio', 'fin']
-
+    FORMAT = '%Y-%m-%d'
+    widgets = {'fecha_pendientes': DateTimePickerInput(format=FORMAT)}
 
 class PeriodoDelete(LoginRequiredMixin, DeleteView):
     model = Periodo
