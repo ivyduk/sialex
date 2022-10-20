@@ -6,7 +6,18 @@ from administracion.models import PreinscripcionHorarioCurso, Idioma, ProgramaAc
 
 class PreinscripcionCursoForm(forms.ModelForm):
 
-    idioma = forms.ModelChoiceField(queryset=Idioma.objects.all().order_by('nombre'))
+    idioma = forms.ModelChoiceField(
+        queryset=Idioma.objects.filter(
+            programaacademico__activo=True,
+            programaacademico__ofertaacademica__periodo__activo=True,
+            programaacademico__ofertaacademica__periodo__finalizado=False
+        ).prefetch_related(
+            'programaacademico_set',
+            'programaacademico_set__ofertaacademica_set'
+        ).distinct().order_by(
+            'nombre'
+        )
+    )
 
     class Meta:
         pass

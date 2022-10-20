@@ -1,6 +1,7 @@
 import uuid
 import os
 from auditlog.registry import auditlog
+from django.core.validators import RegexValidator
 
 
 from django.db import models
@@ -27,6 +28,7 @@ from administracion.enums import *
 
 import logging
 LOGGER = logging.getLogger(__name__)
+
 
 class DatosEstudiantesModel(models.Model):
     id                      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -364,6 +366,8 @@ class Periodo(models.Model):
     finalizado = models.BooleanField(default=False, help_text="Determina si el periodo ya no será visible para los usuarios al autenticarse")
     inicio = models.IntegerField(editable=False, null=True)
     fin = models.IntegerField(editable=False, null=True)
+    fecha_inicio = models.DateField(default=timezone.now, help_text="Fecha Inicio del periodo")
+    fecha_final = models.DateField(default=timezone.now, help_text="Fecha Final del periodo")
 
 
     class Meta:
@@ -690,7 +694,15 @@ class Profile(models.Model):
 
     ciudad_residencia = models.ForeignKey(Ciudad, on_delete=models.CASCADE, null=False,
                                           related_name='profile_ciudad_residencia', default=107)
-    direccion_residencia = models.CharField(max_length=1000, null=False)
+    direccion_residencia = models.CharField(
+        max_length=1000,
+        null=False,
+        validators=[
+            RegexValidator(
+                regex=r"[Autopista|Avenida|Avenida Calle|Avenida Carrera|Avenida|Carrera|Calle|Carrera|Circunvalar|Diagonal|Kilometro|Transversal|AUTOP|AV|AC|AK|CL|KR|CCV|DG|KM|TV].[0-9]* # [0-9] * - [0-9] * . *",
+                message="Dirección inválida")
+        ]
+    )
 
     indicativo_fijo = models.CharField(max_length=3, blank=True)
     telefono_fijo = models.CharField(max_length=15, blank=True)
@@ -842,6 +854,7 @@ class Docente(models.Model):
 
         return self.persona.numero_documento + ' - ' + self.persona.primer_nombre + ' ' + segundo_nombre  + ' ' + self.persona.primer_apellido + ' ' + segundo_apellido
 
+
 class Edificio(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
     nombre = models.CharField(max_length=600)
@@ -852,6 +865,7 @@ class Edificio(models.Model):
         :return: nombre
         """
         return self.nombre
+
 
 class Salon(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
@@ -869,6 +883,7 @@ class Salon(models.Model):
         verbose_name = "Salon"
         verbose_name_plural = "Salones"
 
+
 class GrupoAcademico(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=500)
@@ -879,6 +894,9 @@ class GrupoAcademico(models.Model):
     observaciones = models.TextField(max_length=1000, null=True)
     contenido_nivel_version = models.ForeignKey(ContenidoNivelVersion, on_delete=models.PROTECT, null=True)
     estado = models.IntegerField(choices=ESTADOS_GRUPO_ACADEMICO, default=0)
+    fecha_inicio = models.DateField(default=timezone.now, null=True)
+    fecha_final = models.DateField(default=timezone.now, null=True)
+    enlace_virtual = models.URLField(max_length=255, null=True)
 
     def save(self, *args, **kwargs):
         if self._state.adding:
@@ -887,6 +905,7 @@ class GrupoAcademico(models.Model):
                 self.codigo =  ultimo_codigo + 1
 
         super(GrupoAcademico, self).save(*args, **kwargs)
+
 
 class Preinscripcion(models.Model):
     persona = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
@@ -899,6 +918,7 @@ class Preinscripcion(models.Model):
         help_text='Determina si esta preinscripción requiere facturación electrónica'
     )
 
+
 class PreinscripcionHorarioCurso(Preinscripcion):
     horario_cupo = models.ForeignKey(HorarioCurso, on_delete=models.CASCADE, null=True)
     descuento_solicitado = models.ForeignKey(Descuento, on_delete=models.CASCADE, null=True)
@@ -908,6 +928,7 @@ class PreinscripcionHorarioCurso(Preinscripcion):
         Devuelve la url para acceder a una instancia particular de preinscripcion.
         """
         return reverse('preinscripcion-detail', args=[str(self.id)])
+
 
 class Matricula(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

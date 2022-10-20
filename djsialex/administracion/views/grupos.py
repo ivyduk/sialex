@@ -1,3 +1,4 @@
+from datetime import date
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.db import transaction, IntegrityError
@@ -21,13 +22,13 @@ from django.urls import reverse_lazy
 from bootstrap_modal_forms.generic import BSModalDeleteView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
-def getPreinscritosPorCurso(horario_curso):
 
+def getPreinscritosPorCurso(horario_curso):
     preinscritos_horario_curso = PreinscripcionHorarioCurso.objects.filter(horario_cupo_id=horario_curso.id, estado_preinscripcion__in=[1,3]).all() #estados: Inscrito, Pendiente
     return preinscritos_horario_curso
 
-def getInscritosSinMatricula(inscritos, horario_curso):
 
+def getInscritosSinMatricula(inscritos, horario_curso):
     estudiantes = inscritos.values_list('persona_id', flat=True)
     matriculados = Matricula.objects.filter(estudiante__in=estudiantes, grupo__horarioCurso__curso=horario_curso.curso).values_list('estudiante_id',flat=True)
     inscritos_sin_matricula = inscritos.exclude(persona__in = matriculados)
@@ -194,6 +195,7 @@ def asignarGrupos(request, template_name = 'administracion/grupos/seleccionar_of
             return HttpResponseRedirect(request.path_info)
     return render(request, template_name)
 
+
 class GrupoAcademicoCreateView(LoginRequiredMixin,CreateView):
     template_name = 'administracion/grupos/grupo_form.html'
     form_class = GrupoAcademicoForm
@@ -204,12 +206,19 @@ class GrupoAcademicoCreateView(LoginRequiredMixin,CreateView):
         horariocurso = HorarioCurso.objects.get(id=self.kwargs['horariocurso'])
         grupos_existentes = GrupoAcademico.objects.filter(horarioCurso_id=horariocurso.id)
         len_grupos = len(grupos_existentes)
+        fecha_inicio = horariocurso.curso.oferta_academica.periodo.fecha_inicio
+        fecha_final = horariocurso.curso.oferta_academica.periodo.fecha_final
+        if fecha_inicio is None or fecha_final is None:
+            fecha_inicio = date.today()
+            fecha_final = date.today()
         nombre_curso = horariocurso.curso.nivel.nombre + '-' + horariocurso.curso.nivel.idioma.nombre + '-' + horariocurso.horario.nombre + '-' + horariocurso.curso.oferta_academica.periodo.alias
         grupo_nombre = 'GRU-' + str(len_grupos+1) + '-' + nombre_curso
-        form = GrupoAcademicoForm(initial={'nombre': grupo_nombre, 'horarioCurso' : horariocurso})
+        form = GrupoAcademicoForm(
+            initial={'nombre': grupo_nombre, 'horarioCurso': horariocurso, 'fecha_inicio': fecha_inicio,
+                     'fecha_final': fecha_final}
+        )
         context = {'form': form, 'horariocurso': horariocurso.id}
-        data['html_form'] = render_to_string('administracion/grupos/grupo_form.html',
-        context, request=request)
+        data['html_form'] = render_to_string('administracion/grupos/grupo_form.html', context, request=request)
         return JsonResponse(data)
 
     def form_valid(self, form):
@@ -222,6 +231,7 @@ class GrupoAcademicoCreateView(LoginRequiredMixin,CreateView):
 
     def get_success_url(self):
         return reverse_lazy('seleccion_oferta')
+
 
 @login_required
 def cambiarGrupo(request, nivel):
@@ -285,7 +295,10 @@ def matriculaPorGrupoAcademicoList(request, grupoacademico):
             grupo_academico = None
 
         if grupo_academico:
-
+            DATE_FORMAT = "%d-%m-%Y"
+            fecha_inicio = grupo_academico.fecha_inicio.strftime("%s" % (DATE_FORMAT)) if grupo_academico.fecha_inicio else None
+            fecha_final = grupo_academico.fecha_final.strftime("%s" % (DATE_FORMAT)) if grupo_academico.fecha_final else None
+            enlace_virtual = grupo_academico.enlace_virtual
             docentes = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico).all()
             salones = grupo_academico.salones.all()
 
@@ -308,8 +321,9 @@ def matriculaPorGrupoAcademicoList(request, grupoacademico):
                 matriculas = paginator.page(paginator.num_pages)
 
             return render(request, 'administracion/grupos/matriculas_por_grupo.html',
-                      {'object_list': matriculas, 'grupo': grupo_academico, 'docentes': docentes,
-                       'salones': salones, 'total': len(object_list)})
+                          {'object_list': matriculas, 'grupo': grupo_academico, 'docentes': docentes,
+                           'salones': salones, 'fecha_inicio': fecha_inicio, 'fecha_final': fecha_final,
+                           'enlace_virtual': enlace_virtual, 'total': len(object_list)})
 
         return redirect('seleccion_oferta')
 
@@ -409,15 +423,23 @@ def asignarDocenteSalonAGrupo(request, grupoacademico):
         grupo_academico = None
 
     if request.method == 'GET':
-
+        DATE_FORMAT = "%d-%m-%Y"
         docentes_generales_actual = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico, tipo_docente=tipo_general).all().order_by('docente__persona__primer_apellido', 'docente__persona__primer_nombre')
         docentes_especializados_actual = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo_academico, tipo_docente=tipo_especializado).all().order_by('docente__persona__numero_documento', 'docente__persona__primer_nombre')
         form = AsignarSalonDocenteAGrupoForm(grupo_academico.id)
 
         salones = grupo_academico.salones.all()
         observaciones = grupo_academico.observaciones
-        context = {'docentes_generales_actual': docentes_generales_actual, 'docentes_especializados_actual': docentes_especializados_actual,
-                   'salones_asignados': salones, 'grupo': grupo_academico, 'observaciones': observaciones, 'form': form}
+        codigo_proyecto = grupo_academico.codigo_proyecto
+        fecha_inicio = grupo_academico.fecha_inicio.strftime("%s" % (DATE_FORMAT)) if grupo_academico.fecha_inicio else None
+        fecha_final = grupo_academico.fecha_final.strftime("%s" % (DATE_FORMAT)) if grupo_academico.fecha_final else None
+        enlace_virtual = grupo_academico.enlace_virtual
+        context = {'docentes_generales_actual': docentes_generales_actual,
+                   'docentes_especializados_actual': docentes_especializados_actual,
+                   'salones_asignados': salones, 'grupo': grupo_academico, 'observaciones': observaciones,
+                   'codigo_proyecto': codigo_proyecto,
+                   'fecha_inicio': fecha_inicio, 'fecha_final': fecha_final,
+                   'enlace_virtual': enlace_virtual, 'form': form}
 
     elif request.method == 'POST':
 
@@ -428,6 +450,10 @@ def asignarDocenteSalonAGrupo(request, grupoacademico):
             docentes_especializados = request.POST.getlist('docentes_especializados')
             salones = request.POST.getlist('salones')
             observaciones = request.POST.get('observaciones')
+            codigo_proyecto = request.POST.get('codigo_proyecto')
+            fecha_inicio = request.POST.get('fecha_inicio')
+            fecha_final = request.POST.get('fecha_final')
+            enlace_virtual = request.POST.get('enlace_virtual')
 
             for docente_id in docentes_generales:
                 docente_general = DocentesGrupoAcademico(docente_id=docente_id, grupo_academico=grupo_academico, tipo_docente=tipo_general)
@@ -446,11 +472,16 @@ def asignarDocenteSalonAGrupo(request, grupoacademico):
                     grupo_academico.salones.add(salon_grupo)
 
             grupo_academico.observaciones = str(observaciones).strip()
+            grupo_academico.codigo_proyecto = str(codigo_proyecto).strip()
+            grupo_academico.fecha_inicio = fecha_inicio if fecha_inicio else None
+            grupo_academico.fecha_final = fecha_final if fecha_final else None
+            grupo_academico.enlace_virtual = enlace_virtual
             grupo_academico.save()
 
         return redirect('grupo-detail', grupoacademico=grupoacademico)
 
     return render(request, 'administracion/grupos/asignar_docente_salon.html', context)
+
 
 @login_required
 def eliminarSalonDeGrupo(request, grupoacademico, salon):

@@ -14,7 +14,7 @@
         {% for message in form.errors %}
             <div class="alert alert-warning alert-dismissible fade in" style="text-align: center">
                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                <strong> {{ message }} </strong>
+                <strong> Hay errores en el formulario </strong>
             </div>
         {% endfor %}
     {% endif %}
@@ -175,7 +175,12 @@
                 {% endfor %}
                 <div class="form-group col-md-6">
                     <span class="label-input100">{{ form.direccion_residencia.label }}</span>
-                        {{ form.direccion_residencia|add_class:'form-control' }}
+                    <span>{{ form.direccion_residencia|add_class:'form-control' }}</span>
+                    {% if form.direccion_residencia.errors %}
+                        {% for error in form.direccion_residencia.errors %}
+                            <p class="alert alert-danger">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="form-group col-md-6">
                     <span class="label-input100">{{ form.telefono_fijo.label }}</span>

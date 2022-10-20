@@ -2,7 +2,8 @@ from bootstrap_datepicker_plus import DateTimePickerInput
 from captcha.fields import CaptchaField
 from django import forms
 from django.forms.formsets import BaseFormSet
-from django.contrib.auth.models import User
+from django.forms.fields import MultiValueField, CharField
+
 
 from ..models import TipoDocumentoIdentidad, PersonaContacto, Pais, Ciudad, Profile, EPS
 from django.db.models import Q
@@ -18,6 +19,7 @@ class EditProfileForm(forms.ModelForm):
         choices=((False, 'No'), (True, 'Si'))
     )
     telefono_celular = forms.CharField(widget=forms.TextInput(attrs={'pattern': '[0-9]{10}'}))
+    phone_number = PhoneField(help_text='Ingrese', required=False)
 
     def clean_telefono_fijo(self):
         tel_fijo = str(self.cleaned_data['telefono_fijo']).split('+')[1]

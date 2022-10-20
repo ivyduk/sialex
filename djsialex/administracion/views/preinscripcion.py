@@ -11,8 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.models import Group
-
-
+from django.utils.safestring import mark_safe
 
 from itertools import chain
 
@@ -172,6 +171,8 @@ def preinscripcionView(request):
             if preinscrito and horario and periodo:
 
                 ofertas_periodo = OfertaAcademica.objects.filter(periodo=periodo)
+                oferta_horario = OfertaAcademica.objects.filter(periodo__activo=True,
+                                                                periodo__finalizado=False)
 
                 niveles = Nivel.objects.filter(idioma_id=idioma)
                 preinscripcion_previa = PreinscripcionHorarioCurso.objects.filter(
@@ -180,13 +181,24 @@ def preinscripcionView(request):
                     persona=preinscrito,
                     horario_cupo__curso__oferta_academica__in=ofertas_periodo
                 ) #Estado 6: Cancelado
+                preinscripcion_examen = PreinscripcionExamen.objects.filter(estado_preinscripcion__in=[1, 3, 5],
+                                                                            persona=preinscrito,
+                                                                            examen__periodo__activo=True,
+                                                                            examen__periodo__finalizado=False,
+                                                                            examen__idioma_id=idioma).first()
                 preinscripcion_mismo_idioma = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
                                                                                   horario_cupo__curso__nivel__in=niveles,
                                                                                   persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
-                preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1,3,5],
-                                                                                  horario_cupo__horario=horario.horario,
-                                                                                  persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
-                if not preinscripcion_previa and not preinscripcion_mismo_idioma and not preinscripcion_horario_existente:
+                preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(
+                    estado_preinscripcion__in=[1,3,5],
+                    horario_cupo__horario=horario.horario,
+                    horario_cupo__curso__oferta_academica__in=oferta_horario,
+                    persona=preinscrito,
+                    horario_cupo__curso__oferta_academica__periodo__fin__gt=periodo.inicio,
+                    horario_cupo__curso__oferta_academica__periodo__inicio__lte=periodo.inicio,
+                ).first()
+
+                if not preinscripcion_previa and not preinscripcion_mismo_idioma and not preinscripcion_horario_existente and not preinscripcion_examen:
                     ayudante = AyudanteFinancieros(preinscrito, periodo)
                     tarifa_curso = horario.curso.oferta_academica.tarifa
                     valor_inscripcion, detallado_preinscripcion = ayudante.calcular_valor_preinscripcion_curso(tarifa_curso, horario.curso.nivel, descuento, horario.curso.nivel.costo_materiales)
@@ -300,15 +312,26 @@ def preinscripcionView(request):
                             }
                         )
                     else:
-                        form.add_error('idioma', '¡Lo sentimos, la asignación de cupos ha finalizado!')
+                        form.add_error('idioma', '¡Lo sentimos, la asignación de cupos ha finalizado! ')
                 else:
                     if preinscripcion_previa:
                         form.add_error('idioma',
-                                       'Ya existe una preinscripción para este usuario, en el mismo curso y horario')
+                                        'Ya existe una preinscripción para este usuario, en el mismo curso y horario. ')
                     if preinscripcion_mismo_idioma:
-                        form.add_error('idioma', 'Ya existe una preinscripción para este idioma')
+                        form.add_error('idioma', 'Ya existe una preinscripción para este idioma. ')
                     if preinscripcion_horario_existente:
-                        form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria')
+                        form.add_error('idioma', 'Usted ya cuenta con una preinscripción en esta franja horaria. '
+                                                    ' en el periodo: {}'.format(
+                            preinscripcion_horario_existente.horario_cupo.curso.oferta_academica.periodo.alias
+                        )
+                                        )
+                    if preinscripcion_examen:
+                        form.add_error('idioma',
+                                        'Usted ya cuenta con una preinscripcion para Examen de Calificación en este Idioma'
+                                        ' en el periodo: {}'.format(
+                                            preinscripcion_examen.examen.periodo.alias
+                                        )
+                                    )
     return render(request, 'administracion/inscripcion/preinscripcion_curso.html', {'form': form})
 
 
