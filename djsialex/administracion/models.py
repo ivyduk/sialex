@@ -938,7 +938,7 @@ class FallaAsistencia(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     matricula = models.ForeignKey(Matricula, on_delete=models.PROTECT)
     persona_asignadora = models.ForeignKey(Profile, on_delete=models.PROTECT)
-    fecha = models.DateField()
+    fecha = models.DateField(default=timezone.now)
     cantidad_fallas = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
 

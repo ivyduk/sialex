@@ -148,10 +148,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sialex',
         'USER': 'sialex',
-        'PASSWORD': 'sialex',
-        'HOST': 'localhost',
+        'PASSWORD': 'adminsialex',
+        'HOST': 'database-1-slx.co1rl716txsf.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
-    },
+    }
 }
 
 

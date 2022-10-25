@@ -1,4 +1,11 @@
+{% load profile_tags %}
 {% load widget_tweaks %}
+
+{% block extrahead %}
+    {{ form.media }}
+    {% load static %}
+{% endblock %}
+
 {% block form %}
     <form method="post" action="{% url 'falla_asistencia_create' matricula.id %}">
     {% csrf_token %}
