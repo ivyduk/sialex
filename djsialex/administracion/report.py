@@ -151,7 +151,7 @@ def funcion(report):
     __cm_3 = Paragraph(data["cm_cl"], styleN)
 
     # Signature
-    table_signature_label = Paragraph('Ligia Cortés Cárdenas<br />Coordinadora', styleBH)
+    table_signature_label = Paragraph('Maria Claudia Nieto Cruz<br />Coordinadora', styleBH)
 
     student_data = [
         [table_student_name, value_student_name],
