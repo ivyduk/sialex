@@ -41,9 +41,11 @@
     </div>
 
     <div class="well">
-        <h4>Oprima el botón <b>Calificar grupo</b> cuando esté seguro de los valores registrados.
-            El proceso de calificación puede tardar unos minutos.
-        </h4>
+        <ul style= "list-style-type: circle;">
+            <li><h4>Oprima el botón <b>Calificar grupo</b> cuando esté seguro de los valores registrados.
+                    El proceso de calificación puede tardar unos minutos.</h4> </li>
+            <li><h4>Estimado docente por favor tenga en cuenta que los estudiantes que aun no han formalizado su Inscripción estaran señalados en color <b>rojo</b> y NO podran ser calificados.</h4> </li>           
+          </ul>
     </div>
 
     {% if matriculas %}
@@ -69,9 +71,13 @@
           </thead>
           <tbody>
           {% for matricula in matriculas %}
-            <tr class="col-calificacion">
+          {% if matricula.estado_preinscripcion == 3 %}
+             <tr class="col-calificacion" style="background-color:#e26969">
+          {% else %}                            
+             <tr class="col-calificacion">
+          {% endif %}
                 <input type="hidden" id="matriculaId" name="matriculaId" value="{{ matricula.id }}" class="matricula">
-                <td>{{ forloop.counter }}</td>
+                <td class="{% if matricula.estado_preinscripcion == 3 %}table-warning{% endif %}">{{ forloop.counter }}</td>
                 <td><b>{{ matricula.estudiante.numero_documento }}</b></td>
                 <td><b>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </b></td>
                 {% for nota in notas %}
@@ -79,6 +85,10 @@
                         <input type="hidden" id="notaId" name="notaId" value="{{ nota.id }}" class="nota">
 
                     {% with calificaciones=calificaciones_matricula|get_item:matricula %}
+                    {% if matricula.estado_preinscripcion == 3 %}
+                        <input type="text" placeholder="0.0" name="nota-" id="nota-{{ nota.id }}_{{ matricula.id }}"  size="4"
+                            value="0.0" class="input-nota" disabled>
+                    {% else %}
                         {% if calificaciones|length == 0 %}
                             <input type="text" placeholder="0.0" name="nota-" id="nota-{{ nota.id }}_{{ matricula.id }}"  size="4"
                                 value="0.0" class="input-nota"
@@ -92,6 +102,7 @@
                                      disabled
                                    {% endif %}>
                         {% endif %}
+                    {% endif %}    
                     {% endwith %}
                     </td>
                 {% endfor  %}
