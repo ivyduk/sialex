@@ -478,7 +478,7 @@ def cargar_niveles(request):
         periodo_id = request.session["periodo_contextualizado_id"]
         periodo = Periodo.objects.get(pk=periodo_id)
 
-        nivelesPre = None
+        nivelesPre = Nivel.objects.none()
 
         # retornar niveles de ingreso orden=1
         niveles = ProgramaAcademico.objects.get(
@@ -579,7 +579,7 @@ def cargar_horarios_disponibles(request):
 
         cursos = Curso.objects.filter(
             nivel=nivel_id,
-            oferta_academica__periodo=periodo_id
+            oferta_academica__periodo_id=periodo_id
         ).all()
         horarios = HorarioCurso.objects.filter(
             curso__in=cursos,
