@@ -1,7 +1,6 @@
 import uuid
 import os
 from auditlog.registry import auditlog
-from django.core.validators import RegexValidator
 
 
 from django.db import models
@@ -697,11 +696,6 @@ class Profile(models.Model):
     direccion_residencia = models.CharField(
         max_length=1000,
         null=False,
-        validators=[
-            RegexValidator(
-                regex=r"[Autopista|Avenida|Avenida Calle|Avenida Carrera|Avenida|Carrera|Calle|Carrera|Circunvalar|Diagonal|Kilometro|Transversal|AUTOP|AV|AC|AK|CL|KR|CCV|DG|KM|TV].[0-9]* # [0-9] * - [0-9] * . *",
-                message="Dirección inválida")
-        ]
     )
 
     indicativo_fijo = models.CharField(max_length=3, blank=True)
