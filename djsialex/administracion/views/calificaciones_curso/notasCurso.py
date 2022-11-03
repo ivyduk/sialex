@@ -2,7 +2,7 @@ import collections
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Subquery, OuterRef, Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -17,6 +17,7 @@ from administracion.util import CSVWriter
 def isDocente(user):
     persona = Profile.objects.filter(usuario__id = user.id).first()
     return Docente.objects.filter(persona__id = persona.id).exists()
+
 
 @login_required
 def cursosAsociadosList(request):
@@ -56,6 +57,7 @@ def cursosAsociadosList(request):
                              'Por favor comuníquese con el administrador del sistema')
 
     return render(request, "administracion/docente/mis_cursos_list.html", context)
+
 
 @login_required
 def listadoEstudiantesPorGrupo(request, grupoacademico):
@@ -135,8 +137,26 @@ def listadoCalificacionesPorGrupo(request, grupoacademico):
 
         if grupo and periodo:
             calificaciones_matricula = {}
-            #Matriculas: Se excluyen aquellas que estan canceladas o aplazadas por usuario y departamento
-            matriculas = Matricula.objects.filter(grupo=grupo).exclude(estado_matricula__in=[4,5,6]).order_by('estudiante__primer_apellido')
+            # Matriculas: Se excluyen aquellas que estan canceladas o aplazadas por usuario y departamento
+            preinscripcion = PreinscripcionHorarioCurso.objects.filter(estado_preinscripcion__in=[1, 3, 5],
+                                                                       horario_cupo__curso__oferta_academica__periodo=OuterRef(
+                                                                           'grupo__horarioCurso__curso__oferta_academica__periodo'),
+                                                                       horario_cupo__curso__oferta_academica__programa=OuterRef(
+                                                                           'grupo__horarioCurso__curso__oferta_academica__programa'),
+                                                                       horario_cupo__curso__nivel=OuterRef(
+                                                                           'grupo__horarioCurso__curso__nivel'),
+                                                                       persona=OuterRef('estudiante')
+                                                                       )
+
+            matriculas = Matricula.objects.filter(
+                grupo=grupo
+            ).exclude(
+                estado_matricula__in=[4, 5, 6]
+            ).order_by(
+                'estudiante__primer_apellido'
+            ).annotate(
+                estado_preinscripcion=Subquery(preinscripcion.values('estado_preinscripcion'))
+            )
             for matricula in matriculas:
                 calificaciones = Calificacion.objects.filter(matricula=matricula).all()
                 if matricula not in calificaciones_matricula:

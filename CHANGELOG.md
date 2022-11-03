@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.7.0
+- Agregados fecha inicio y fecha final en periodo Academico
+- Agregados campos de fecha inicio, fecha final y enlace virtual en grupo academico
+- Agregado para editar codigo proyecto en grupo academico
+- Agregado tipo de documento en vista de formalizacion
+- Agregado filtros para exportar listas de preinscritos por curso y por examen
+- Ajuste vista para aplazar estudiante
+- Cambio en nombre de coordinadora para exportar boletines
+- Agregado fecha en período para notificar a la dependencia si hay estudiantes preinscritos en estado pendiente
+- Agregada la edición deshabilitada de notas para estudiantes pendientes
+
 ## 1.6.0
 - Ajustes de validaciones e incluidos errores en formulario de preinscripción
 - Desactivado boton de envío de preisncripción una vez se ha hecho click

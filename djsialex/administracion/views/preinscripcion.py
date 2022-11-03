@@ -1353,11 +1353,12 @@ def descargarListaPreinscritosPeriodo(request):
     data = {i+1: [preinscripcion[i].persona.tipo_documento,
                   preinscripcion[i].persona.numero_documento, preinscripcion[i].persona.getNombreCompleto().upper(),
                   preinscripcion[i].persona.usuario.email, getEstadoPreinscripcion(preinscripcion[i].estado_preinscripcion),
+                  preinscripcion[i].horario_cupo.nombre,
                   preinscripcion[i].fecha_preinscripcion.strftime('%d/%m/%Y - %H:%M'), preinscripcion[i].valor_preinscripcion]
              for i in range(len(preinscripcion))}
 
     header = ['#', 'Tipo documento', 'Numero documento', 'Nombre estudiante', 'Correo electrónico', 'Estado',
-              'Fecha Inscripcion', 'Valor inscripcion']
+              "Curso", 'Fecha Inscripcion', 'Valor inscripcion']
 
     csv_writer = CSVWriter()
     response = csv_writer.download_csv_file(data, header, 'Preinscritos-' + str(periodo.alias))
