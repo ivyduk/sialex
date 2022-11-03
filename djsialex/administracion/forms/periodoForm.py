@@ -10,7 +10,9 @@ class PeriodoForm(forms.ModelForm):
         fields = '__all__'
         FORMAT = '%Y-%m-%d'
         widgets = {'fecha_inicio': DateTimePickerInput(format=FORMAT),
-                   'fecha_final': DateTimePickerInput(format=FORMAT)}
+                   'fecha_final': DateTimePickerInput(format=FORMAT),
+                   'fecha_pendientes': DateTimePickerInput(format=FORMAT)
+                   }
 
     def clean(self):
         cleaned_data = super(PeriodoForm, self).clean()

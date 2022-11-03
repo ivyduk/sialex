@@ -1012,6 +1012,7 @@ def preinscribir_persona(persona, descuento, horario_curso, periodo):
                 error = 'Ya cuenta con una preinscripción en esta franja horaria en el presente periodo'
         return error, preinscripcion
 
+
 @login_required
 def preinscripcion_curso_lote(request):
 
@@ -1117,7 +1118,7 @@ def preinscripcion_curso_lote(request):
 
                     i += 1
 
-                #TODO: PREINSCRIBIR
+            #TODO: PREINSCRIBIR
             messages.add_message(request, messages.SUCCESS, 'Se han preinscrito a '
                                  + str(preinscritos) + ' personas al curso: ' + curso.nombre)
             return render(request,
@@ -1126,6 +1127,7 @@ def preinscripcion_curso_lote(request):
 
     context = {'form': form, 'periodo': periodo,'campos': campos, 'tipos_documento': tipos_documento, 'descuentos': descuentos}
     return render(request, 'administracion/inscripcion/lote/preinscripcion_curso_lote.html', context)
+
 
 @login_required()
 def cargarSaldoFavor(request, pk):
@@ -1142,6 +1144,7 @@ def cargarSaldoFavor(request, pk):
             messages.add_message(request, messages.WARNING,'Ya se cargo un saldo para esta preinscripcion previamente')
             return redirect('formalizar-curso', pk=recibopreinscripcion.preinscripcion.id)
     return render(request, 'administracion/inscripcion/cargar_saldo_a_favor.html', {'sobrante' : sobrante })
+
 
 @login_required()
 def aplicarSaldoPago(request,pk):
@@ -1174,6 +1177,7 @@ def aplicarSaldoPago(request,pk):
         pago.save()
         return redirect('formalizar-curso', pk=reserva.preinscripcion_reserva.id)
     return render(request, 'administracion/inscripcion/confirmar_saldo_pago.html', {'reserva': reserva})
+
 
 @login_required()
 def aplicarBecaPago(request,pk):

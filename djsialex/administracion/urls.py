@@ -379,7 +379,7 @@ urlpatterns = [
 
     url(r'^administracion/examen_clasificacion/filtros/$', examenFiltros, name='examen-curso-list'),
 	url(r'^administracion/examen_clasificacion/listado/$', PreinscritosExamenCalificacionlistView.as_view(), name='examen-list'),
-	url(r'^administracion/preinscripciones/curso_periodo/exportar/(?P<horario_curso>[0-9a-f-]+)$',
+	url(r'^administracion/preinscripciones/curso_periodo/exportar/$',
 		descargarListaPreinscritosPeriodo, name='preinscritos-periodo-csv'),
 
 ]

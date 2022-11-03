@@ -367,7 +367,7 @@ class Periodo(models.Model):
     fin = models.IntegerField(editable=False, null=True)
     fecha_inicio = models.DateField(default=timezone.now, help_text="Fecha Inicio del periodo")
     fecha_final = models.DateField(default=timezone.now, help_text="Fecha Final del periodo")
-
+    fecha_pendientes = models.DateField(default=timezone.now, help_text="Fecha Para envio de pendientes")
 
     class Meta:
         verbose_name = "Periodo"
@@ -773,6 +773,7 @@ class Profile(models.Model):
     	"""
         return self.usuario.username + ' ' + self.primer_nombre + ' ' + self.primer_apellido
 
+
 class PersonaContacto(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombres = models.CharField(max_length=100, null=False)
@@ -782,11 +783,13 @@ class PersonaContacto(models.Model):
     parentesco = models.IntegerField(choices=PARENTESCO, null=False)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
 
+
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(usuario=instance)
     instance.profile.save()
+
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
