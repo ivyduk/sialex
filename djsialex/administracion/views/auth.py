@@ -101,6 +101,7 @@ def activate(request, uidb64, token):
 def completeProfile(request):
     indc_fijo = ''
     perfil = get_object_or_404(Profile, usuario_id=request.user.id)
+    
     PersonaContactoFormSet = formset_factory(PersonaContactoForm, formset=BasePersonaContactoFormSet, can_delete=True,
                                              extra=0, max_num=3, min_num=1, validate_max=True, validate_min=True)
     personas_contacto = PersonaContacto.objects.filter(profile=perfil).all()
@@ -110,14 +111,14 @@ def completeProfile(request):
                        for c in contactos]
 
     if request.method == 'POST':
-
+         
         form = EditProfileForm(request.POST, instance=perfil)
         persona_contacto_formset = PersonaContactoFormSet(request.POST)
-
+        
         # Profile.objects.filter(user=perfil).values_list() order_by('nombres')
-
+        
         if form.is_valid() and persona_contacto_formset.is_valid():
-
+            
             if 'telefono_fijo' in request.POST:
                 indc_fijo = str(request.POST['telefono_fijo']).split('+')[0].upper()
 
@@ -125,6 +126,7 @@ def completeProfile(request):
             profile = form.save(commit=False)
             profile.indicativo_fijo = indc_fijo
             profile.indicativo_celular = indc_celular
+
             profile.save()
             # se agrega el perfil de aspirante
             user = get_object_or_404(User, id=request.user.id)
@@ -162,14 +164,13 @@ def completeProfile(request):
             return redirect('home')
 
     else:
-
+        
         form = EditProfileForm(instance=perfil)
         p = Profile.objects.get(pk=perfil.id)
         form.indicativo_fijo = str(p.indicativo_fijo).lower()
         form.indicativo_celular = str(p.indicativo_celular).lower()
-
         persona_contacto_formset = PersonaContactoFormSet(initial=datos_contactos)
-
+                             
         return render(request, 'administracion/usuario/editarperfil.html', {'form': form,
                                                                             'persona_contacto_formset': persona_contacto_formset,
                                                                             'personas_contacto': personas_contacto,
