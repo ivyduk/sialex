@@ -111,14 +111,14 @@ def completeProfile(request):
                        for c in contactos]
 
     if request.method == 'POST':
-         
+
         form = EditProfileForm(request.POST, instance=perfil)
         persona_contacto_formset = PersonaContactoFormSet(request.POST)
-        
+
         # Profile.objects.filter(user=perfil).values_list() order_by('nombres')
-        
+
         if form.is_valid() and persona_contacto_formset.is_valid():
-            
+
             if 'telefono_fijo' in request.POST:
                 indc_fijo = str(request.POST['telefono_fijo']).split('+')[0].upper()
 
@@ -164,13 +164,13 @@ def completeProfile(request):
             return redirect('home')
 
     else:
-        
+
         form = EditProfileForm(instance=perfil)
         p = Profile.objects.get(pk=perfil.id)
         form.indicativo_fijo = str(p.indicativo_fijo).lower()
         form.indicativo_celular = str(p.indicativo_celular).lower()
         persona_contacto_formset = PersonaContactoFormSet(initial=datos_contactos)
-                             
+
         return render(request, 'administracion/usuario/editarperfil.html', {'form': form,
                                                                             'persona_contacto_formset': persona_contacto_formset,
                                                                             'personas_contacto': personas_contacto,
