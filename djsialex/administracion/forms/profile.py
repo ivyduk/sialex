@@ -34,7 +34,6 @@ class DireccionSelectorWidget(forms.widgets.MultiWidget):
         return [None, None]
 
     def format_output(self, rendered_widgets):
-        print(rendered_widgets)
         return u''.join(rendered_widgets)
 
     def render(self, name, value, attrs=None, renderer=None):
