@@ -82,13 +82,13 @@
                         {% if calificaciones|length == 0 %}
                             <input type="text" placeholder="0.0" name="nota-" id="nota-{{ nota.id }}_{{ matricula.id }}"  size="4"
                                 value="0.0" class="input-nota"
-                                   {% if not es_administrador and tipos_docente and nota.tipo_nota not in tipos_docente %}
+                                   {% if not es_administrador and tipos_docente and nota.tipo_nota not in tipos_docente and tipo_general.id not in tipos_docente %}
                                      disabled
                                    {% endif %}>
                         {% else %}
                             <input type="text" placeholder="0.0" name="nota-" id="nota-{{ nota.id }}_{{ matricula.id }}" class="input-nota" size="4"
                                 value="{{ calificaciones|get_item:nota }}"
-                                   {% if not es_administrador and tipos_docente and nota.tipo_nota not in tipos_docente %}
+                                   {% if not es_administrador and tipos_docente and nota.tipo_nota not in tipos_docente and tipo_general.id not in tipos_docente %}
                                      disabled
                                    {% endif %}>
                         {% endif %}
