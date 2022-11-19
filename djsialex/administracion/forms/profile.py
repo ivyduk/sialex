@@ -55,7 +55,8 @@ class EditProfileForm(forms.ModelForm):
             'eps': 'EPS',
             'tipo_vinculacion_un': 'Tipo de vinculación UN',
             'es_egresado': 'Es egresado UN',
-            'estado_civil': 'Estado civil'
+            'estado_civil': 'Estado civil',
+            'discapacidad': 'Discapacidad'
         }
 
         FORMAT = '%Y-%m-%d'

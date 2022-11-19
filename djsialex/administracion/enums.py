@@ -174,3 +174,10 @@ ESTADO_CIVIL = [
     (6, ("RELIGIOSO(A)")),
     (7, ("SEPARADO(A)"))
 ]
+
+DISCAPACIDAD = [
+    (1, ("NO APLICA")),
+    (2, ("CIEGO(A)")),
+    (3, ("SORDO(A)")),
+    (4, ("MUDO(A)"))
+]

@@ -711,6 +711,7 @@ class Profile(models.Model):
     tipo_vinculacion_un = models.IntegerField(choices=TIPOS_VINCULACION, null=False, default=7) #Ninguna
     nivel_formacion = models.IntegerField(choices=NIVEL_FORMACION, null=False, default=1) #No Aplica
     estado_civil = models.IntegerField(choices=ESTADO_CIVIL, null=False, default=7) #Ninguna
+    discapacidad = models.IntegerField(choices=DISCAPACIDAD, null=False, default=1) 
 
     class Meta:
         verbose_name = "Persona"
