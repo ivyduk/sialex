@@ -4,15 +4,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from administracion.models import Profile, Docente, GrupoAcademico, Matricula, Periodo, NotaParcial, Calificacion, \
+from administracion.models import Profile, Docente, Nivel, GrupoAcademico, Matricula, Periodo, NotaParcial, Calificacion, \
     DocentesGrupoAcademico, TipoDocente, FallaAsistencia, usuarioTieneGrupo, Observacion, getEstadoMatricula, \
     PreinscripcionHorarioCurso, OfertaAcademica
 import json
-
+from datetime import datetime, date
 from administracion.util import CSVWriter
-
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 def isDocente(user):
     persona = Profile.objects.filter(usuario__id = user.id).first()
@@ -49,7 +52,12 @@ def cursosAsociadosList(request):
                 if curso not in mis_cursos:
                     mis_cursos[curso] = []
                 mis_cursos[curso].append([grupo, len(matriculas)])
-            context = {'mis_cursos': mis_cursos, 'periodo': periodo}
+            if periodo.fecha_calificacion <= date.today() :
+               fecha_califica = True
+            else:
+               fecha_califica = False
+
+            context = {'mis_cursos': mis_cursos, 'periodo': periodo, 'fecha_califica':fecha_califica}
 
         else:
             messages.warning(request, 'Lo sentimos, a usted no le ha sido asignado el rol de docente.'
@@ -100,8 +108,13 @@ def listadoEstudiantesPorGrupo(request, grupoacademico):
             for matricula in matriculas:
                 observaciones[matricula] = len(Observacion.objects.filter(matricula=matricula))
 
+            if periodo.fecha_calificacion <= date.today() :
+               fecha_califica = True
+            else:
+               fecha_califica = False
+
             context = {'matriculas': matriculas, 'periodo': periodo, 'grupo': grupo,
-                       'escala_notas': escala_notas,
+                       'escala_notas': escala_notas, 'fecha_califica': fecha_califica,
                        'docentes_generales': docentes_generales, 'docentes_especializados': docentes_especializados,
                        'tipo_docente': tipo_docente, 'es_administrador': es_administrador,
                        'salones': salones, 'observaciones_matricula': observaciones}
@@ -166,6 +179,74 @@ def listadoCalificacionesPorGrupo(request, grupoacademico):
 
     return render(request, "administracion/docente/matriculas_list.html", context)
 
+
+@login_required
+def listadoCalificacionesPlanilla(request, *args, **kwargs):
+
+    context = {}
+    now = datetime.now()
+    fecha = (now.strftime("%d/%m/%Y %H:%M:%S"))
+    user = request.user
+    persona = Profile.objects.filter(usuario__id=user.id).first()
+    docentes = Docente.objects.filter(persona__id=persona.id)
+    periodo_actual = request.session["periodo_contextualizado_id"]
+
+    if request.method == 'GET':
+        try:
+            pk = kwargs.get('grupoacademico')
+            grupo = get_object_or_404(GrupoAcademico, pk=pk)
+        except GrupoAcademico.DoesNotExist:
+            grupo = None
+
+        try:
+            periodo = Periodo.objects.get(pk=periodo_actual)
+        except Periodo.DoesNotExist:
+            periodo = None
+
+        if grupo and periodo:
+            salones = grupo.salones.all()
+            docentes = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo).all()
+            
+            curso = grupo.horarioCurso.curso.nivel.id
+            niveles = Nivel.objects.filter(id=curso).first()
+                        
+            inasistencias_matricula = {}
+            matriculas = Matricula.objects.filter(grupo=grupo).exclude(estado_matricula__in=[4,5,6]).order_by('estudiante__primer_apellido')
+            for matricula in matriculas:
+                 inasistencias = FallaAsistencia.objects.filter(matricula=matricula).order_by('fecha').all()           
+                 if matricula not in inasistencias_matricula:
+                    inasistencias_matricula[matricula] = {}
+                 for inasistencia in inasistencias:
+                    fallas = "cantidad_fallas"
+                    inasistencias_matricula[matricula][fallas] = inasistencia.cantidad_fallas
+
+            observaciones_matricula = {}
+            for matricula in matriculas:     
+                 observaciones = Observacion.objects.filter(matricula=matricula).all()         
+                 if matricula not in observaciones_matricula:
+                    observaciones_matricula[matricula] = {}
+                 for observacion in observaciones:
+                    observa = "observacion"
+                    observaciones_matricula[matricula][observa] = observacion.observacion
+              
+            template_path = 'administracion/docente/mis_cursos_export.html'
+            context = {'matriculas': matriculas, 'periodo': periodo, 'grupo': grupo, 'inasistencias_matricula': inasistencias_matricula,
+                       'docentes': docentes, 'salones': salones, 'niveles': niveles,'fecha':fecha}
+            
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'filename="report.pdf"'
+
+            template = get_template(template_path)
+            html = template.render(context)
+
+            pisa_status = pisa.CreatePDF(
+                html, dest=response)
+
+            if pisa_status.err:
+                return HttpResponse('We had some errors <pre>' + html + '</pre>')
+            return response
+
+
 def asignarCalificacion(matricula_nota, nota_parcial, calificacion, escala_notas):
 
     errores = ''
@@ -194,6 +275,7 @@ def asignarCalificacion(matricula_nota, nota_parcial, calificacion, escala_notas
 
     return errores
 
+
 def asignarCalificacionFinal(matricula_nota, escala_notas):
 
     calificaciones_matricula = Calificacion.objects.filter(matricula=matricula_nota).all()
@@ -202,6 +284,7 @@ def asignarCalificacionFinal(matricula_nota, escala_notas):
         calificacion_final += calificacion.calificacion * calificacion.nota.ponderacion / 100
     matricula_nota.calificacionFinal = round(calificacion_final, escala_notas.numero_decimales)
     matricula_nota.save()
+
 
 @login_required
 @csrf_exempt
@@ -256,6 +339,7 @@ def calificarGrupo(request, grupoacademico):
         return HttpResponse(json.dumps(response), content_type='application/json')
 
     return render(request, 'administracion/docente/mis_cursos_list.html')
+
 
 def actualizarEstadoMatriculasPorGrupo(grupo_academico, ofertas_periodo):
 

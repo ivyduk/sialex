@@ -1,3 +1,4 @@
+from bootstrap_datepicker_plus import DateTimePickerInput
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django_filters.views import FilterView
@@ -32,6 +33,9 @@ class PeriodoCreate(LoginRequiredMixin, CreateView):
     template_name = 'administracion/periodo/periodo_form.html'
     exclude = ['inicio', 'fin']
 
+    FORMAT = '%Y-%m-%d'
+    widgets = {'fecha_calificacion': DateTimePickerInput(format=FORMAT)}
+
     def form_valid(self, form):
         self.object = form.save()
         try:
@@ -50,7 +54,9 @@ class PeriodoUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'administracion/periodo/periodo_form.html'
     exclude = ['inicio', 'fin']
 
-
+    FORMAT = '%Y-%m-%d'
+    widgets = {'fecha_calificacion': DateTimePickerInput(format=FORMAT)}
+    
 class PeriodoDelete(LoginRequiredMixin, DeleteView):
     model = Periodo
     template_name = 'administracion/periodo/periodo_confirm_delete.html'

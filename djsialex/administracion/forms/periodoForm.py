@@ -1,3 +1,4 @@
+from bootstrap_datepicker_plus import DateTimePickerInput
 from django import forms
 from administracion.models import Periodo
 
@@ -6,7 +7,10 @@ class PeriodoForm(forms.ModelForm):
     class Meta:
         model = Periodo
 
-        exclude = ['inicio', 'fin']
+        #exclude = ['inicio', 'fin']
+        fields = '__all__'
+        FORMAT = '%Y-%m-%d'
+        widgets = {'fecha_calificacion': DateTimePickerInput(format=FORMAT)}
 
     def clean(self):
         cleaned_data = super(PeriodoForm, self).clean()
@@ -14,7 +18,7 @@ class PeriodoForm(forms.ModelForm):
         abierto = cleaned_data.get('abierto')
         periodicidad = cleaned_data.get('periodicidad')
         secuencia = cleaned_data.get('secuencia')
-
+        print(cleaned_data)
         # Values may be None if the fields did not pass previous validations.
         if abierto is not None and periodicidad is not None:
             if abierto and periodicidad.nombre != 'Bimestral' and periodicidad.nombre != 'Semestral':

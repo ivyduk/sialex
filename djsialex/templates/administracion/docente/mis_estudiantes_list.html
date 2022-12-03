@@ -120,12 +120,16 @@
                     <strong>¡Periodo sin contextualizar!</strong>
                 </div>
             {% else %}
-                <button type="button" class="btn btn-danger pull-right" onclick="location.href='{% url 'actualizar-estados' grupo.id %}'">
-             <span class="glyphicon glyphicon-refresh"></span> Publicar notas </button>
+                {% if fecha_califica == True %}
+                    <button type="button" class="btn btn-danger pull-right" onclick="location.href='{% url 'actualizar-estados' grupo.id %}'">
+                       <span class="glyphicon glyphicon-refresh"></span> Publicar notas </button>
+                {% endif %}
             {% endif %}
         {% else %}
-            <button type="button" class="btn btn-danger pull-right" disabled>
-                <span class="glyphicon glyphicon-refresh"></span> Publicar notas </button>
+            {% if fecha_califica == True %}    
+                <button type="button" class="btn btn-danger pull-right" disabled>
+                    <span class="glyphicon glyphicon-refresh"></span> Publicar notas </button>
+            {% endif %}
         {% endif %}
 
         <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'calificaciones-grupo-csv' grupo.id %}'">

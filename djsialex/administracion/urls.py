@@ -19,9 +19,8 @@ from administracion.views.calificaciones_curso.fallasAsistencia import FallaAsis
 from administracion.views.calificarExamenClasificacion import calificarExamen, seleccionarIdiomaExamen
 from administracion.views.calificaciones_curso.notasCurso import cursosAsociadosList, \
 	listadoCalificacionesPorGrupo, calificarGrupo, listadoEstudiantesPorGrupo, actualizarEstadoMatriculas, \
-	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos
-from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, \
-	cursoCalificacionesDetallePDF, misCursosList
+	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos, listadoCalificacionesPlanilla
+from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, cursoCalificacionesDetallePDF, misCursosList
 from administracion.views.preinscripcionExamenClasificacion import preinscripcionExamenView, \
 	preinscripcion_examen_fase_previa, PreinscripcionExamenDetailView, PreinscripcionExamenDelete
 
@@ -229,7 +228,6 @@ urlpatterns = [
 	url(r'^inscripcion/examen/formalizar/(?P<pk>[0-9]+)$', formalizar_vista_examen, name='formalizar-examen'),
 	path('inscripcion/curso/borrar/<pk>', CancelPreinscripcion.as_view(), name='preinscripcion_delete'),
 	path('inscripcion/descuento/borrar/<pk>', CancelDescuento.as_view(), name='descuento_aplicado_borrar'),
-	path('inscripcion/descuento/crear/<pk>', CrearDescuento.as_view(), name='descuento_aplicado_crear'),
 	path('inscripcion/descuento/editar/<pk>', ModificarDescuento.as_view(), name='descuento_aplicado_editar'),
 	path('ajax/cargar-programas/', cargar_programas_academicos, name='ajax_cargar_programas'),  # <-- this one here
 	path('ajax/cargar-niveles/', cargar_niveles, name='ajax_cargar_niveles'),  # <-- this one here
@@ -302,6 +300,7 @@ urlpatterns = [
 	url(r'^docente/cursos/mis-cursos', cursosAsociadosList, name='mis-cursos'),
     url(r'^docente/cursos/mis-estudiantes/(?P<grupoacademico>[-\w]+)', listadoEstudiantesPorGrupo, name='mis-estudiantes'),
     url(r'^docente/cursos/calificaciones-estudiantes/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPorGrupo, name='calificaciones-estudiantes'),
+	url(r'^docente/cursos/calificaciones-listas/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPlanilla, name='calificaciones-listas'),
 	url(r'^docente/cursos/calificar-grupo/(?P<grupoacademico>[-\w]+)', calificarGrupo, name='calificar-grupo'),
 	url(r'^docente/cursos/actualizar-estados-todos', actualizarEstadoMatriculasGrupos, name='actualizar-estados-todos'),
 	url(r'^docente/cursos/actualizar-estados/(?P<grupoacademico>[-\w]+)', actualizarEstadoMatriculas,name='actualizar-estados'),
@@ -322,10 +321,9 @@ urlpatterns = [
 
 	# historia academica
 	url(r'^administracion/historia-academica', miHistoriaAcademica, name='mi_historia_academica'),
-	url(r'^administracion/cursos-progreso', misCursosList, name='mis_cursos_en_progreso'),
 	url(r'^administracion/mis-calificaciones/(?P<matricula>[-\w]+)/(?P<opcion>[0-9]+)', cursoCalificacionesDetalle, name='calificaciones-detalle'),
 	url(r'^administracion/mis-calificaciones-pdf/(?P<matricula>[-\w]+)/(?P<opcion>[0-9]+)', cursoCalificacionesDetallePDF, name='calificaciones-detalle-pdf'),
-
+    url(r'^administracion/cursos-progreso', misCursosList, name='mis_cursos_en_progreso'),
 	#beca
 	url(r'^administracion/beca/opciones', escogerOpcionAdministrarBeca, name='beca-opciones'),
     url(r'^administracion/beca/estudiantes', estudiantesBecaList, name='becados'),
@@ -374,5 +372,3 @@ urlpatterns = [
 	url(r'^administracion/grupos/preinscritos-sin-matricula/(?P<horario_curso>[0-9a-f-]+)$', verPreinscritosSinMatriculaCurso, name='preinscritos-sin-matricula'),
 
 ]
-
-

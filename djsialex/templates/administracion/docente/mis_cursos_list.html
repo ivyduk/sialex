@@ -12,17 +12,16 @@
                 <li class="list-group-item alert alert-info">
                     <h4>Estimado docente, a continuación encontrará el listado de grupos académicos que tiene a su cargo en el periodo <b>{{ periodo }}</b></h4>
                 </li>
-
+                {% if fecha_califica == True %}
                 {% if request.user|has_group:"Administrador" %}
                 <li class="list-group-item alert alert-info">
                     <h4>Señor administrador, recuerde que al oprimir el botón <b>Publicar notas</b> se cambiarán los estados de matrículas según corresponda para cada estudiante de todos los grupos del periodo actual</h4>
                     <br><button type="button" class="btn btn-danger" onclick="location.href='{% url 'actualizar-estados-todos' %}'">
                     <span class="glyphicon glyphicon-refresh"></span> Publicar notas </button>
-
                 </li>
                 {% endif %}
+                {% endif %}
             </ul>
-
 
         {% if mis_cursos|length > 0 %}
         <div class="table-responsive">
@@ -61,6 +60,14 @@
                                         <a href="{% url 'calificaciones-estudiantes' grupoacademico=info_grupo.0.id %}">
                                         <button class="btn btn-primary btn-xs" title="Calificar">
                                             <span class="glyphicon glyphicon-edit">
+                                            </span>
+
+                                        </button>
+                                        </a>
+
+                                        <a href="{% url 'calificaciones-listas' grupoacademico=info_grupo.0.id %}">
+                                        <button class="btn btn-primary btn-xs" title="Exportar">
+                                            <span class="glyphicon glyphicon-download">
                                             </span>
 
                                         </button>

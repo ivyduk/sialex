@@ -1,5 +1,15 @@
 {% extends "administracion/base_form.html" %}
+{% load profile_tags %}
 {% load widget_tweaks %}
+{% block extrahead %}
+    {% load bootstrap3 %}
+{% bootstrap_javascript jquery='full' %}
+    {{ form.media }}
+    {% load static %}
+
+
+{% endblock %}
+
 {% block administration-title %}
     <h2 class="title-project">Administrar periodos</h2>
 {% endblock %}

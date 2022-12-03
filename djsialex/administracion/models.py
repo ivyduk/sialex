@@ -364,7 +364,7 @@ class Periodo(models.Model):
     finalizado = models.BooleanField(default=False, help_text="Determina si el periodo ya no será visible para los usuarios al autenticarse")
     inicio = models.IntegerField(editable=False, null=True)
     fin = models.IntegerField(editable=False, null=True)
-
+    fecha_calificacion = models.DateField(default=timezone.now, help_text="Fecha Calificacion del periodo")
 
     class Meta:
         verbose_name = "Periodo"
@@ -879,6 +879,8 @@ class GrupoAcademico(models.Model):
     observaciones = models.TextField(max_length=1000, null=True)
     contenido_nivel_version = models.ForeignKey(ContenidoNivelVersion, on_delete=models.PROTECT, null=True)
     estado = models.IntegerField(choices=ESTADOS_GRUPO_ACADEMICO, default=0)
+    fecha_inicio = models.DateField(default=timezone.now)
+    fecha_final = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):
         if self._state.adding:
