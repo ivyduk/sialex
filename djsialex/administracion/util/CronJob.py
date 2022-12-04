@@ -44,7 +44,7 @@ def Inscritos_Pendientes():
         'PreInscritos Pendientes',
         'Buen Dia!! Se adjunta el archivo con los preinscritos en estado pendiente.',
         'sialex_fchbog@unal.edu.co',
-        ['iaduquea@unal.edu.co']
+        ['sialex_fchbog@unal.edu.co']
         )
 
         email.attach(nombreArchivo, csvfile.getvalue(), 'text/csv')
