@@ -10,6 +10,7 @@
 - Cambio en nombre de coordinadora para exportar boletines
 - Agregado fecha en período para notificar a la dependencia si hay estudiantes preinscritos en estado pendiente
 - Agregada la edición deshabilitada de notas para estudiantes pendientes
+- Ajustes lista de niveles disponibles para beca
 
 ## 1.6.0
 - Ajustes de validaciones e incluidos errores en formulario de preinscripción
