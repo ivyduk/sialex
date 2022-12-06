@@ -2,6 +2,7 @@ import uuid
 
 from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
+from bootstrap_datepicker_plus import DatePickerInput
 
 from ..models import GrupoAcademico, Matricula, Docente, Salon, Edificio, DocentesGrupoAcademico
 
@@ -9,13 +10,16 @@ from ..models import GrupoAcademico, Matricula, Docente, Salon, Edificio, Docent
 class GrupoAcademicoForm(forms.ModelForm):
     class Meta:
         model = GrupoAcademico
-        fields = ('nombre', 'codigo_proyecto', 'horarioCurso')
-        widgets = {'horarioCurso': forms.HiddenInput()}
+        fields = ('nombre', 'codigo_proyecto', 'horarioCurso', 'fecha_inicio', 'fecha_final')
+        widgets = {'horarioCurso': forms.HiddenInput(),
+                   'fecha_inicio': forms.HiddenInput(),
+                   'fecha_final': forms.HiddenInput()}
 
     def __init__(self, *args, **kwargs):
         super(GrupoAcademicoForm, self).__init__(*args, **kwargs)
         self.fields['horarioCurso'].label = ''
-
+        self.fields['fecha_inicio'].label = ''
+        self.fields['fecha_final'].label = ''
 
 
 class CambioGrupoForm(forms.Form):
@@ -27,13 +31,18 @@ class CambioGrupoForm(forms.Form):
         super(CambioGrupoForm, self).__init__(*args, **kwargs)
         self.fields['matriculas'].queryset = Matricula.objects.filter(grupo_id=grupo_id, estado_matricula__in=[1,2,7,8])
 
-class AsignarSalonDocenteAGrupoForm(forms.Form):
 
+class AsignarSalonDocenteAGrupoForm(forms.Form):
+    FORMAT = '%Y-%m-%d'
     docentes_generales = forms.ModelMultipleChoiceField(queryset=Docente.objects.none(), required= False)
     docentes_especializados = forms.ModelMultipleChoiceField(queryset=Docente.objects.none(), required=False)
     edificio = forms.ModelChoiceField(queryset=Edificio.objects.all(), required=False)
     salones = forms.ModelMultipleChoiceField(queryset=Salon.objects.all(), required=False)
     observaciones = forms.CharField(widget=forms.Textarea(attrs={"rows": 5, "cols": 200}), required=False)
+    codigo_proyecto = forms.CharField(widget=forms.TextInput())
+    fecha_inicio = forms.DateField(widget=DatePickerInput(format=FORMAT),  required=False)
+    fecha_final = forms.DateField(widget=DatePickerInput(format=FORMAT),  required=False)
+    enlace_virtual = forms.URLField(required=False)
 
     def __init__(self, grupo_id, *args, **kwargs):
         super(AsignarSalonDocenteAGrupoForm, self).__init__(*args, **kwargs)
@@ -48,3 +57,11 @@ class AsignarSalonDocenteAGrupoForm(forms.Form):
             grupo = None
         if grupo and grupo.observaciones:
             self.fields['observaciones'].initial = grupo.observaciones
+        if grupo.codigo_proyecto:
+            self.fields['codigo_proyecto'].initial = grupo.codigo_proyecto
+        if grupo.fecha_inicio:
+            self.fields['fecha_inicio'].initial = grupo.fecha_inicio
+        if grupo.fecha_final:
+            self.fields['fecha_final'].initial = grupo.fecha_final
+        if grupo.enlace_virtual:
+            self.fields['enlace_virtual'].initial = grupo.enlace_virtual

@@ -1,0 +1,94 @@
+{% extends 'administracion/base_form.html' %}
+{% load widget_tweaks %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "css/base_preinscripcion.css" %}">
+{% block form %}
+    <div class="wrap-preinscripcion">
+        <form action="{% url 'examen-list' %}" method="get">
+        <h2 class="title-project">Generación listado Preinscritos Examen de Clasificación</h2>
+
+        <div class="panel panel-primary tab">
+            <div class="panel-heading">
+                <h3 class="panel-title">Seleccione de Examen</h3>
+            </div>
+            <div class="panel-body">
+
+                    <div class="alert alert-info">
+                        Seleccione los siguientes filtros para poder generar el listado de los estudiantes inscritos
+                        y poder exportarlos.
+                    </div>
+
+                <div class="form-group row">
+                    <label class="col-md-3">{{ form.idioma.label }}:</label>
+                    <div class="col-md-9">
+                        {{ form.idioma|add_class:'form-control cascadeDropDown'|attr:"nextfield:#id_examen"|attr:"nextblock:#bloque_examen"|attr:"dataurl:/ajax/cargar-examenes-disponibles/"|attr:"parametro:idioma"|attr:"datafield:0" }}
+                    </div>
+                </div>
+
+                <div id="bloque_examen" class="stepByStep form-group row">
+                    <label class="col-md-3">Examen de clasificación</label>
+                    <div class="col-md-9">
+                        <select name="examen" required="" id="id_examen" class="form-control cascadeDropDown" nextblock="#bloque_enviar" dataurl="">
+                            <option value="" selected="">---------</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="bloque_enviar" class="stepByStep form-group row">
+                    <div style="text-align: center">
+                        <br />
+                        <button type="submit" class="btn-primary-login">
+                            Generar Listado
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var dependenceCascade = {}
+        var skipElement=false
+        dependenceCascade["id_idioma"] ="";
+        dependenceCascade["id_examen"] ="bloque_examen";
+        dependenceCascade["enviar"]="bloque_enviar";
+
+        $(".cascadeDropDown").change(function () {
+            var url = $(this).attr("dataurl");
+            var parametro = $(this).attr("parametro");
+            var id= $(this).prop("value")
+
+            nextblock = $(this).attr("nextblock")
+            nextfield = $(this).attr("nextfield")
+            var dataObject = {
+                "randomval": Math.random(),
+            };
+            var list = $(nextfield);
+            for (var key in dependenceCascade) {
+                if(key==$(this).attr("id")||skipElement){
+                    if(key!=$(this).attr("id")){
+                        $("#"+dependenceCascade[key]).hide()
+                    }
+                    skipElement=true
+                }
+            }
+            list.empty()
+            list.append('<option value="" selected>------</option>')
+
+            if($(this).attr("datafield")!="0"){
+                datafield=$(this).attr("datafield")
+                id=$(datafield).prop("value")
+            }
+            dataObject[parametro] = id;
+            skipElement=false
+            $.getJSON(url, dataObject, function(data) {
+                $.each(data, function(index, label) {
+                    list.append('<option value=' + index + '>' + label + '</option>');
+                });
+                $(nextblock).show("fast");
+            })
+            if(url==''){
+                $(nextblock).show("fast");
+            }
+        });
+    </script>
+{% endblock %}

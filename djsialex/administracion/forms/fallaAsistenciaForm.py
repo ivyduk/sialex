@@ -6,6 +6,11 @@ import pytz
 
 from administracion.models import FallaAsistencia
 
+
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
+
 class FallaAsistenciaForm(forms.ModelForm):
 
     class Meta:
@@ -13,9 +18,11 @@ class FallaAsistenciaForm(forms.ModelForm):
         exclude = ['matricula', 'persona_asignadora']
 
         labels = {
-            'fecha': 'Fecha (aaaa-mm-dd)',
+            'fecha': 'Fecha (mm-dd-aaaa)',
             'cantidad_fallas': 'Número inasistencias'
         }
+
+        widgets = {'fecha': DateInput()}
 
     def __init__(self, *args, **kwargs):
         super(FallaAsistenciaForm, self).__init__(*args, **kwargs)
@@ -29,9 +36,11 @@ class FallaAsistenciaUpdateForm(BSModalForm):
         exclude = ['matricula', 'persona_asignadora']
 
         labels = {
-            'fecha': 'Fecha (aaaa-mm-dd)',
+            'fecha': 'Fecha (mm-dd-aaaa)',
             'cantidad_fallas': 'Número inasistencias'
         }
+
+        widgets = {'fecha': DateInput()}
 
     def __init__(self, *args, **kwargs):
         super(FallaAsistenciaUpdateForm, self).__init__(*args, **kwargs)

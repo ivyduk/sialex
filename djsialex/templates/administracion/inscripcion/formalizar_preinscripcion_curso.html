@@ -43,29 +43,36 @@
                           </thead>
                         <tbody>
                             <tr>
-                                <td># Documento :</td>
-                                <td class="table-info">{{ preinscripcionhorariocurso.persona.numero_documento}}</td>
+                                <td>Tipo Documento: </td>
+                                <td>{{ preinscripcionhorariocurso.persona.tipo_documento.nombre}}</td>
                                 <td>Idioma</td>
                                 <td>{{ preinscripcionhorariocurso.horario_cupo.curso.nivel.idioma.nombre}}</td>
                             </tr>
                             <tr>
-                                <td>Nombres: </td>
-                                <td>{{ preinscripcionhorariocurso.persona.primer_nombre}} {{ preinscripcionhorariocurso.persona.segundo_nombre}}</td>
+                                <td>Documento: </td>
+                                <td>{{ preinscripcionhorariocurso.persona.numero_documento}}</td>
                                 <td>Programa Académico: </td>
                                 <td>{{ preinscripcionhorariocurso.horario_cupo.curso.oferta_academica }}</td>
                             </tr>
                             <tr>
-                                <td>Apellidos</td>
-                                <td>{{ preinscripcionhorariocurso.persona.primer_apellido}} {{ preinscripcionhorariocurso.persona.segundo_apellido}}</td>
+                                <td>Nombres: </td>
+                                <td>{{ preinscripcionhorariocurso.persona.primer_nombre}}</td>
                                 <td>Nivel: </td>
                                 <td>{{ preinscripcionhorariocurso.horario_cupo.curso.nivel.nombre }}</td>
                             </tr>
                             <tr>
-                                <td>Fecha De Preinscripción: </td>
-                                <td>{{ preinscripcionhorariocurso.fecha_preinscripcion }}</td>
+                                <td>Apellidos: </td>
+                                <td>{{ preinscripcionhorariocurso.persona.primer_apellido }}</td>
                                 <td>Horario: </td>
                                 <td>{{ preinscripcionhorariocurso.horario_cupo.horario.nombre }}</td>
                             </tr>
+                            <tr>
+                                <td>Fecha De Preinscripción: </td>
+                                <td>{{ preinscripcionhorariocurso.fecha_preinscripcion }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
                         <tr>
                             <form action = "{% url 'formalizar-curso' preinscripcionhorariocurso.id %}" method = "post" id="requiere_facturacion">
                                 {{facturacion_form}}

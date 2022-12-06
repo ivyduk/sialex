@@ -77,7 +77,9 @@ INSTALLED_APPS = [
     'auditlog',
     'explorer',
     'bootstrapform',
-    'ckeditor'
+    'ckeditor',
+    # won't work on windows
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -266,3 +268,8 @@ CKEDITOR_CONFIGS = {
         'width': '100%'
     },
 }
+
+CRONJOBS = [
+    ('*/2 * * * *', 'administracion.util.CronJob.Inscritos_Pendientes')
+]
+CRONTAB_COMMAND_SUFFIX = '2>&1'

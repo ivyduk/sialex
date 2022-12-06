@@ -261,3 +261,37 @@ def verPreinscritosExamen(request, examen):
 
     return render(request, 'administracion/examenClasificacion/preinscritos_examen.html',
                   {'preinscripciones': preinscripciones})
+
+
+@login_required
+def examenFiltros(request):
+
+    if request.method == 'GET':
+        form = ExamenClasificacionForm()
+    return render(request, 'administracion/inscripcion/examenClasificacion/preinscripcion_examen_filtros.html', {'form': form})
+
+
+class PreinscritosExamenCalificacionlistView(LoginRequiredMixin, generic.ListView):
+    model = PreinscripcionExamen
+    template_name = 'administracion/inscripcion/examenClasificacion/preinscripcion_examen_listado.html'
+    login_url = '/acceso/login'
+    redirect_field_name = 'redirect_to'
+    examen_calificacion = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        examen = self.request.GET.get('examen')
+        context['examen'] = ExamenClasificacion.objects.get(pk=examen)
+        return context
+
+    def get_queryset(self):
+        examen = self.request.GET.get('examen')
+
+        try:
+            examen_clasificacion = ExamenClasificacion.objects.get(pk=examen)
+        except ExamenClasificacion.DoesNotExist:
+            examen_clasificacion = None
+
+        if examen_clasificacion:
+            preinscripciones = PreinscripcionExamen.objects.filter(examen=examen_clasificacion).order_by('persona__primer_nombre', 'fecha_preinscripcion').all()
+        return list(preinscripciones)

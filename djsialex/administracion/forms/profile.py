@@ -2,7 +2,7 @@ from bootstrap_datepicker_plus import DateTimePickerInput
 from captcha.fields import CaptchaField
 from django import forms
 from django.forms.formsets import BaseFormSet
-from django.contrib.auth.models import User
+
 
 from ..models import TipoDocumentoIdentidad, PersonaContacto, Pais, Ciudad, Profile, EPS
 from django.db.models import Q

@@ -36,10 +36,20 @@
                     {{ docente.docente.persona.getNombreCompleto }}<br>
                 {% endfor %}
 
-                <h3 class="title-project">Salón(es):</h3>
-                {% for salon in salones %}
-                    Edificio: {{ salon.edificio.nombre }} -Salón: {{ salon.nombre }} <br>
-                {% endfor %}
+                                <h3 class="title-project">Salón(es):</h3>
+                {% if salones %}
+                    {% for salon in salones %}
+                        Edificio: {{ salon.edificio.nombre }} - Salón: {{ salon.nombre }} <br>
+                    {% endfor %}
+                {% else %}
+                    <p>No hay salones asociados</p>
+                {% endif %}
+
+                {% if enlace_virtual %}
+                    <h3 class="title-project">Enlace a curso:</h3>
+                    <a href="{{ enlace_virtual }}" target="_blank" class="rss"
+                   title="Enlace a curso">{{ enlace_virtual }}</a>
+                {% endif %}
                 <h3 class="title-project">Observación(es):</h3>
                 {% if grupo.observaciones %}
                     {{ grupo.observaciones }} <br>

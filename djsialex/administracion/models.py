@@ -28,6 +28,7 @@ from administracion.enums import *
 import logging
 LOGGER = logging.getLogger(__name__)
 
+
 class DatosEstudiantesModel(models.Model):
     id                      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id_sub_proyecto_curso   = models.CharField(max_length=15)
@@ -364,7 +365,9 @@ class Periodo(models.Model):
     finalizado = models.BooleanField(default=False, help_text="Determina si el periodo ya no será visible para los usuarios al autenticarse")
     inicio = models.IntegerField(editable=False, null=True)
     fin = models.IntegerField(editable=False, null=True)
-
+    fecha_inicio = models.DateField(default=timezone.now, help_text="Fecha Inicio del periodo")
+    fecha_final = models.DateField(default=timezone.now, help_text="Fecha Final del periodo")
+    fecha_pendientes = models.DateField(default=timezone.now, help_text="Fecha Para envio de pendientes")
 
     class Meta:
         verbose_name = "Periodo"
@@ -690,7 +693,10 @@ class Profile(models.Model):
 
     ciudad_residencia = models.ForeignKey(Ciudad, on_delete=models.CASCADE, null=False,
                                           related_name='profile_ciudad_residencia', default=107)
-    direccion_residencia = models.CharField(max_length=1000, null=False)
+    direccion_residencia = models.CharField(
+        max_length=1000,
+        null=False,
+    )
 
     indicativo_fijo = models.CharField(max_length=3, blank=True)
     telefono_fijo = models.CharField(max_length=15, blank=True)
@@ -767,6 +773,7 @@ class Profile(models.Model):
     	"""
         return self.usuario.username + ' ' + self.primer_nombre + ' ' + self.primer_apellido
 
+
 class PersonaContacto(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombres = models.CharField(max_length=100, null=False)
@@ -776,11 +783,13 @@ class PersonaContacto(models.Model):
     parentesco = models.IntegerField(choices=PARENTESCO, null=False)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
 
+
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(usuario=instance)
     instance.profile.save()
+
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
@@ -842,6 +851,7 @@ class Docente(models.Model):
 
         return self.persona.numero_documento + ' - ' + self.persona.primer_nombre + ' ' + segundo_nombre  + ' ' + self.persona.primer_apellido + ' ' + segundo_apellido
 
+
 class Edificio(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
     nombre = models.CharField(max_length=600)
@@ -852,6 +862,7 @@ class Edificio(models.Model):
         :return: nombre
         """
         return self.nombre
+
 
 class Salon(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
@@ -869,6 +880,7 @@ class Salon(models.Model):
         verbose_name = "Salon"
         verbose_name_plural = "Salones"
 
+
 class GrupoAcademico(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=500)
@@ -879,6 +891,9 @@ class GrupoAcademico(models.Model):
     observaciones = models.TextField(max_length=1000, null=True)
     contenido_nivel_version = models.ForeignKey(ContenidoNivelVersion, on_delete=models.PROTECT, null=True)
     estado = models.IntegerField(choices=ESTADOS_GRUPO_ACADEMICO, default=0)
+    fecha_inicio = models.DateField(default=timezone.now, null=True)
+    fecha_final = models.DateField(default=timezone.now, null=True)
+    enlace_virtual = models.URLField(max_length=255, null=True)
 
     def save(self, *args, **kwargs):
         if self._state.adding:
@@ -887,6 +902,7 @@ class GrupoAcademico(models.Model):
                 self.codigo =  ultimo_codigo + 1
 
         super(GrupoAcademico, self).save(*args, **kwargs)
+
 
 class Preinscripcion(models.Model):
     persona = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
@@ -899,6 +915,7 @@ class Preinscripcion(models.Model):
         help_text='Determina si esta preinscripción requiere facturación electrónica'
     )
 
+
 class PreinscripcionHorarioCurso(Preinscripcion):
     horario_cupo = models.ForeignKey(HorarioCurso, on_delete=models.CASCADE, null=True)
     descuento_solicitado = models.ForeignKey(Descuento, on_delete=models.CASCADE, null=True)
@@ -908,6 +925,7 @@ class PreinscripcionHorarioCurso(Preinscripcion):
         Devuelve la url para acceder a una instancia particular de preinscripcion.
         """
         return reverse('preinscripcion-detail', args=[str(self.id)])
+
 
 class Matricula(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -938,7 +956,7 @@ class FallaAsistencia(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     matricula = models.ForeignKey(Matricula, on_delete=models.PROTECT)
     persona_asignadora = models.ForeignKey(Profile, on_delete=models.PROTECT)
-    fecha = models.DateField()
+    fecha = models.DateField(default=timezone.now)
     cantidad_fallas = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
 

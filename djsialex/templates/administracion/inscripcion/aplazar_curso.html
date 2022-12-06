@@ -1,5 +1,5 @@
 {% extends "administracion/home.html" %}
-
+{% load widget_tweaks %}
 {% block content %}
  <div class="col-sm-9 col-md-9">
 <h1>Aplazar Preinscripción</h1>
@@ -9,32 +9,55 @@
     <h3 class="alert-info"> valor pagado por el usuario $ {{ pagado }}</h3>
 
     {% if form %}
-        <div class="col-sm-6">
+        <div class="container">
         <form action={% url 'aplazar-curso' preinscripcionhorariocurso.id %} method="post">
             <div class="modal-body">
-            {% for field in form %}
                 <div class="form-group{% if field.errors %} invalid{% endif %}">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {% if field.name == 'valor_saldo_a_favor' %}
-                        <label id='label_valor_saldo_a_favor' style="font-size:25px;color:olive">$</label>
-                    {% endif %}
-                    {{ field }}
-                {% for error in field.errors %}
-                  <p class="help-block">{{ error }}</p>
-                {% endfor %}
+
+                    <div class="container">
+                        <h4><b>Motivos:</b></h4>
+                        {% for field in form.motivo %}
+                        <div class="form-row">
+                            {% render_field field %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <br>
+
+                    <div class="container">
+                        <div class="row">
+                           <div class="col-sm-4">
+                              <h4><b>Valor a cargar como saldo a favor del usuario: </b></h4>
+                           </div>
+                           <div class="col-sm-4">
+                              <label id='label_valor_saldo_a_favor' style="font-size:25px;color:olive">$</label>
+                           </div>
+                        </div>
+                        <div class="row"></div>
+                           <div class="col-sm-4">
+                              {% render_field form.valor_saldo_a_favor %}
+                           </div>
+                        </div>
+                    </div>
+
+                    {% for error in field.errors %}
+                       <p class="help-block">{{ error }}</p>
+                    {% endfor %}
                 </div>
-            {% endfor %}
             </div>
             <input type="submit" class="btn btn-primary" value="Guardar" id="aplazar">
          {% csrf_token %}
         </form>
         </div>
     {% endif %}
+
     <style>
     label {
       display: inline-block;
-      width: 140px;
-      text-align: right;
+      width: 250px;
+      text-align: left;
+      padding-left: 20;
     }
 
     </style>

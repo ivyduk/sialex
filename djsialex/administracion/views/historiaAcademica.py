@@ -61,6 +61,7 @@ def cursoCalificacionesDetalle(request, matricula, opcion):
             if docente not in docentes:
                 docentes[docente.docente.persona] = docente.tipo_docente
         salones = matricula_encontrada.grupo.salones.all()
+        enlace_virtual = matricula_encontrada.grupo.enlace_virtual
 
         calificaciones = Calificacion.objects.filter(matricula=matricula_encontrada).order_by('nota__orden_nota_conjunto').all()
         observaciones = Observacion.objects.filter(matricula=matricula_encontrada).all()
@@ -68,7 +69,7 @@ def cursoCalificacionesDetalle(request, matricula, opcion):
 
         context = {'matricula': matricula_encontrada, 'calificaciones': calificaciones,
                    'docentes_generales': docentes_generales, 'docentes_especializados': docentes_especializados, 'salones': salones,
-                   'observaciones': observaciones, 'inasistencias': inasistencias, 'opcion': opcion, 'docentes': docentes}
+                   'enlace_virtual': enlace_virtual, 'observaciones': observaciones, 'inasistencias': inasistencias, 'opcion': opcion, 'docentes': docentes}
 
     return render(request, template_name, context)
 

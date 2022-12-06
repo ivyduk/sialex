@@ -67,14 +67,23 @@ def getNiveles(persona):
     if grupo_estudiante in persona.usuario.groups.all():
         es_estudiante = True
         for idioma in idiomas:
-            matriculas = Matricula.objects.filter(estudiante=persona, grupo__horarioCurso__curso__nivel__idioma=idioma,
-                                                  estado_matricula__in=[2,9])  # Aprobado, Aprobado - Pendiente en formalizacion
+            matriculas = Matricula.objects.filter(
+                estudiante=persona,
+                grupo__horarioCurso__curso__nivel__idioma__id=idioma.id,
+                estado_matricula__in=[2, 9]
+            ) # Aprobado, Aprobado - Pendiente en formalizacion
             if matriculas:
-                nivel_maximo_aprobado = matriculas.values('grupo__horarioCurso__curso__nivel').annotate(
+                nivel_maximo_aprobados = matriculas.values('grupo__horarioCurso__curso__nivel').annotate(
                     max=Max('grupo__horarioCurso__curso__nivel__orden'))
+                max = nivel_maximo_aprobados[0].get('max')
+                for aprobado in nivel_maximo_aprobados:
+                    if aprobado.get('max') >= max:
+                        max = aprobado.get('max')
+                        nivel_maximo_aprobado = aprobado
                 try:
                     nivel_maximo_aprobado = Nivel.objects.get(
-                        pk=nivel_maximo_aprobado[0]['grupo__horarioCurso__curso__nivel'])
+                        pk=nivel_maximo_aprobado.get('grupo__horarioCurso__curso__nivel')
+                    )
                 except Nivel.DoesNotExist:
                     nivel_maximo_aprobado = None
                 try:

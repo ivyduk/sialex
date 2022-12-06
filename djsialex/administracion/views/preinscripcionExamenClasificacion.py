@@ -38,19 +38,19 @@ class PreinscripcionExamenListView(LoginRequiredMixin, ListView):
         periodo_id = self.request.session["periodo_contextualizado_id"]
         return PreinscripcionExamen.objects.filter(persona=perfil, examen__periodo_id=periodo_id)
 
+
 class PreinscripcionExamenDetailView(LoginRequiredMixin,DetailView):
     model = PreinscripcionExamen
     template_name = 'administracion/inscripcion/examenClasificacion/preinscripcion_examen_detail.html'
     login_url = '/acceso/login'
     redirect_field_name = 'redirect_to'
 
+
 class PreinscripcionExamenDelete(LoginRequiredMixin, DeleteView):
 
     model = PreinscripcionExamen
     template_name = 'administracion/inscripcion/examenClasificacion/preinscripcion_examen_confirm_delete.html'
     success_url = reverse_lazy('mis-inscripciones')
-
-
 
 @login_required
 def preinscripcionExamenView(request):
@@ -98,7 +98,8 @@ def preinscripcionExamenView(request):
                     preinscripcion_curso = PreinscripcionHorarioCurso.objects.filter(
                         horario_cupo__curso__oferta_academica__in=ofertas_academicas,
                         persona=preinscrito, estado_preinscripcion__in=[1, 3, 5],
-                        horario_cupo__curso__oferta_academica__periodo__lte=periodo.inicio - 4
+                        horario_cupo__curso__oferta_academica__periodo__activo=True,
+                        horario_cupo__curso__oferta_academica__periodo__finalizado=False
                     ).first()
                     if preinscripcion_curso or len(examenes_encontrados) > 0:
                         if preinscripcion_curso:
