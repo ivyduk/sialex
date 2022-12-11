@@ -160,7 +160,6 @@ def completeProfile(request):
                 messages.error(request, 'Hubo un error al guardar sus datos personales')
 
             return redirect('home')
-        print(form)
         return render(request, 'administracion/usuario/editarperfil.html', {'form': form,
                                                                             'persona_contacto_formset': persona_contacto_formset,
                                                                             })

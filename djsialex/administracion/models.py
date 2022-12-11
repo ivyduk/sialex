@@ -274,6 +274,7 @@ class Nivel(models.Model):
             self.mensaje_formalizacion = None
         super(Nivel, self).save(*args, **kwargs)
 
+
 class EPS(models.Model):
     """
        Modelo que representa una EPS
@@ -670,6 +671,18 @@ class TipoDocumentoIdentidad(models.Model):
         return self.nombre
 
 
+class Discapacidad(models.Model):
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        verbose_name = "Discapacidad"
+        verbose_name_plural = "Discapacidades"
+
+    id = models.AutoField(primary_key=True, editable=False)
+    nombre = models.CharField(max_length=200)
+
+
 class Profile(models.Model):
     # Para el registro se permiten campos nulos, en la activación se validan los demás campos
     # en un forms.py especifico para el perfil del usuario
@@ -722,6 +735,8 @@ class Profile(models.Model):
     tipo_vinculacion_un = models.IntegerField(choices=TIPOS_VINCULACION, null=False, default=7) #Ninguna
     nivel_formacion = models.IntegerField(choices=NIVEL_FORMACION, null=False, default=1) #No Aplica
     estado_civil = models.IntegerField(choices=ESTADO_CIVIL, null=False, default=7) #Ninguna
+    discapacidad = models.ForeignKey(Discapacidad, on_delete=models.CASCADE, null=True,
+                                          related_name='profile_discapacidad', default=None)
 
     class Meta:
         verbose_name = "Persona"

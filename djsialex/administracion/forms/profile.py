@@ -6,7 +6,7 @@ from django.forms.formsets import BaseFormSet
 from ..enums import *
 from django.utils.safestring import mark_safe
 
-from ..models import TipoDocumentoIdentidad, PersonaContacto, Pais, Ciudad, Profile, EPS
+from ..models import TipoDocumentoIdentidad, PersonaContacto, Pais, Ciudad, Profile, EPS, Discapacidad
 from django.db.models import Q
 
 
@@ -117,6 +117,7 @@ class EditProfileForm(forms.ModelForm):
     segundo_apellido = forms.CharField(help_text='Ingrese el primer apellido', required=False)
     segundo_nombre = forms.CharField(help_text='Ingrese el segundo apellido', required=False)
     eps = forms.ModelChoiceField(queryset=EPS.objects.order_by('nombre'))
+    discapacidad = forms.ModelChoiceField(queryset=Discapacidad.objects.order_by('nombre'), required=False)
     direccion_sin_formato = DireccionField(widget=DireccionSelectorWidget(), required=False, label='Dirección de residencia')
     es_egresado = forms.TypedChoiceField(
         initial='No',
@@ -161,7 +162,8 @@ class EditProfileForm(forms.ModelForm):
             'eps': 'EPS',
             'tipo_vinculacion_un': 'Tipo de vinculación UN',
             'es_egresado': 'Es egresado UN',
-            'estado_civil': 'Estado civil'
+            'estado_civil': 'Estado civil',
+            'discapacidad': 'Discapacidad'
         }
 
         FORMAT = '%Y-%m-%d'
