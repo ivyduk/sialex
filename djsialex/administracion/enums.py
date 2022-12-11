@@ -174,3 +174,52 @@ ESTADO_CIVIL = [
     (6, ("RELIGIOSO(A)")),
     (7, ("SEPARADO(A)"))
 ]
+
+DIRECCION_PREFIJO = [
+    (" "         , (" ")),
+    ("Bis"    , ("Bis")),
+    ("Norte"    , ("Norte")),
+    ("Sur"      , ("Sur")),
+    ("Oriente"  , ("Oriente")),
+    ("Occidente", ("Occidente"))
+]
+
+DIRECCION_LETRA = [
+    (" ", (" ")),
+    ("A", ("A")),
+    ("B", ("B")),
+    ("C", ("C")),
+    ("D", ("D")),
+    ("E", ("E")),
+    ("F", ("F")),
+    ("G", ("G")),
+    ("H", ("H")),
+    ("I", ("I")),
+    ("J", ("J")),
+    ("K", ("K")),
+    ("L", ("L")),
+    ("M", ("M")),
+    ("N", ("N"))
+]
+
+DIRECCION_TIPO = [
+    ("Autopista"       , ("Autopista")),
+    ("Avenida"         , ("Avenida")),
+    ("Avenida Calle"   , ("Avenida Calle")),
+    ("Avenida Carrera" , ("Avenida Carrera")),
+    ("Bulevar"         , ("Bulevar")),
+    ("Calle"           , ("Calle")),
+    ("Carrera"         , ("Carrera")),
+    ("Circular"        , ("Circular")),
+    ("Kilometro"       , ("Kilometro")),
+    ("Circunvalar"     , ("Circunvalar")),
+    ("Ctas Corridas"   , ("Ctas Corridas")),
+    ("Diagonal"        , ("Diagonal")),
+    ("Pasaje"          , ("Pasaje")),
+    ("Paseo"           , ("Paseo")),
+    ("Peatonal"        , ("Peatonal")),
+    ("Transversal"     , ("Transversal")),
+    ("Troncal"         , ("Troncal")),
+    ("Variante"        , ("Variante")),
+    ("Zona"            , ("Zona"))
+]

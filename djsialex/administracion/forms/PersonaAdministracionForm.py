@@ -33,7 +33,7 @@ class PersonaAdministracionForm(forms.ModelForm):
             'ciudad_nacimiento': 'Ciudad de nacimiento',
             'pais_residencia': 'País de residencia',
             'ciudad_residencia': 'Ciudad de residencia',
-            'direccion_residencia': 'Dirección de residencia actual',
+            'direccion_sin_formato': 'Dirección de residencia actual',
             'telefono_fijo': 'Teléfono fijo',
             'telefono_celular': 'Teléfono celular',
             'tipo_sangre': 'Tipo de sangre',

@@ -20,6 +20,7 @@ from ..models import Profile, PersonaContacto, Preinscripcion, PreinscripcionExa
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
+
 class PersonaDetailView(LoginRequiredMixin,DetailView):
 
     model = Profile
@@ -70,6 +71,7 @@ def personas_list(request):
         personas = paginator.page(paginator.num_pages)
 
     return render(request, 'administracion/persona/persona_list.html', {'object_list': personas, 'total': len(object_list)})
+
 
 class EditarPersona(LoginRequiredMixin, UpdateView):
     model = Profile

@@ -114,6 +114,8 @@ def completeProfile(request):
         form = EditProfileForm(request.POST, instance=perfil)
         persona_contacto_formset = PersonaContactoFormSet(request.POST)
 
+        # Profile.objects.filter(user=perfil).values_list() order_by('nombres')
+
         if form.is_valid() and persona_contacto_formset.is_valid():
 
             if 'telefono_fijo' in request.POST:
@@ -158,8 +160,7 @@ def completeProfile(request):
                 messages.error(request, 'Hubo un error al guardar sus datos personales')
 
             return redirect('home')
-        form.indicativo_fijo = str(form.indicativo_fijo).lower()
-        form.indicativo_celular = str(form.indicativo_celular).lower()
+        print(form)
         return render(request, 'administracion/usuario/editarperfil.html', {'form': form,
                                                                             'persona_contacto_formset': persona_contacto_formset,
                                                                             })

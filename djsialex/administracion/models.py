@@ -685,7 +685,7 @@ class Profile(models.Model):
 
     ciudad_expedicion_documento = models.ForeignKey(Ciudad, on_delete=models.CASCADE, null=False,
                                                     related_name='profile_ciudad_expedicion_documento', default=107)
-    genero_sexual = models.IntegerField(verbose_name='Sexo biológico',choices=GENERO_SEXUAL, null=False, default=2)
+    genero_sexual = models.IntegerField(verbose_name='Sexo biológico',  choices=GENERO_SEXUAL, null=False, default=2)
 
     fecha_nacimiento = models.DateField(null=True, blank=False)
     ciudad_nacimiento = models.ForeignKey(Ciudad, on_delete=models.CASCADE, null=False,
@@ -694,6 +694,11 @@ class Profile(models.Model):
     ciudad_residencia = models.ForeignKey(Ciudad, on_delete=models.CASCADE, null=False,
                                           related_name='profile_ciudad_residencia', default=107)
     direccion_residencia = models.CharField(
+        max_length=1000,
+        null=False,
+    )
+
+    direccion_sin_formato = models.CharField(
         max_length=1000,
         null=False,
     )
@@ -772,6 +777,10 @@ class Profile(models.Model):
     	:return: nombre
     	"""
         return self.usuario.username + ' ' + self.primer_nombre + ' ' + self.primer_apellido
+
+    def save(self, *args, **kwargs):
+        self.direccion_residencia = self.direccion_sin_formato.replace('|', ' ')
+        super(Profile, self).save(*args, **kwargs)
 
 
 class PersonaContacto(models.Model):
