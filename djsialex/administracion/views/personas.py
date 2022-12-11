@@ -157,6 +157,18 @@ class EditarPersonaDocumentoEntregado(LoginRequiredMixin, UpdateView):
     fields = ["documento_identificacion_entregado"]
     success_message = 'Actualizados documentos de identificación.'
 
+    def post(self, request, **kwargs):
+        self.object = self.get_object()
+        if not request.POST.get('documento_identificacion_entregado'):
+            preinscripcion_id = self.kwargs["preinscripcion"]
+            precurso = Preinscripcion.objects.filter(id=preinscripcion_id).first()
+
+            if precurso.estado_preinscripcion == 1:
+                precurso.estado_preinscripcion = 3
+                precurso.save()
+
+        return super(EditarPersonaDocumentoEntregado, self).post(request, **kwargs)
+
     def get_success_url(self, *args, **kwargs):
         preinscripcion_id = self.kwargs["preinscripcion"]
         preinscripcion = PreinscripcionExamen.objects.filter(id=preinscripcion_id).first()
