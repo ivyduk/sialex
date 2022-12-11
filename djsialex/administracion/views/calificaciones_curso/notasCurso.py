@@ -182,9 +182,11 @@ def listadoCalificacionesPorGrupo(request, grupoacademico):
             context = {'matriculas': matriculas, 'periodo': periodo, 'grupo': grupo, 'notas': notas, 'range': range(len(notas)),
                        'calificaciones_matricula': calificaciones_matricula, 'escala_notas': escala_notas,
                        'docentes_generales': docentes_generales, 'docentes_especializados': docentes_especializados,
-                       'tipos_docente': tipos_docente, 'es_administrador': es_administrador_o_coordinador}
+                       'tipos_docente': tipos_docente, 'es_administrador': es_administrador_o_coordinador,
+                       'tipo_general': tipo_general}
 
     return render(request, "administracion/docente/matriculas_list.html", context)
+
 
 def asignarCalificacion(matricula_nota, nota_parcial, calificacion, escala_notas):
 
