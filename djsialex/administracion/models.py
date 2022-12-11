@@ -934,6 +934,7 @@ class Matricula(models.Model):
     calificacionFinal = models.FloatField(default=0.0)
     total_fallas = models.IntegerField(default=0)
     estado_matricula = models.IntegerField(choices=ESTADOS_ACADEMICOS_MATRICULA, default=1);
+    preinscripcion_generada = models.ForeignKey(Preinscripcion, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         """

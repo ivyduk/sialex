@@ -11,7 +11,7 @@ from administracion.util import CSVWriter
 from administracion.views import BusquedaGenerica
 from ..models import GrupoAcademico, OfertaAcademica, HorarioCurso, Curso, PreinscripcionHorarioCurso, Matricula, \
     DocentesGrupoAcademico, TipoDocente, Docente, Salon, ESTADOS_ACADEMICOS_MATRICULA, getEstadoMatricula, \
-    ContenidoNivel, ContenidoNivelVersion, Nivel
+    ContenidoNivel, ContenidoNivelVersion, Nivel, Preinscripcion
 from django.shortcuts import render, redirect, get_object_or_404
 import json
 from django.views.generic.edit import CreateView
@@ -62,7 +62,11 @@ def guardarGruposYMatriculas(grupos, horario_curso):
                 matricula_encontrada = Matricula.objects.filter(estudiante=preinscrito.persona, grupo=grupo,
                                                                 estado_matricula=7)
                 if not matricula_encontrada and matricula not in matriculas:
-                    matriculas.append(matricula)
+                    preinscripcion_curso = PreinscripcionHorarioCurso.objects.get(horario_cupo_id=horario_curso.id,
+                                                                                  persona_id = preinscrito.persona)
+                    preinscripcion= Preinscripcion.objects.get(pk = preinscripcion_curso.id)                                                                                                       
+                    matricula.preinscripcion_generada = preinscripcion
+                    matriculas.append(matricula)                    
             try:
                 with transaction.atomic():
                     Matricula.objects.bulk_create(matriculas)
