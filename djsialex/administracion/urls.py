@@ -31,7 +31,7 @@ from administracion.views.preinscripciones.adminPreinscripciones import escogerO
 	liberarCuposCursoNivel1
 from .views import *
 
-from administracion.views.DatosEstudiantesView import escogerOpcionReportes,reporteFechaCreate,DatosEstudiantesAPI
+from administracion.views.DatosEstudiantesView import escogerOpcionReportes,reporteFechaCreate,descargarReporteHermes,DatosEstudiantesAPI
 
 from rest_framework.routers import DefaultRouter
 
@@ -384,8 +384,8 @@ urlpatterns = [
     #Reporte HERMES
 	path('administracion/reportes/opciones/', escogerOpcionReportes, name='reporte_hermes'),
  	path('administracion/reportes/fechas/', reporteFechaCreate, name='reportefechas_opcion'),
-	#<uuid:pk>
-	#.as_view()
+	url(r'^administracion/reportes/exportar/$',descargarReporteHermes, name='ReporteHermes-csv'),
+	
 ]
 
 
