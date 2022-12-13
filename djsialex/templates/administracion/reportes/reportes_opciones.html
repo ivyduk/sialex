@@ -1,0 +1,30 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks profile_tags %}
+{% block breadcrumb %}
+    {{ block.super }} » Administración 
+{% endblock %}
+
+{% block administration-title %}
+    <h2 class="title-project">Administrar Reportes</h2>
+{% endblock %}
+
+{% block form %}
+    <div class="alert alert-info"><h4>Escoja una de las siguientes opciones</h4></div>
+
+    <div class="list-group" id="list-tab" role="tablist">
+        {% if request.user|has_group:"Administrador" %}
+            <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" role="tab"><h4>Reportes</h4></a>
+            <a href="{% url 'reportefechas_opcion' %}" class="list-group-item">
+                <h4 class="list-group-item-heading">Configurar Fechas Reporte</h4>
+            </a>
+
+            <a href="#" class="list-group-item">
+                <h4 class="list-group-item-heading">Generar Reporte HERMES
+                <button type="button" class="btn btn-info pull-right" onclick="location.href='{% url 'preinscritos-periodo-csv' %}'">
+                 <span class="glyphicon glyphicon-download"></span> Descargar CSV </button>
+                </h4>
+            </a>
+        {% endif %}
+    </div>
+
+{% endblock %}

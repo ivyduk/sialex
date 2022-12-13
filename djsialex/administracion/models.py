@@ -1877,7 +1877,31 @@ class Encuesta(Survey):
         return "{} - {} - {}".format(
             self.asociada.periodo.alias, self.asociada.plantilla.name, self.programa.nombre,
         )
+class reporteHermes_conf(models.Model):    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    fecha_inicio = models.DateField(default=timezone.now, help_text="Fecha Inicio del Reporte HERMES")
+    fecha_final = models.DateField(default=timezone.now, help_text="Fecha Final del Reporte HERMES")
 
+    class Meta:
+        verbose_name = "reporteHermes_conf"
+        verbose_name_plural = "reporteHermes_confs"
+
+    def get_absolute_url(self):
+        """
+         Devuelve la url para acceder a una instancia particular de Periodo.
+         """
+        return reverse('reporte_hermes')
+
+    def save(self, *args, **kwargs):
+        self.__class__.objects.exclude(id=self.id).delete()
+        super(reporteHermes_conf, self).save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        try:
+            return cls.objects.get()
+        except cls.DoesNotExist:
+            return cls()
 
 auditlog.register(Profile)
 auditlog.register(User)

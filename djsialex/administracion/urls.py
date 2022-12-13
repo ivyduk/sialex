@@ -25,14 +25,13 @@ from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCal
 from administracion.views.preinscripcionExamenClasificacion import preinscripcionExamenView, \
 	preinscripcion_examen_fase_previa, PreinscripcionExamenDetailView, PreinscripcionExamenDelete
 
-
 from .views.DocumentoDescuento import DocumentoDescuentoUpdateView
 
 from administracion.views.preinscripciones.adminPreinscripciones import escogerOpcionPreinscripcion, liberarCuposOpcion, \
 	liberarCuposCursoNivel1
 from .views import *
 
-from administracion.views.DatosEstudiantesView import DatosEstudiantesAPI
+from administracion.views.DatosEstudiantesView import escogerOpcionReportes,reporteFechaCreate,DatosEstudiantesAPI
 
 from rest_framework.routers import DefaultRouter
 
@@ -293,7 +292,7 @@ urlpatterns = [
 	url(r'^administracion/grupos/docente-salon/(?P<grupoacademico>[-\w]+)', asignarDocenteSalonAGrupo, name='docente-salon'),
 	url(r'^administracion/grupos/docente-salon-correo/(?P<grupoacademico>[-\w]+)', informacionDocenteSalonAGrupo, name='docente-salon-correo'),
 	url(r'^administracion/grupos/eliminar-docente-grupo/(?P<grupoacademico>[-\w]+)/(?P<docente>[-\w]+)', eliminarDocenteDeGrupo, name='eliminar-docente-grupo'),
-	url(r'^administracion/grupos/eliminar-salon-grupo/(?P<grupoacademico>[-\w]+)/(?P<salon>[-\w]+)', eliminarSalonDeGrupo, name='eliminar-salon-grupo'),
+	url(r'^administracion/grupos/eliminar-salon-grupo/(?P<grupoacademico>[-w]+)/(?P<salon>[-\w]+)', eliminarSalonDeGrupo, name='eliminar-salon-grupo'),
 	url(r'^administracion/grupos/aplazar-grupo/(?P<grupoacademico>[-\w]+)', aplazarCursoLoteView, name='aplazar-grupo'),
 
 	#calificacion de cursos
@@ -382,6 +381,11 @@ urlpatterns = [
 	url(r'^administracion/preinscripciones/curso_periodo/exportar/$',
 		descargarListaPreinscritosPeriodo, name='preinscritos-periodo-csv'),
 
+    #Reporte HERMES
+	path('administracion/reportes/opciones/', escogerOpcionReportes, name='reporte_hermes'),
+ 	path('administracion/reportes/fechas/', reporteFechaCreate, name='reportefechas_opcion'),
+	#<uuid:pk>
+	#.as_view()
 ]
 
 
