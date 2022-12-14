@@ -384,7 +384,7 @@ urlpatterns = [
     #Reporte HERMES
 	path('administracion/reportes/opciones/', escogerOpcionReportes, name='reporte_hermes'),
  	path('administracion/reportes/fechas/', reporteFechaCreate, name='reportefechas_opcion'),
-	url(r'^administracion/reportes/exportar/$',descargarReporteHermes, name='ReporteHermes-csv'),
+	path('administracion/reportes/exportar/', descargarReporteHermes, name='ReporteHermes-csv'),
 	
 ]
 

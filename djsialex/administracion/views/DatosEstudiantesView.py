@@ -1,21 +1,14 @@
 from bootstrap_datepicker_plus import DateTimePickerInput
-from django.views import generic
-from django.http import HttpResponseRedirect
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
-
-from ..models import reporteHermes_conf,Preinscripcion, PreinscripcionHorarioCurso, Periodo
+from ..models import reporteHermes_conf
 from ..forms.ReporteFechaForm import ReporteFechaForm
-
 from django.contrib import messages
 from ..models import DatosEstudiantesModel
 from django.contrib.auth.decorators import login_required
 from ..serialize import DatosEstudiantesSerialize
 from rest_framework import viewsets
 from django.shortcuts import render, redirect
-
 from administracion.util import CSVWriter
-from administracion.models import getEstadoPreinscripcion
+
 
 @login_required
 def escogerOpcionReportes(request):
@@ -51,29 +44,32 @@ def reporteFechaCreate(request):
                messages.add_message(request, messages.SUCCESS,'Se ha modificado la configuracion del reporte HERMES')
                return redirect('reporte_hermes')
 
-@login_required
 def descargarReporteHermes(request):
+    config = reporteHermes_conf.objects.first()
+    fechainicio = config.fecha_inicio
+    fechafinal = config.fecha_final
+    estudiante = DatosEstudiantesModel.objects.raw('select * from datosEstudiantes(\'{}\',\'{}\')'.format(fechainicio,fechafinal))
+    
+    data = {}
+    for i in range(len(estudiante)):
 
-    periodo_id = request.session["periodo_contextualizado_id"]
-    periodo = Periodo.objects.get(pk=periodo_id)
-
-    preinscripcion = PreinscripcionHorarioCurso.objects.filter(
-        horario_cupo__curso__oferta_academica__periodo=periodo
-    )
-
-    data = {i+1: [preinscripcion[i].persona.tipo_documento,
-                  preinscripcion[i].persona.numero_documento, preinscripcion[i].persona.getNombreCompleto().upper(),
-                  preinscripcion[i].persona.usuario.email, getEstadoPreinscripcion(preinscripcion[i].estado_preinscripcion),
-                  preinscripcion[i].horario_cupo.nombre,
-                  preinscripcion[i].fecha_preinscripcion.strftime('%d/%m/%Y - %H:%M'), preinscripcion[i].valor_preinscripcion]
-             for i in range(len(preinscripcion))}
-
-    header = ['#', 'Tipo documento', 'Numero documento', 'Nombre estudiante', 'Correo electrónico', 'Estado',
-              "Curso", 'Fecha Inscripcion', 'Valor inscripcion']
-
+        data_calificacion = [estudiante[i].id_sub_proyecto_curso, estudiante[i].tipo_documento, estudiante[i].numero_documento, 
+                             estudiante[i].primer_nombre, estudiante[i].segundo_nombre, estudiante[i].primer_apellido,
+                             estudiante[i].segundo_apellido, estudiante[i].sexo_biologico, estudiante[i].estado_civil,
+                             estudiante[i].fecha_nacimiento, estudiante[i].pais_nacimiento, estudiante[i].departamento_nacimiento, 
+                             estudiante[i].ciudad_nacimiento, estudiante[i].nivel_formacion, estudiante[i].egresado_un, 
+                             estudiante[i].vinculacion, estudiante[i].telefono_fijo, estudiante[i].ext, estudiante[i].celular, 
+                             estudiante[i].email, estudiante[i].direccion_residencia, estudiante[i].pais_residencia,
+                             estudiante[i].departamento_residencia, estudiante[i].ciudad_residencia, estudiante[i].descuento, 
+                             estudiante[i].valor_inscripcion, estudiante[i].valor_pago, estudiante[i].fecha_pago, 
+                             estudiante[i].no_soporte_de_pago, estudiante[i].tipo_pago]
+        data[i+1] = data_calificacion
+    
+    header = ['#','id_sub_proyecto_curso','tipo_documento','numero_documento','primer_nombre','segundo_nombre','primer_apellido','segundo_apellido','sexo_biologico','estado_civil','fecha_nacimiento','pais_nacimiento','departamento_nacimiento','ciudad_nacimiento','nivel_formacion','egresado_un','vinculacion','telefono_fijo','ext','celular','email','direccion_residencia','pais_residencia','departamento_residencia','ciudad_residencia','descuento','valor_inscripcion','valor_pago','fecha_pago','no_soporte_de_pago','tipo_pago']
     csv_writer = CSVWriter()
-    response = csv_writer.download_csv_file(data, header, 'Preinscritos-' + str(periodo.alias))
+    response = csv_writer.download_csv_file(data, header, 'Calificaciones-Examenes')
     return response
+        
 
 class DatosEstudiantesAPI(viewsets.ModelViewSet):
     config = reporteHermes_conf.objects.first()
