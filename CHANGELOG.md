@@ -4,7 +4,7 @@
 - Agregado el forzar formato de dirección de colombia para las direcciones de los usuarios
 - Agregado campo de relación de discapacidad para los datos de los usuarios
 - Se arregló Bug en la asignación de docente titular y docente de clase especializada
-- Se fijarón las 3 primeras columnas en la vista del docente para agregar calificaciones
+- Se fijaron las 3 primeras columnas en la vista del docente para agregar calificaciones
 - Se agregó función para actualizar el documento del estudiantes desde la vista de formalización 
 para poner estudiante en pendiente después de formalizado
 - Se agregó función para facilitar que la planilla de notas se pueda descargar en PDF
