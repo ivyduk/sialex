@@ -369,6 +369,7 @@ class Periodo(models.Model):
     fecha_inicio = models.DateField(default=timezone.now, help_text="Fecha Inicio del periodo")
     fecha_final = models.DateField(default=timezone.now, help_text="Fecha Final del periodo")
     fecha_pendientes = models.DateField(default=timezone.now, help_text="Fecha Para envio de pendientes")
+    fecha_calificacion = models.DateField(default=timezone.now, help_text="Fecha Calificacion del periodo")
 
     class Meta:
         verbose_name = "Periodo"

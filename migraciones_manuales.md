@@ -35,8 +35,7 @@ ALTER TABLE public.administracion_discapacidad_id_seq OWNER TO sialex;
 ```
 
 ``` sql
-ALTER TABLE public.administracion_profile
-ADD COLUMN discapacidad_id integer;
+ALTER TABLE administracion_profile ADD COLUMN discapacidad_id integer;
 ```
 
 ``` sql
@@ -58,4 +57,7 @@ INSERT INTO public.administracion_discapacidad (id, nombre) VALUES (8, 'Otra');
 ALTER TABLE ONLY public.administracion_discapacidad ALTER COLUMN id SET DEFAULT nextval('public.administracion_discapacidad_id_seq'::regclass);
 ```
 
+``` sql
+ALTER TABLE administracion_periodo ADD COLUMN fecha_calificacion DATE;
+```
 

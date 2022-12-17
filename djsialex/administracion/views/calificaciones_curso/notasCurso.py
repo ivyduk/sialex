@@ -54,7 +54,13 @@ def cursosAsociadosList(request):
                 if curso not in mis_cursos:
                     mis_cursos[curso] = []
                 mis_cursos[curso].append([grupo, len(matriculas)])
-            context = {'mis_cursos': mis_cursos, 'periodo': periodo}
+
+            if periodo.fecha_calificacion == date.today():
+                calificacion_activa = True
+            else:
+                calificacion_activa = False
+
+            context = {'mis_cursos': mis_cursos, 'periodo': periodo, 'calificacion_activa': calificacion_activa}
 
         else:
             messages.warning(request, 'Lo sentimos, a usted no le ha sido asignado el rol de docente.'
@@ -106,8 +112,13 @@ def listadoEstudiantesPorGrupo(request, grupoacademico):
             for matricula in matriculas:
                 observaciones[matricula] = len(Observacion.objects.filter(matricula=matricula))
 
+            if periodo.fecha_calificacion == date.today():
+                calificacion_activa = True
+            else:
+                calificacion_activa = False
+
             context = {'matriculas': matriculas, 'periodo': periodo, 'grupo': grupo,
-                       'escala_notas': escala_notas,
+                       'escala_notas': escala_notas, 'calificacion_activa': calificacion_activa,
                        'docentes_generales': docentes_generales, 'docentes_especializados': docentes_especializados,
                        'tipo_docente': tipo_docente, 'es_administrador': es_administrador,
                        'salones': salones, 'observaciones_matricula': observaciones}
