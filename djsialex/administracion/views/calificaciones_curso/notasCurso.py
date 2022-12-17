@@ -4,14 +4,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Subquery, OuterRef, Sum
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from administracion.models import Profile, Docente, GrupoAcademico, Matricula, Periodo, NotaParcial, Calificacion, \
+from administracion.models import Profile, Docente, Nivel, GrupoAcademico, Matricula, Periodo, NotaParcial, Calificacion, \
     DocentesGrupoAcademico, TipoDocente, FallaAsistencia, usuarioTieneGrupo, Observacion, getEstadoMatricula, \
     PreinscripcionHorarioCurso, OfertaAcademica
 import json
-
+from datetime import datetime, date
 from administracion.util import CSVWriter
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 
 def isDocente(user):
@@ -407,3 +411,70 @@ def descargarNotasGrupos(request):
     csv_writer = CSVWriter()
     response = csv_writer.download_csv_file(data, header, 'Calificaciones')
     return response
+
+
+@login_required
+def listadoCalificacionesPlanilla(request, *args, **kwargs):
+
+    context = {}
+    now = datetime.now()
+    fecha = (now.strftime("%d/%m/%Y %H:%M:%S"))
+    user = request.user
+    persona = Profile.objects.filter(usuario__id=user.id).first()
+    docentes = Docente.objects.filter(persona__id=persona.id)
+    periodo_actual = request.session["periodo_contextualizado_id"]
+
+    if request.method == 'GET':
+        try:
+            pk = kwargs.get('grupoacademico')
+            grupo = get_object_or_404(GrupoAcademico, pk=pk)
+        except GrupoAcademico.DoesNotExist:
+            grupo = None
+
+        try:
+            periodo = Periodo.objects.get(pk=periodo_actual)
+        except Periodo.DoesNotExist:
+            periodo = None
+
+        if grupo and periodo:
+            salones = grupo.salones.all()
+            docentes = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo).all()
+
+            curso = grupo.horarioCurso.curso.nivel.id
+            niveles = Nivel.objects.filter(id=curso).first()
+
+            inasistencias_matricula = {}
+            matriculas = Matricula.objects.filter(grupo=grupo).exclude(estado_matricula__in=[4,5,6]).order_by('estudiante__primer_apellido')
+            for matricula in matriculas:
+                 inasistencias = FallaAsistencia.objects.filter(matricula=matricula).order_by('fecha').all()
+                 if matricula not in inasistencias_matricula:
+                    inasistencias_matricula[matricula.id] = {}
+                 fallas = "cantidad_fallas"
+                 inasistencias_matricula[matricula.id][fallas] = 0
+                 for inasistencia in inasistencias:
+                    inasistencias_matricula[matricula.id][fallas] = inasistencias_matricula[matricula.id][fallas] + int(inasistencia.cantidad_fallas)
+
+            observaciones_matricula = {}
+            for matricula in matriculas:
+                 observaciones = Observacion.objects.filter(matricula=matricula).all()
+                 if matricula not in observaciones_matricula:
+                    observaciones_matricula[matricula.id] = list()
+                 for observacion in observaciones:
+                     observaciones_matricula[matricula.id].append(observacion.observacion)
+
+            template_path = 'administracion/docente/mis_cursos_export.html'
+            context = {'matriculas': matriculas, 'periodo': periodo, 'grupo': grupo, 'inasistencias_matricula': inasistencias_matricula,
+                       'docentes': docentes, 'salones': salones, 'niveles': niveles, 'fecha':fecha, 'observaciones_matricula': observaciones_matricula}
+
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'filename="report.pdf"'
+
+            template = get_template(template_path)
+            html = template.render(context)
+
+            pisa_status = pisa.CreatePDF(
+                html, dest=response)
+
+            if pisa_status.err:
+                return HttpResponse('Algunos errores ocurrieron <pre>' + html + '</pre>')
+            return response
