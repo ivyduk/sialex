@@ -30,6 +30,7 @@ admin.site.register(ConjuntoNotas)
 admin.site.register(Descuento)
 admin.site.register(Docente)
 admin.site.register(Edificio)
+admin.site.register(Discapacidad)
 
 class SalonAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'edificio']

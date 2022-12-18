@@ -17,7 +17,7 @@ class SignUpForm(UserCreationForm):
     segundo_apellido = forms.CharField(help_text='Ingrese el primer apellido',required = False)
     segundo_nombre = forms.CharField(help_text='Ingrese el segundo apellido',required = False)
     acepta_habeas_data = forms.BooleanField(help_text='Acepta la política de tratamiento de datos personales', required=True)
-    fecha_nacimiento = forms.DateTimeField(widget= DateTimePickerInput(format=FORMAT))
+    fecha_nacimiento = forms.DateTimeField(widget=DateTimePickerInput(format=FORMAT))
     email2 = forms.CharField(initial='')
 
 
