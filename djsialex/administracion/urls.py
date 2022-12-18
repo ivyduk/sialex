@@ -32,7 +32,8 @@ from administracion.views.preinscripciones.adminPreinscripciones import escogerO
 	liberarCuposCursoNivel1
 from .views import *
 
-from administracion.views.DatosEstudiantesView import DatosEstudiantesAPI
+from administracion.views.DatosEstudiantesView import escogerOpcionReportes,reporteFechaCreate,descargarReporteHermes, \
+	DatosEstudiantesAPI
 
 from rest_framework.routers import DefaultRouter
 
@@ -382,6 +383,11 @@ url(r'^docente/cursos/calificaciones-listas/(?P<grupoacademico>[-\w]+)', listado
 	url(r'^administracion/examen_clasificacion/listado/$', PreinscritosExamenCalificacionlistView.as_view(), name='examen-list'),
 	url(r'^administracion/preinscripciones/curso_periodo/exportar/$',
 		descargarListaPreinscritosPeriodo, name='preinscritos-periodo-csv'),
+
+    #Reporte HERMES
+	path('administracion/reportes/opciones/', escogerOpcionReportes, name='reporte_hermes'),
+ 	path('administracion/reportes/fechas/', reporteFechaCreate, name='reportefechas_opcion'),
+	path('administracion/reportes/exportar/', descargarReporteHermes, name='ReporteHermes-csv'),
 
 ]
 

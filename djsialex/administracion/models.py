@@ -961,7 +961,8 @@ class Matricula(models.Model):
     grupo = models.ForeignKey(GrupoAcademico, on_delete=models.PROTECT)
     calificacionFinal = models.FloatField(default=0.0)
     total_fallas = models.IntegerField(default=0)
-    estado_matricula = models.IntegerField(choices=ESTADOS_ACADEMICOS_MATRICULA, default=1);
+    estado_matricula = models.IntegerField(choices=ESTADOS_ACADEMICOS_MATRICULA, default=1)
+    preinscripcion_generada_id = models.ForeignKey(Preinscripcion, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         """
@@ -1773,6 +1774,7 @@ class Question(models.Model):
         msg += "{}".format(self.get_clean_choices())
         return msg
 
+
 class Response(models.Model):
 
     """
@@ -1805,6 +1807,7 @@ class Response(models.Model):
         msg = "Diligenciamiento a {} por {}".format(self.survey, self.user)
         msg += " en {}".format(self.created)
         return msg
+
 
 class Answer(models.Model):
 
@@ -1904,6 +1907,33 @@ class Encuesta(Survey):
         return "{} - {} - {}".format(
             self.asociada.periodo.alias, self.asociada.plantilla.name, self.programa.nombre,
         )
+
+
+class ReporteHermesConfiguracion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    fecha_inicio = models.DateField(default=timezone.now, help_text="Fecha Inicio del Reporte HERMES")
+    fecha_final = models.DateField(default=timezone.now, help_text="Fecha Final del Reporte HERMES")
+
+    class Meta:
+        verbose_name = "reporte_hermes_configuracion"
+        verbose_name_plural = "reporte_hermes_configuraciones"
+
+    def get_absolute_url(self):
+        """
+         Devuelve la url para acceder a una instancia particular de Periodo.
+         """
+        return reverse('reporte_hermes')
+
+    def save(self, *args, **kwargs):
+        self.__class__.objects.exclude(id=self.id).delete()
+        super(ReporteHermesConfiguracion, self).save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        try:
+            return cls.objects.get()
+        except cls.DoesNotExist:
+            return cls()
 
 
 auditlog.register(Profile)

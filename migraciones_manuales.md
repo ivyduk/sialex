@@ -1,3 +1,25 @@
+### version 1.9.0
+
+``` sql
+CREATE TABLE administracion_reportehermesconfiguracion (
+	id uuid PRIMARY KEY NOT NULL,
+	fecha_inicio DATE,
+	fecha_final DATE,
+);
+```
+
+``` sql
+ALTER TABLE administracion_matricula ADD COLUMN preinscripcion_generada_id integer;
+```
+
+``` sql
+ALTER TABLE administracion_reportehermesconfiguracion OWNER TO sialex;
+```
+
+``` sql
+INSERT INTO administracion_reportehermesconfiguracion (id, fecha_inicio, fecha_final) VALUES ('0e2b51a1-9646-423d-8796-75c18fb067db'::uuid, '2022-01-01'::date, '2022-12-31'::date)
+```
+
 ### version 1.8.0
 
 ``` sql
