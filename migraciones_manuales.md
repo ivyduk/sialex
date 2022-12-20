@@ -4,7 +4,7 @@
 CREATE TABLE administracion_reportehermesconfiguracion (
 	id uuid PRIMARY KEY NOT NULL,
 	fecha_inicio DATE,
-	fecha_final DATE,
+	fecha_final DATE
 );
 ```
 
