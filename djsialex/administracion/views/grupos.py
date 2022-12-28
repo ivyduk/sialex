@@ -143,7 +143,7 @@ def get_matriculas_numero(grupo):
 def seleccionOfertaAcademica(request, template_name='administracion/grupos/seleccionar_oferta.html'):
     if request.GET:
         oferta_filtrada = request.GET['oferta']
-        ofertas = OfertaAcademica.objects.filter(periodo_id= request.session["periodo_contextualizado_id"])
+        ofertas = OfertaAcademica.objects.filter(periodo_id=request.session["periodo_contextualizado_id"])
         current_oferta = request.GET['oferta']
         cursos = Curso.objects.filter(oferta_academica_id=oferta_filtrada).order_by("nivel__orden")
         niveles_curso = {}
