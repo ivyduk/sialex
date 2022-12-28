@@ -193,7 +193,7 @@ def preinscripcionView(request):
                                                                                   horario_cupo__curso__nivel__in=niveles,
                                                                                   persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
                 preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(
-                    estado_preinscripcion__in=[1,3,5],
+                    estado_preinscripcion__in=[1, 3, 5],
                     horario_cupo__horario=horario.horario,
                     horario_cupo__curso__oferta_academica__in=oferta_horario,
                     persona=preinscrito,
@@ -498,7 +498,7 @@ def cargar_niveles(request):
 
         matriculas = Matricula.objects.filter(
             estudiante=request.user.profile,
-            grupo__horarioCurso__curso__oferta_academica__periodo__inicio__lte=periodo.inicio-6,
+            grupo__horarioCurso__curso__oferta_academica__periodo__inicio__gte=periodo.inicio-6,
             grupo__horarioCurso__curso__oferta_academica__programa_id=programa_academico_id
         )
         examenes_calificados_vigentes = CalificacionExamen.objects.filter(
