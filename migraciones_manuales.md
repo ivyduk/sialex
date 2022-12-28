@@ -23,6 +23,7 @@ INSERT INTO administracion_reportehermesconfiguracion (id, fecha_inicio, fecha_f
 ``` sql
 ALTER TABLE administracion_programaacademico ADD COLUMN para_ninios boolean;
 ```
+
 ### version 1.8.0
 
 ``` sql
