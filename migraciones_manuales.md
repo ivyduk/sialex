@@ -20,6 +20,9 @@ ALTER TABLE administracion_reportehermesconfiguracion OWNER TO sialex;
 INSERT INTO administracion_reportehermesconfiguracion (id, fecha_inicio, fecha_final) VALUES ('0e2b51a1-9646-423d-8796-75c18fb067db'::uuid, '2022-01-01'::date, '2022-12-31'::date)
 ```
 
+``` sql
+ALTER TABLE administracion_programaacademico ADD COLUMN para_ninios boolean;
+```
 ### version 1.8.0
 
 ``` sql

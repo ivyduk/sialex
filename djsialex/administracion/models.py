@@ -413,6 +413,7 @@ class ProgramaAcademico(models.Model):
     edad_maxima = models.IntegerField(default=1, help_text='Edad máxima permitida')
     nivel = models.ManyToManyField(Nivel, help_text="Seleccione nivel para el Programa Academico")
     activo = models.BooleanField(default=False, help_text='Determina disponibilidad del programa académico')
+    para_ninios = models.BooleanField(default=False, help_text='Determina si es para niños')
     descuento_obligatorio = models.BooleanField(
         default=False,
         help_text='Determina si se requiere selección de descuento obligatorio'
