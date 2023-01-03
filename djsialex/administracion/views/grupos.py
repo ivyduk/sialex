@@ -11,7 +11,7 @@ from administracion.util import CSVWriter
 from administracion.views import BusquedaGenerica
 from ..models import GrupoAcademico, OfertaAcademica, HorarioCurso, Curso, PreinscripcionHorarioCurso, Matricula, \
     DocentesGrupoAcademico, TipoDocente, Docente, Salon, ESTADOS_ACADEMICOS_MATRICULA, getEstadoMatricula, \
-    ContenidoNivel, ContenidoNivelVersion, Nivel
+    ContenidoNivel, ContenidoNivelVersion, Nivel, Preinscripcion
 from django.shortcuts import render, redirect, get_object_or_404
 import json
 from django.views.generic.edit import CreateView
@@ -62,6 +62,11 @@ def guardarGruposYMatriculas(grupos, horario_curso):
                 matricula_encontrada = Matricula.objects.filter(estudiante=preinscrito.persona, grupo=grupo,
                                                                 estado_matricula=7)
                 if not matricula_encontrada and matricula not in matriculas:
+                    preinscripcion_curso = PreinscripcionHorarioCurso.objects.get(horario_cupo_id=horario_curso.id,
+                                                                                  persona_id=preinscrito.persona,
+                                                                                  estado_preinscripcion_in=[1, 3])
+                    preinscripcion = Preinscripcion.objects.get(pk=preinscripcion_curso.id)
+                    matricula.preinscripcion_generada = preinscripcion
                     matriculas.append(matricula)
             try:
                 with transaction.atomic():
@@ -138,7 +143,7 @@ def get_matriculas_numero(grupo):
 def seleccionOfertaAcademica(request, template_name='administracion/grupos/seleccionar_oferta.html'):
     if request.GET:
         oferta_filtrada = request.GET['oferta']
-        ofertas = OfertaAcademica.objects.filter(periodo_id= request.session["periodo_contextualizado_id"])
+        ofertas = OfertaAcademica.objects.filter(periodo_id=request.session["periodo_contextualizado_id"])
         current_oferta = request.GET['oferta']
         cursos = Curso.objects.filter(oferta_academica_id=oferta_filtrada).order_by("nivel__orden")
         niveles_curso = {}

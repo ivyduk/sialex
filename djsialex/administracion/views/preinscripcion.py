@@ -113,6 +113,7 @@ class CancelPreinscripcion(LoginRequiredMixin, DeleteView):
                 pass
         return HttpResponseRedirect(self.get_success_url())
 
+
 class PreinscripcionCursoListView(LoginRequiredMixin, generic.ListView):
     model = PreinscripcionHorarioCurso
     template_name = 'administracion/inscripcion/mis_inscripciones.html'
@@ -125,6 +126,7 @@ class PreinscripcionCursoListView(LoginRequiredMixin, generic.ListView):
         preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(persona=perfil, horario_cupo__curso__oferta_academica__periodo_id=periodo_id)
         preinscripcionesExamen = PreinscripcionExamen.objects.filter(persona=perfil, examen__periodo_id=periodo_id)
         return list(chain(preinscripcionesCurso, preinscripcionesExamen))
+
 
 class PreinscripcionCursoCreate(LoginRequiredMixin, CreateView):
     model = PreinscripcionHorarioCurso
@@ -191,7 +193,7 @@ def preinscripcionView(request):
                                                                                   horario_cupo__curso__nivel__in=niveles,
                                                                                   persona=preinscrito, horario_cupo__curso__oferta_academica__in=ofertas_periodo)
                 preinscripcion_horario_existente = PreinscripcionHorarioCurso.objects.filter(
-                    estado_preinscripcion__in=[1,3,5],
+                    estado_preinscripcion__in=[1, 3, 5],
                     horario_cupo__horario=horario.horario,
                     horario_cupo__curso__oferta_academica__in=oferta_horario,
                     persona=preinscrito,
@@ -496,7 +498,7 @@ def cargar_niveles(request):
 
         matriculas = Matricula.objects.filter(
             estudiante=request.user.profile,
-            grupo__horarioCurso__curso__oferta_academica__periodo__inicio__gte=periodo.inicio-4,
+            grupo__horarioCurso__curso__oferta_academica__periodo__inicio__gte=periodo.inicio-6,
             grupo__horarioCurso__curso__oferta_academica__programa_id=programa_academico_id
         )
         examenes_calificados_vigentes = CalificacionExamen.objects.filter(

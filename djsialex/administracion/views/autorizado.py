@@ -150,7 +150,7 @@ def autorizadoUpdate(request, pk):
         periodo = curso.oferta_academica.periodo
         idioma = curso.nivel.idioma
 
-        programas_academicos = ProgramaAcademico.objects.filter(idioma = idioma.id, activo=True).exclude(pk = programa.id).order_by('nombre').all()
+        programas_academicos = ProgramaAcademico.objects.filter(idioma=idioma.id, activo=True).exclude(pk = programa.id).order_by('nombre').all()
         ofertas_academicas = OfertaAcademica.objects.filter(periodo_id=periodo_id, programa=programa.id).all()
         cursos = Curso.objects.filter(oferta_academica__in=ofertas_academicas).order_by('nombre').all()
         horarios = HorarioCurso.objects.filter(curso_id = curso.id).order_by('nombre').all()

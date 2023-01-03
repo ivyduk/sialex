@@ -14,17 +14,6 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
-"""from sshtunnel import SSHTunnelForwarder
-
-# Connect to a server using the ssh keys. See the sshtunnel documentation for using password authentication
-ssh_tunnel = SSHTunnelForwarder(
-    ('168.176.18.15', 33000),
-    ssh_username='extdevelop',
-    ssh_password="2022/IDuque",
-    remote_bind_address=('localhost', 5432),
-)
-ssh_tunnel.start()"""
-
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

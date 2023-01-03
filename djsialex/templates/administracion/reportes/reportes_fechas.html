@@ -1,0 +1,64 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks profile_tags %}
+
+{% block extrahead %}
+    {{ form.media }}
+    {% load static %}
+{% endblock %}
+
+{% block breadcrumb %}
+    {{ block.super }} » Administración 
+{% endblock %}
+
+{% block administration-title %}
+    <h2 class="title-project">Administrar Fechas Reportes</h2>
+{% endblock %}
+
+{% block form %}
+    <div class="alert alert-info"><h4>Configure las fechas de <b>inicio</b> y de <b>fin</b> para la generacion del reporte</h4></div>
+
+    <div class="row card">
+
+    <form class="form-horizontal" method="post">
+    {% csrf_token %}
+        {% if form.errors %}
+        <!-- Error messaging -->
+        <div id="errors" class="alert alert-warning" role="alert">
+            <div class="inner">
+                <h3>Hay errores en la información ingresada. por favor corrija lo siguiente:</h3>
+                {{ form.non_field_errors }}
+                <ul>
+                    {% for field in form %}
+                        {% if field.errors %}<li class="alert alert-danger">{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!-- /Error messaging -->
+        {% endif %}
+
+        {% for field in form.visible_fields %}
+            <div class="form-group small-margin" id="{{ field.label }}">
+             <label for="{{ field.id_for_label }}" class="col-md-3 control-label">{{ field.label }}
+                <span class="help-block"><i class="glyphicon glyphicon-question-sign" data-toggle="popover" title="{{ field.help_text }}" data-content="{{ field.help_text }}" ></i></span>
+             </label>
+
+            <div class="col-md-9">
+                {{ field|add_class:'form-control' }}
+             </div>
+            </div>
+        {% endfor %}
+
+        <div class="form-group">      
+            <button type="submit" class="btn btn-success btn-sm pull-right">
+                <span class="glyphicon glyphicon-ok-sign"></span> Guardar
+            </button>
+
+            <a href="{% url 'reporte_hermes' %}" >
+               <input type="button" class="btn btn-danger btn-sm pull-right" 
+               value="Cancelar">
+            </a>
+        </div>
+    </form>
+    </div>
+{% endblock %}
