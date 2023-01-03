@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.9.0
+- Agregada fechas para el generación de reporte y servicio web que se integra con Hermes
+- Agregar funcionalidad para exportar en csv el mismo reporte que se envía a través del servicio web con Hermes
+- Agregar campo de especificación de curso de niños en el formulario de programa académico para renderizar diferente el boletín de notas
+- Agregados filtros de programa académico por periodo en creacion de cursos
+
 ## 1.8.0
 - Agregado el forzar formato de dirección de colombia para las direcciones de los usuarios
 - Agregado campo de relación de discapacidad para los datos de los usuarios
