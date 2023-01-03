@@ -1,7 +1,8 @@
 from bootstrap_datepicker_plus import DateTimePickerInput, DatePickerInput
 from django import forms
 
-from ..models import Profile
+from ..models import Profile, Discapacidad
+from ..forms import DireccionField, DireccionSelectorWidget
 
 
 class PersonaAdministracionForm(forms.ModelForm):
@@ -13,12 +14,14 @@ class PersonaAdministracionForm(forms.ModelForm):
         coerce=lambda x: x == 'True',
         choices=((False, 'No'), (True, 'Si'))
     )
+    discapacidad = forms.ModelChoiceField(queryset=Discapacidad.objects.order_by('nombre'), required=False)
+    direccion_sin_formato = DireccionField(widget=DireccionSelectorWidget(), required=False, label='Dirección de residencia')
 
     class Meta:
         model = Profile
         exclude = ['usuario', 'numero_documento','profile_completed', 'cuenta_duplicada',
                    'cuenta_duplicada_desactivada', 'acepta_habeas_data', 'indicativo_celular',
-                   'indicativo_fijo', 'email_confirmed']
+                   'indicativo_fijo', 'email_confirmed', 'direccion_residencia']
 
         FORMAT = '%Y-%m-%d'
 
@@ -33,7 +36,7 @@ class PersonaAdministracionForm(forms.ModelForm):
             'ciudad_nacimiento': 'Ciudad de nacimiento',
             'pais_residencia': 'País de residencia',
             'ciudad_residencia': 'Ciudad de residencia',
-            'direccion_residencia': 'Dirección de residencia actual',
+            'direccion_sin_formato': 'Dirección de residencia actual',
             'telefono_fijo': 'Teléfono fijo',
             'telefono_celular': 'Teléfono celular',
             'tipo_sangre': 'Tipo de sangre',

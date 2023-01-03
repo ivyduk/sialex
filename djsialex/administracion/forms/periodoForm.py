@@ -11,7 +11,8 @@ class PeriodoForm(forms.ModelForm):
         FORMAT = '%Y-%m-%d'
         widgets = {'fecha_inicio': DateTimePickerInput(format=FORMAT),
                    'fecha_final': DateTimePickerInput(format=FORMAT),
-                   'fecha_pendientes': DateTimePickerInput(format=FORMAT)
+                   'fecha_pendientes': DateTimePickerInput(format=FORMAT),
+                   'fecha_calificacion': DateTimePickerInput(format=FORMAT)
                    }
 
     def clean(self):

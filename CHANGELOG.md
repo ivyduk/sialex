@@ -1,5 +1,23 @@
 # Change Log
 
+## 1.9.0
+- Agregada fechas para el generación de reporte y servicio web que se integra con Hermes
+- Agregar funcionalidad para exportar en csv el mismo reporte que se envía a través del servicio web con Hermes
+- Agregar campo de especificación de curso de niños en el formulario de programa académico para renderizar diferente el boletín de notas
+- Agregados filtros de programa académico por periodo en creacion de cursos
+
+## 1.8.0
+- Agregado el forzar formato de dirección de colombia para las direcciones de los usuarios
+- Agregado campo de relación de discapacidad para los datos de los usuarios
+- Se arregló Bug en la asignación de docente titular y docente de clase especializada
+- Se fijaron las 3 primeras columnas en la vista del docente para agregar calificaciones
+- Se agregó función para actualizar el documento del estudiantes desde la vista de formalización 
+para poner estudiante en pendiente después de formalizado
+- Se agregó función para facilitar que la planilla de notas se pueda descargar en PDF
+- Se agrego fecha en perido para permitir o no la publicacion de notas
+- Se ajustó formato del boletín exportado a pdf de los estudiantes
+
+
 ## 1.7.0
 - Agregados fecha inicio y fecha final en periodo Academico
 - Agregados campos de fecha inicio, fecha final y enlace virtual en grupo academico

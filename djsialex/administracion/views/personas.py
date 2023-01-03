@@ -20,6 +20,7 @@ from ..models import Profile, PersonaContacto, Preinscripcion, PreinscripcionExa
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
+
 class PersonaDetailView(LoginRequiredMixin,DetailView):
 
     model = Profile
@@ -70,6 +71,7 @@ def personas_list(request):
         personas = paginator.page(paginator.num_pages)
 
     return render(request, 'administracion/persona/persona_list.html', {'object_list': personas, 'total': len(object_list)})
+
 
 class EditarPersona(LoginRequiredMixin, UpdateView):
     model = Profile
@@ -154,6 +156,18 @@ class EditarPersonaDocumentoEntregado(LoginRequiredMixin, UpdateView):
     template_name = 'administracion/persona/persona_documento_entregado_form.html'
     fields = ["documento_identificacion_entregado"]
     success_message = 'Actualizados documentos de identificación.'
+
+    def post(self, request, **kwargs):
+        self.object = self.get_object()
+        if not request.POST.get('documento_identificacion_entregado'):
+            preinscripcion_id = self.kwargs["preinscripcion"]
+            precurso = Preinscripcion.objects.filter(id=preinscripcion_id).first()
+
+            if precurso.estado_preinscripcion == 1:
+                precurso.estado_preinscripcion = 3
+                precurso.save()
+
+        return super(EditarPersonaDocumentoEntregado, self).post(request, **kwargs)
 
     def get_success_url(self, *args, **kwargs):
         preinscripcion_id = self.kwargs["preinscripcion"]

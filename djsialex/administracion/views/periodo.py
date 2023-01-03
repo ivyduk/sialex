@@ -35,7 +35,8 @@ class PeriodoCreate(LoginRequiredMixin, CreateView):
     FORMAT = '%Y-%m-%d'
     widgets = {'fecha_inicio': DateTimePickerInput(format=FORMAT),
                'fecha_final': DateTimePickerInput(format=FORMAT),
-               'fecha_pendientes': DateTimePickerInput(format=FORMAT)
+               'fecha_pendientes': DateTimePickerInput(format=FORMAT),
+               'fecha_calificacion': DateTimePickerInput(format=FORMAT)
                }
 
     def form_valid(self, form):
@@ -58,7 +59,8 @@ class PeriodoUpdate(LoginRequiredMixin, UpdateView):
     FORMAT = '%Y-%m-%d'
     widgets = {'fecha_inicio': DateTimePickerInput(format=FORMAT),
                'fecha_final': DateTimePickerInput(format=FORMAT),
-               'fecha_pendientes': DateTimePickerInput(format=FORMAT)
+               'fecha_pendientes': DateTimePickerInput(format=FORMAT),
+               'fecha_calificacion': DateTimePickerInput(format=FORMAT)
                }
 
 

@@ -17,13 +17,18 @@ class CursoCreate(LoginRequiredMixin, CreateView):
     form_class = CursoModelForm
     success_url = None
 
+    def get_form_kwargs(self):
+        kwargs = super(CursoCreate, self).get_form_kwargs()
+        kwargs['periodo_contextualizado_id'] = self.request.session["periodo_contextualizado_id"]
+        return kwargs
+
     def get_context_data(self, **kwargs):
         data = super(CursoCreate, self).get_context_data(**kwargs)
         if self.request.POST:
             data['cursoForm'] = data['form']
             data['formset'] = HorarioCursoFormset(self.request.POST)
         else:
-            data['cursoForm'] = self.form_class
+            data['cursoForm'] = data['form']
             data['formset'] = HorarioCursoFormset()
         return data
 
@@ -54,13 +59,20 @@ class CursoCreate(LoginRequiredMixin, CreateView):
             except IntegrityError:
                 messages.warning(self.request, 'Hubo un error al guardar el curso, revise que no exista el curso y que los campos estén correctamente diligenciados')
                 return redirect(reverse('curso_create'))
+
     def get_success_url(self):
         return reverse_lazy('curso-detail', kwargs={'pk': self.object.id})
+
 
 class CursoUpdate(LoginRequiredMixin, UpdateView):
     model = Curso
     template_name = 'administracion/curso/curso_horarios_form.html'
     form_class = CursoModelForm
+
+    def get_form_kwargs(self):
+        kwargs = super(CursoUpdate, self).get_form_kwargs()
+        kwargs['periodo_contextualizado_id'] = self.request.session["periodo_contextualizado_id"]
+        return kwargs
 
     def get_context_data(self, **kwargs):
         data = super(CursoUpdate, self).get_context_data(**kwargs)
@@ -99,8 +111,10 @@ class CursoUpdate(LoginRequiredMixin, UpdateView):
             except IntegrityError:
                 messages.warning(self.request, 'Hubo un error al guardar el curso, revise que no exista el curso y que los campos estén correctamente diligenciados')
                 return redirect(reverse('curso_update', kwargs={'pk': self.object.id}))
+
     def get_success_url(self):
         return reverse_lazy('curso-detail', kwargs={'pk': self.object.id})
+
 
 class CursoListView(LoginRequiredMixin, generic.ListView):
     model = Curso

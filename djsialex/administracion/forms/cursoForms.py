@@ -23,8 +23,9 @@ HorarioCursoFormset = inlineformset_factory(
     Curso, HorarioCurso, form=HorarioCursoForm,
     fields=['horario', 'cupo_inicial', 'cupo_autorizados'],extra=1, can_delete=True)
 
+
 class CursoModelForm(forms.ModelForm):
-    oferta_academica = forms.ModelChoiceField(queryset=OfertaAcademica.objects.all().order_by('nombre'),widget=forms.Select(attrs={"class" : "form-control"}))
+    oferta_academica = forms.ModelChoiceField(queryset=OfertaAcademica.objects.all().order_by('idioma__nombre', 'orden'))
     nivel = forms.ModelChoiceField(queryset=Nivel.objects.all().order_by('idioma__nombre', 'orden'), widget=forms.Select(attrs={"class" : "form-control"}))
     conjunto_notas = forms.ModelChoiceField(queryset=ConjuntoNotas.objects.all(), widget=forms.Select(attrs={"class" : "form-control"}))
 
@@ -36,3 +37,13 @@ class CursoModelForm(forms.ModelForm):
             'nivel' : 'Nivel',
             'conjunto_notas' : 'Conjunto de Notas para este nivel'
         }
+
+    def __init__(self, *args, **kwargs):
+        self.periodo_contextualizado_id = kwargs.pop('periodo_contextualizado_id', None)
+        super(CursoModelForm, self).__init__(*args, **kwargs)
+        self.fields['oferta_academica'] = forms.ModelChoiceField(
+            queryset=OfertaAcademica.objects.filter(
+                periodo_id=self.periodo_contextualizado_id
+            ).all().order_by('nombre'),
+            widget=forms.Select(attrs={"class": "form-control"})
+        )

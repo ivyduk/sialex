@@ -4,6 +4,10 @@ from administracion.enums import ESTADOS_ACADEMICOS_MATRICULA, COHORTE
 
 register = template.Library()
 
+@register.filter(name='as_dict')
+def as_dict(value):
+    return value.__dict__
+
 @register.filter(name='has_group')
 def has_group(user, group_name):
      return user.groups.filter(name=group_name).exists()

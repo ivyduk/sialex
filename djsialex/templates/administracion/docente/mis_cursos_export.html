@@ -1,0 +1,142 @@
+<!doctype html>
+
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>SIALEX-Reporte PDF</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+    integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+  <style>
+    @page {
+      size: letter landscape;
+      margin: 1.0cm 1.5cm 3.5cm 1.5cm;
+    }
+
+    body {
+
+      padding: 5px 10px 0px 10px;
+      text-align: center;
+      background: #fff;
+      color: black;
+      font-size: 9px;
+      font-family: 'Times New Roman', serif;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  {% load profile_tags %}
+  {% block content %}
+
+  <div>
+    <table class="table" border="1px" width="100%">
+      <tr>
+        <th rowspan="3"><img style="display:fix;"
+            src="https://s3.amazonaws.com/s3.timetoast.com/public/uploads/photo/7474928/image/97da1181a39ac673791b6c9fc00791d6"
+            alt="unal logo"></th>
+        <th colspan="4">
+          PROGRAMA DE EXTENSION Y EDUCACION CONTINUA - DEPARTAMENTO DE LENGUAS EXTRANJERAS
+        </th>
+      </tr>
+
+      <tr>
+        <th colspan="4">PLANILLA DE ASISTENCIA</th>
+      </tr>
+
+      <tr>
+        <th colspan="1">Codigo: {{ grupo.codigo }}</th>
+        <th colspan="1">Version: 1.0</th>
+        <th colspan="1">Fecha de Entrega: {{ fecha }}</th>
+        <th colspan="1">PAGINA 1 DE 1</th>
+      </tr>
+    </table>
+  </div>
+
+  <br>
+
+
+  <table class="table" border="1px" width="100%">
+    <tr>
+      <th colspan="2">Curso:</th>
+      <td colspan="3">{{ grupo.horarioCurso.curso.nombre }}</td>
+      <th colspan="2">Docente:</th>
+      <td colspan="3">
+        {% for docentePdf in docentes %}
+        {{ docentePdf.docente.persona.getNombreCompleto|upper }}<br>
+        {% endfor %}
+      </td>
+      <th colspan="2">Aula:</th>
+      <td colspan="3">
+        {% for salon in salones %}
+        Edificio: {{ salon.edificio.nombre }} - Salón: {{ salon.nombre }}
+        {% endfor %}</td>
+    </tr>
+
+    <tr>
+      <th colspan="2">Programa:</th>
+      <td colspan="3">{{ grupo.horarioCurso.curso.oferta_academica.programa.nombre }}</td>
+      <th colspan="2">Modalidad:</th>
+      <td colspan="3">{{ grupo.horarioCurso.curso.oferta_academica.periodo.periodicidad }}</td>
+      <th colspan="2">Horario:</th>
+      <td colspan="3">{{ grupo.horarioCurso.horario }}</td>
+    </tr>
+
+    <tr>
+      <th colspan="2">Grupo:</th>
+      <td colspan="3">{{ grupo.nombre }}</td>
+      <th colspan="2">Periodo:</th>
+      <td colspan="3">{{ grupo.horarioCurso.curso.oferta_academica.periodo.nombre }}</td>
+      <th rowspan="2" colspan="2">Horas Dictadas:</th>
+      <td rowspan="2" colspan="3">{{ niveles.intensidad_horaria }}</td>
+    </tr>
+
+    <tr>
+      <th colspan="2">Fecha:</th>
+      <td colspan="3">{{ grupo.fecha_inicio|date:"d/m/Y" }}</td>
+      <th colspan="2">Fecha Fin:</th>
+      <td colspan="3">{{ grupo.fecha_final|date:"d/m/Y" }}</td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table class="table" border="1px" width="95%" , align="center">
+    <thead class="table-head">
+      <tr>
+        <th scope="col" width = "5%">No.</th>
+        <th scope="col" width = "20%">Documento Estudiante</th>
+        <th scope="col" width = "30%">Nombre Estudiante</th>
+        <th scope="col" width = "15%">Nota Final</th>
+        <th scope="col" width = "15%">Inasistencias</th>
+        <th scope="col" width = "15%">Observaciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for matricula in matriculas %}
+      <tr>
+        <input type="hidden" id="matriculaId" name="matriculaId" value="{{ matricula.id }}" class="matricula">
+        <td>{{ forloop.counter }}</td>
+        <td>{{ matricula.estudiante.numero_documento }}</td>
+        <td>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </td>
+        <td>{{ matricula.calificacionFinal }}</td>
+        <td>{{ inasistencias_matricula|get_item:matricula.id|get_item:'cantidad_fallas' }}</td>
+          <td>
+              {%  for observacion in observaciones_matricula|get_item:matricula.id %}
+              - {{ observacion }} <br>
+              {% endfor %}
+              </td>
+      </tr>
+      {% endfor %}
+  </table>
+
+  {% endblock content %}
+
+</body>
+
+</html>

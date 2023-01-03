@@ -51,19 +51,19 @@
 
     {% if matriculas %}
         <div class="table-responsive">
-        <table class="table table-striped table-border size-text-table">
+        <table class="table bg-table table-border size-text-table">
             <thead class="table-head">
             <tr>
-                <th scope="col" width="5%">Nº</th>
-                <th scope="col">Documento</th>
-                <th scope="col">Nombre estudiante</th>
+                <th class="sticky-head first-col" width="5%">Nº</th>
+                <th class="sticky-head second-col">Documento</th>
+                <th class="sticky-head third-col">Nombre estudiante</th>
                 {% for nota in notas %}
                     <th>{{ nota.nombre }}</th>
                 {% endfor %}
                 <th scope="col">Nota definitiva</th>
             </tr>
             <tr>
-                <th scope="col" colspan="3"></th>
+                <th class="sticky-head note-col" colspan="3"></th>
                 {% for nota in notas %}
                     <th>{{ nota.ponderacion }}%</th>
                 {% endfor %}
@@ -79,9 +79,9 @@
               {% endif %}
             <tr class="col-calificacion">
                 <input type="hidden" id="matriculaId" name="matriculaId" value="{{ matricula.id }}" class="matricula">
-                <td class="{% if matricula.estado_preinscripcion == 3 %}warning{% endif %}">{{ forloop.counter }}</td>
-                <td><b>{{ matricula.estudiante.numero_documento }}</b></td>
-                <td><b>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </b></td>
+                <td class="sticky-col first-col">{{ forloop.counter }}</td>
+                <td class="sticky-col second-col"><b>{{ matricula.estudiante.numero_documento }}</b></td>
+                <td class="sticky-col third-col"><b>{{ matricula.estudiante.getApellidos | upper }} {{ matricula.estudiante.getNombres | upper}} </b></td>
                 {% for nota in notas %}
                     <td>
                         <input type="hidden" id="notaId" name="notaId" value="{{ nota.id }}" class="nota">
@@ -94,13 +94,13 @@
                         {% if calificaciones|length == 0 %}
                             <input type="text" placeholder="0.0" name="nota-" id="nota-{{ nota.id }}_{{ matricula.id }}"  size="4"
                                 value="0.0" class="input-nota"
-                                   {% if not es_administrador and tipos_docente and nota.tipo_nota not in tipos_docente %}
+                                   {% if not es_administrador and tipos_docente and nota.tipo_nota not in tipos_docente and tipo_general.id not in tipos_docente %}
                                      disabled
                                    {% endif %}>
                         {% else %}
                             <input type="text" placeholder="0.0" name="nota-" id="nota-{{ nota.id }}_{{ matricula.id }}" class="input-nota" size="4"
                                 value="{{ calificaciones|get_item:nota }}"
-                                   {% if not es_administrador and tipos_docente and nota.tipo_nota not in tipos_docente %}
+                                   {% if not es_administrador and tipos_docente and nota.tipo_nota not in tipos_docente and tipo_general.id not in tipos_docente %}
                                      disabled
                                    {% endif %}>
                         {% endif %}
@@ -130,9 +130,55 @@
     {% endif %}
 
     <style>
+            .sticky-head {
+           position: -webkit-sticky;
+           position: sticky;
+           background-color: #7bcac9;
+
+        }
+
+        .sticky-col {
+            position: -webkit-sticky;
+            position: sticky;
+            background-color: whitesmoke;
+        }
+
+        .first-col {
+           width: 50px;
+           min-width: 50px;
+           max-width: 50px;
+           left: 0px;
+        }
+
+        .second-col {
+           width: 100px;
+           min-width: 100px;
+           max-width: 100px;
+           left: 50px;
+        }
+
+        .third-col {
+           width: 180px;
+           min-width: 180px;
+           max-width: 180px;
+           left: 150px;
+        }
+
+        .note-col {
+            width: 330px;
+            min-width: 330px;
+            max-width: 330px;
+            left: 0px;
+        }
+
         .size-text-table {
             font-size: 14px;
         }
+
+        .bg-table{
+            background-color: whitesmoke;
+        }
+
         .input-nota{
             width: 60px;
         }

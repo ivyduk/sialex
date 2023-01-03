@@ -19,7 +19,7 @@ from administracion.views.calificaciones_curso.fallasAsistencia import FallaAsis
 from administracion.views.calificarExamenClasificacion import calificarExamen, seleccionarIdiomaExamen
 from administracion.views.calificaciones_curso.notasCurso import cursosAsociadosList, \
 	listadoCalificacionesPorGrupo, calificarGrupo, listadoEstudiantesPorGrupo, actualizarEstadoMatriculas, \
-	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos
+	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos, listadoCalificacionesPlanilla
 from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, \
 	cursoCalificacionesDetallePDF, misCursosList
 from administracion.views.preinscripcionExamenClasificacion import preinscripcionExamenView, \
@@ -32,7 +32,8 @@ from administracion.views.preinscripciones.adminPreinscripciones import escogerO
 	liberarCuposCursoNivel1
 from .views import *
 
-from administracion.views.DatosEstudiantesView import DatosEstudiantesAPI
+from administracion.views.DatosEstudiantesView import escogerOpcionReportes,reporteFechaCreate,descargarReporteHermes, \
+	DatosEstudiantesAPI
 
 from rest_framework.routers import DefaultRouter
 
@@ -300,6 +301,7 @@ urlpatterns = [
 	url(r'^docente/cursos/mis-cursos', cursosAsociadosList, name='mis-cursos'),
     url(r'^docente/cursos/mis-estudiantes/(?P<grupoacademico>[-\w]+)', listadoEstudiantesPorGrupo, name='mis-estudiantes'),
     url(r'^docente/cursos/calificaciones-estudiantes/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPorGrupo, name='calificaciones-estudiantes'),
+url(r'^docente/cursos/calificaciones-listas/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPlanilla, name='calificaciones-listas'),
 	url(r'^docente/cursos/calificar-grupo/(?P<grupoacademico>[-\w]+)', calificarGrupo, name='calificar-grupo'),
 	url(r'^docente/cursos/actualizar-estados-todos', actualizarEstadoMatriculasGrupos, name='actualizar-estados-todos'),
 	url(r'^docente/cursos/actualizar-estados/(?P<grupoacademico>[-\w]+)', actualizarEstadoMatriculas,name='actualizar-estados'),
@@ -381,6 +383,11 @@ urlpatterns = [
 	url(r'^administracion/examen_clasificacion/listado/$', PreinscritosExamenCalificacionlistView.as_view(), name='examen-list'),
 	url(r'^administracion/preinscripciones/curso_periodo/exportar/$',
 		descargarListaPreinscritosPeriodo, name='preinscritos-periodo-csv'),
+
+    #Reporte HERMES
+	path('administracion/reportes/opciones/', escogerOpcionReportes, name='reporte_hermes'),
+ 	path('administracion/reportes/fechas/', reporteFechaCreate, name='reportefechas_opcion'),
+	path('administracion/reportes/exportar/', descargarReporteHermes, name='ReporteHermes-csv'),
 
 ]
 

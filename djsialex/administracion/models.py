@@ -274,6 +274,7 @@ class Nivel(models.Model):
             self.mensaje_formalizacion = None
         super(Nivel, self).save(*args, **kwargs)
 
+
 class EPS(models.Model):
     """
        Modelo que representa una EPS
@@ -368,6 +369,7 @@ class Periodo(models.Model):
     fecha_inicio = models.DateField(default=timezone.now, help_text="Fecha Inicio del periodo")
     fecha_final = models.DateField(default=timezone.now, help_text="Fecha Final del periodo")
     fecha_pendientes = models.DateField(default=timezone.now, help_text="Fecha Para envio de pendientes")
+    fecha_calificacion = models.DateField(default=timezone.now, help_text="Fecha Calificacion del periodo")
 
     class Meta:
         verbose_name = "Periodo"
@@ -411,6 +413,7 @@ class ProgramaAcademico(models.Model):
     edad_maxima = models.IntegerField(default=1, help_text='Edad máxima permitida')
     nivel = models.ManyToManyField(Nivel, help_text="Seleccione nivel para el Programa Academico")
     activo = models.BooleanField(default=False, help_text='Determina disponibilidad del programa académico')
+    para_ninios = models.BooleanField(default=False, help_text='Determina si es para niños')
     descuento_obligatorio = models.BooleanField(
         default=False,
         help_text='Determina si se requiere selección de descuento obligatorio'
@@ -670,6 +673,18 @@ class TipoDocumentoIdentidad(models.Model):
         return self.nombre
 
 
+class Discapacidad(models.Model):
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        verbose_name = "Discapacidad"
+        verbose_name_plural = "Discapacidades"
+
+    id = models.AutoField(primary_key=True, editable=False)
+    nombre = models.CharField(max_length=200)
+
+
 class Profile(models.Model):
     # Para el registro se permiten campos nulos, en la activación se validan los demás campos
     # en un forms.py especifico para el perfil del usuario
@@ -685,7 +700,7 @@ class Profile(models.Model):
 
     ciudad_expedicion_documento = models.ForeignKey(Ciudad, on_delete=models.CASCADE, null=False,
                                                     related_name='profile_ciudad_expedicion_documento', default=107)
-    genero_sexual = models.IntegerField(verbose_name='Sexo biológico',choices=GENERO_SEXUAL, null=False, default=2)
+    genero_sexual = models.IntegerField(verbose_name='Sexo biológico',  choices=GENERO_SEXUAL, null=False, default=2)
 
     fecha_nacimiento = models.DateField(null=True, blank=False)
     ciudad_nacimiento = models.ForeignKey(Ciudad, on_delete=models.CASCADE, null=False,
@@ -694,6 +709,11 @@ class Profile(models.Model):
     ciudad_residencia = models.ForeignKey(Ciudad, on_delete=models.CASCADE, null=False,
                                           related_name='profile_ciudad_residencia', default=107)
     direccion_residencia = models.CharField(
+        max_length=1000,
+        null=False,
+    )
+
+    direccion_sin_formato = models.CharField(
         max_length=1000,
         null=False,
     )
@@ -717,6 +737,8 @@ class Profile(models.Model):
     tipo_vinculacion_un = models.IntegerField(choices=TIPOS_VINCULACION, null=False, default=7) #Ninguna
     nivel_formacion = models.IntegerField(choices=NIVEL_FORMACION, null=False, default=1) #No Aplica
     estado_civil = models.IntegerField(choices=ESTADO_CIVIL, null=False, default=7) #Ninguna
+    discapacidad = models.ForeignKey(Discapacidad, on_delete=models.CASCADE, null=True,
+                                          related_name='profile_discapacidad', default=None)
 
     class Meta:
         verbose_name = "Persona"
@@ -773,6 +795,10 @@ class Profile(models.Model):
     	"""
         return self.usuario.username + ' ' + self.primer_nombre + ' ' + self.primer_apellido
 
+    def save(self, *args, **kwargs):
+        self.direccion_residencia = self.direccion_sin_formato.replace('|', ' ')
+        super(Profile, self).save(*args, **kwargs)
+
 
 class PersonaContacto(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -828,6 +854,9 @@ class DocumentoIdentidad(models.Model):
 class TipoDocente(models.Model):
     id = models.AutoField(primary_key=True, editable=False)
     tipo = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.tipo
 
 
 class Docente(models.Model):
@@ -933,7 +962,8 @@ class Matricula(models.Model):
     grupo = models.ForeignKey(GrupoAcademico, on_delete=models.PROTECT)
     calificacionFinal = models.FloatField(default=0.0)
     total_fallas = models.IntegerField(default=0)
-    estado_matricula = models.IntegerField(choices=ESTADOS_ACADEMICOS_MATRICULA, default=1);
+    estado_matricula = models.IntegerField(choices=ESTADOS_ACADEMICOS_MATRICULA, default=1)
+    preinscripcion_generada = models.ForeignKey(Preinscripcion, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         """
@@ -1745,6 +1775,7 @@ class Question(models.Model):
         msg += "{}".format(self.get_clean_choices())
         return msg
 
+
 class Response(models.Model):
 
     """
@@ -1777,6 +1808,7 @@ class Response(models.Model):
         msg = "Diligenciamiento a {} por {}".format(self.survey, self.user)
         msg += " en {}".format(self.created)
         return msg
+
 
 class Answer(models.Model):
 
@@ -1876,6 +1908,33 @@ class Encuesta(Survey):
         return "{} - {} - {}".format(
             self.asociada.periodo.alias, self.asociada.plantilla.name, self.programa.nombre,
         )
+
+
+class ReporteHermesConfiguracion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    fecha_inicio = models.DateField(default=timezone.now, help_text="Fecha Inicio del Reporte HERMES")
+    fecha_final = models.DateField(default=timezone.now, help_text="Fecha Final del Reporte HERMES")
+
+    class Meta:
+        verbose_name = "reporte_hermes_configuracion"
+        verbose_name_plural = "reporte_hermes_configuraciones"
+
+    def get_absolute_url(self):
+        """
+         Devuelve la url para acceder a una instancia particular de Periodo.
+         """
+        return reverse('reporte_hermes')
+
+    def save(self, *args, **kwargs):
+        self.__class__.objects.exclude(id=self.id).delete()
+        super(ReporteHermesConfiguracion, self).save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        try:
+            return cls.objects.get()
+        except cls.DoesNotExist:
+            return cls()
 
 
 auditlog.register(Profile)
