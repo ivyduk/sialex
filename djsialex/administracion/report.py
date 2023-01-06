@@ -28,11 +28,10 @@ from django.http import HttpResponse
 def funcion(report):
     d_matricula = report['matricula']
     d_grupo = d_matricula.grupo
+    ninios = d_matricula.grupo.horarioCurso.curso.oferta_academica.programa.para_ninios
 
     d_estudiante = d_matricula.estudiante
     d_calificaciones = report['calificaciones']
-
-    print()
 
     nombre_estudiante = d_estudiante.primer_nombre + " " + d_estudiante.segundo_nombre + " " + d_estudiante.primer_apellido + " " + d_estudiante.segundo_apellido
 
@@ -152,10 +151,16 @@ def funcion(report):
     summary_table = Table(summary_data, colWidths=[6.95 * cm, 6.95 * cm])
     equival_label = Table(equival_labl, colWidths=[4 * cm])
     equival_table = Table(equival_data, colWidths=[2 * cm, 2 * cm])
+    
+    if ninios == True:
+        tabla_data = [
+            [records_table, [equival_label, equival_table]],
+        ]
+    else:
+        tabla_data = [
+            [records_table],
+        ]
 
-    tabla_data = [
-        [records_table, [equival_label, equival_table]],
-    ]
     data_table = Table(tabla_data, colWidths=[10 * cm, 6 * cm])
 
     simple_style = TableStyle([
