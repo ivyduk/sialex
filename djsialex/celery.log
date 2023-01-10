@@ -1,0 +1,114 @@
+[2023-01-09 04:23:13,228: INFO/MainProcess] Connected to redis://localhost:6379//
+[2023-01-09 04:23:13,236: INFO/MainProcess] mingle: searching for neighbors
+[2023-01-09 04:23:14,252: INFO/MainProcess] mingle: all alone
+[2023-01-09 04:23:14,282: WARNING/MainProcess] /home/webdev/webdeveloper/ve-sialex/lib/python3.6/site-packages/celery/fixups/django.py:203: UserWarning: Using settings.DEBUG leads to a memory
+            leak, never use this setting in production environments!
+  leak, never use this setting in production environments!''')
+[2023-01-09 04:23:14,282: INFO/MainProcess] celery@webdev-VirtualBox ready.
+[2023-01-09 04:23:14,370: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[34b0c45e-36b5-417a-985b-d993ee896ad9]  
+[2023-01-09 04:23:14,372: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[0438c69c-acf5-407a-9c96-6ad3fc64f8da]  
+[2023-01-09 04:23:14,373: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:14,377: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[41e231a0-f489-4b70-96db-e26a8d54173b]  
+[2023-01-09 04:23:14,385: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[04097e76-a252-499a-b73d-c78a5e5de8d6]  
+[2023-01-09 04:23:14,387: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[2dbec7ca-afac-480f-ab94-05e298dd04fe]  
+[2023-01-09 04:23:15,041: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:17,615: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[34b0c45e-36b5-417a-985b-d993ee896ad9] succeeded in 3.2425468669998736s: None
+[2023-01-09 04:23:17,618: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:18,288: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[711dbca8-d0d1-40a5-8720-e67d764226f6]  
+[2023-01-09 04:23:18,396: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:20,889: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[0438c69c-acf5-407a-9c96-6ad3fc64f8da] succeeded in 3.2701596320002864s: None
+[2023-01-09 04:23:20,894: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:21,581: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:22,293: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[bd27f193-1692-4992-aebd-b944693eb405]  
+[2023-01-09 04:23:24,010: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[41e231a0-f489-4b70-96db-e26a8d54173b] succeeded in 3.1159854959996665s: None
+[2023-01-09 04:23:24,013: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:24,262: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[f495df91-e1e3-4833-95e1-88a5eb3137c8]  
+[2023-01-09 04:23:24,845: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:27,233: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[04097e76-a252-499a-b73d-c78a5e5de8d6] succeeded in 3.220466629999464s: None
+[2023-01-09 04:23:27,237: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:27,914: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:28,307: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[265223e7-ddd1-4510-9c33-e2a2eb855102]  
+[2023-01-09 04:23:30,342: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[2dbec7ca-afac-480f-ab94-05e298dd04fe] succeeded in 3.1052905500000634s: None
+[2023-01-09 04:23:30,345: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:31,154: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:33,563: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[711dbca8-d0d1-40a5-8720-e67d764226f6] succeeded in 3.2172999000003983s: None
+[2023-01-09 04:23:33,568: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:34,257: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:36,660: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[bd27f193-1692-4992-aebd-b944693eb405] succeeded in 3.091421361999892s: None
+[2023-01-09 04:23:36,663: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:37,452: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:39,870: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[f495df91-e1e3-4833-95e1-88a5eb3137c8] succeeded in 3.2067958910001835s: None
+[2023-01-09 04:23:39,872: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 04:23:40,547: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 04:23:42,953: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[265223e7-ddd1-4510-9c33-e2a2eb855102] succeeded in 3.081244663999314s: None
+[2023-01-09 22:18:39,294: INFO/MainProcess] Connected to redis://localhost:6379//
+[2023-01-09 22:18:39,378: INFO/MainProcess] mingle: searching for neighbors
+[2023-01-09 22:18:40,496: INFO/MainProcess] mingle: all alone
+[2023-01-09 22:18:40,581: WARNING/MainProcess] /home/webdev/webdeveloper/ve-sialex/lib/python3.6/site-packages/celery/fixups/django.py:203: UserWarning: Using settings.DEBUG leads to a memory
+            leak, never use this setting in production environments!
+  leak, never use this setting in production environments!''')
+[2023-01-09 22:18:40,581: INFO/MainProcess] celery@webdev-VirtualBox ready.
+[2023-01-09 22:20:01,827: INFO/MainProcess] Connected to redis://localhost:6379//
+[2023-01-09 22:20:01,887: INFO/MainProcess] mingle: searching for neighbors
+[2023-01-09 22:20:02,946: INFO/MainProcess] mingle: all alone
+[2023-01-09 22:20:03,004: WARNING/MainProcess] /home/webdev/webdeveloper/ve-sialex/lib/python3.6/site-packages/celery/fixups/django.py:203: UserWarning: Using settings.DEBUG leads to a memory
+            leak, never use this setting in production environments!
+  leak, never use this setting in production environments!''')
+[2023-01-09 22:20:03,004: INFO/MainProcess] celery@webdev-VirtualBox ready.
+[2023-01-09 22:23:28,984: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[9cdc337b-6331-4c40-bca4-d4dd6784705c]  
+[2023-01-09 22:23:28,987: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:23:29,687: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:23:32,585: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[9cdc337b-6331-4c40-bca4-d4dd6784705c] succeeded in 3.5982011240002976s: None
+[2023-01-09 22:24:00,023: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[75e7dffb-f2be-46a4-afd1-c4e23ce82ab5]  
+[2023-01-09 22:24:00,024: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:24:00,892: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:24:02,339: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[75e7dffb-f2be-46a4-afd1-c4e23ce82ab5] succeeded in 2.3150670180002635s: None
+[2023-01-09 22:25:00,057: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[616e9770-0211-44a8-a4b8-187af444cacf]  
+[2023-01-09 22:25:00,058: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:25:01,140: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:25:02,731: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[616e9770-0211-44a8-a4b8-187af444cacf] succeeded in 2.6730116170001565s: None
+[2023-01-09 22:26:00,054: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[192a94f4-e6f7-4813-9158-acc94f232d70]  
+[2023-01-09 22:26:00,055: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:26:00,865: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:26:03,789: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[192a94f4-e6f7-4813-9158-acc94f232d70] succeeded in 3.7344634810006028s: None
+[2023-01-09 22:27:00,052: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[8c849680-5d5d-452d-9ea5-931d11a73162]  
+[2023-01-09 22:27:00,053: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:27:05,681: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:27:08,638: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[8c849680-5d5d-452d-9ea5-931d11a73162] succeeded in 8.58491183500064s: None
+[2023-01-09 22:28:00,060: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[d83fc4b1-1366-4fb7-8d53-1697844de19f]  
+[2023-01-09 22:28:00,061: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:28:00,924: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:28:18,844: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[d83fc4b1-1366-4fb7-8d53-1697844de19f] succeeded in 18.782539839000492s: None
+[2023-01-09 22:29:00,051: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[751dc421-1b4c-47f7-a584-500f86081506]  
+[2023-01-09 22:29:00,052: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:29:00,971: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:29:03,186: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[751dc421-1b4c-47f7-a584-500f86081506] succeeded in 3.1339668339996933s: None
+[2023-01-09 22:30:00,050: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[061f1b90-ed7d-4f97-b458-db0111d86ea5]  
+[2023-01-09 22:30:00,051: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:30:01,107: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:30:04,962: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[061f1b90-ed7d-4f97-b458-db0111d86ea5] succeeded in 4.910863024999344s: None
+[2023-01-09 22:31:00,053: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[c5dd2b3d-31cf-4227-92c0-a92a589e4f58]  
+[2023-01-09 22:31:00,054: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:31:01,316: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:31:04,284: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[c5dd2b3d-31cf-4227-92c0-a92a589e4f58] succeeded in 4.2303859000003285s: None
+[2023-01-09 22:32:00,049: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[46e22f17-7861-4ae1-a2b4-efdfd745be5c]  
+[2023-01-09 22:32:00,050: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:32:01,009: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:32:05,998: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[46e22f17-7861-4ae1-a2b4-efdfd745be5c] succeeded in 5.948116726999615s: None
+[2023-01-09 22:33:00,057: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[3a4a637c-75ec-48cc-84ce-977b34390dd3]  
+[2023-01-09 22:33:00,063: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:33:00,945: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:33:08,876: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[3a4a637c-75ec-48cc-84ce-977b34390dd3] succeeded in 8.812742639000135s: None
+[2023-01-09 22:34:00,056: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[7f35ec3d-27db-44bb-82e5-374d1455e476]  
+[2023-01-09 22:34:00,058: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:34:00,955: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:34:02,505: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[7f35ec3d-27db-44bb-82e5-374d1455e476] succeeded in 2.4474532719996205s: None
+[2023-01-09 22:35:00,055: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[45d3e3a6-0703-4c09-84f9-62bdc287eda4]  
+[2023-01-09 22:35:00,056: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:35:01,014: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:35:04,873: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[45d3e3a6-0703-4c09-84f9-62bdc287eda4] succeeded in 4.817070967999825s: None
+[2023-01-09 22:36:00,059: INFO/MainProcess] Received task: sendmessage.tasks.Inscritos_Pendientes[224cacd6-4e93-4f68-8527-71920ffc7a2d]  
+[2023-01-09 22:36:00,060: WARNING/ForkPoolWorker-1] ejecuta
+[2023-01-09 22:36:01,046: WARNING/ForkPoolWorker-1] entra
+[2023-01-09 22:36:04,012: INFO/ForkPoolWorker-1] Task sendmessage.tasks.Inscritos_Pendientes[224cacd6-4e93-4f68-8527-71920ffc7a2d] succeeded in 3.952031920999616s: None
+                                                                                                                                                                                                                                                                                                                                                                                                                                          

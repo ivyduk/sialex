@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-
+from celery.schedules import crontab
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -68,7 +68,8 @@ INSTALLED_APPS = [
     'bootstrapform',
     'ckeditor',
     # won't work on windows
-    'django_crontab'
+    'django_crontab',
+    'sendmessage',
 ]
 
 MIDDLEWARE = [
@@ -139,10 +140,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sialex',
         'USER': 'sialex',
-        'PASSWORD': 'sialex',
-        'HOST': 'localhost',
+        'PASSWORD': 'adminsialex',
+        'HOST': 'database-1-slx.co1rl716txsf.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
-    },
+    }
 }
 
 
@@ -258,7 +259,19 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-CRONJOBS = [
-    ('*/2 * * * *', 'administracion.util.CronJob.Inscritos_Pendientes')
-]
-CRONTAB_COMMAND_SUFFIX = '2>&1'
+#.....
+# Rest of the file
+#....
+#CELERY SETTINGS
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Almaty'
+CELERY_BEAT_SCHEDULE = {
+'Inscritos_Pendientes': {
+'task': 'sendmessage.tasks.Inscritos_Pendientes',
+'schedule': crontab(minute='*/10')
+}
+}
