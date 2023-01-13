@@ -330,7 +330,7 @@ def preinscripcionView(request):
                                         )
                     if preinscripcion_examen:
                         form.add_error('idioma',
-                                        'xUsted ya cuenta con una preinscripcion para Examen de Calificación en este Idioma'
+                                        'Usted ya cuenta con una preinscripcion para Examen de Calificación en este Idioma'
                                         ' en el periodo: {}'.format(
                                             preinscripcion_examen.examen.periodo.alias
                                         )
