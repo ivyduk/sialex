@@ -201,7 +201,7 @@ def preinscripcionView(request):
                     horario_cupo__curso__oferta_academica__periodo__inicio__lte=periodo.inicio,
                 ).first()
 
-                if not preinscripcion_previa and not preinscripcion_mismo_idioma and not preinscripcion_horario_existente and not preinscripcion_examen:
+                if not preinscripcion_previa and not preinscripcion_mismo_idioma and not preinscripcion_horario_existente:
                     ayudante = AyudanteFinancieros(preinscrito, periodo)
                     tarifa_curso = horario.curso.oferta_academica.tarifa
                     valor_inscripcion, detallado_preinscripcion = ayudante.calcular_valor_preinscripcion_curso(tarifa_curso, horario.curso.nivel, descuento, horario.curso.nivel.costo_materiales)
@@ -330,7 +330,7 @@ def preinscripcionView(request):
                                         )
                     if preinscripcion_examen:
                         form.add_error('idioma',
-                                        'Usted ya cuenta con una preinscripcion para Examen de Calificación en este Idioma'
+                                        'xUsted ya cuenta con una preinscripcion para Examen de Calificación en este Idioma'
                                         ' en el periodo: {}'.format(
                                             preinscripcion_examen.examen.periodo.alias
                                         )
