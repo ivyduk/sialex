@@ -64,7 +64,7 @@ def guardarGruposYMatriculas(grupos, horario_curso):
                 if not matricula_encontrada and matricula not in matriculas:
                     preinscripcion_curso = PreinscripcionHorarioCurso.objects.get(horario_cupo_id=horario_curso.id,
                                                                                   persona_id=preinscrito.persona,
-                                                                                  estado_preinscripcion_in=[1, 3])
+                                                                                  estado_preinscripcion__in=[1, 3])
                     preinscripcion = Preinscripcion.objects.get(pk=preinscripcion_curso.id)
                     matricula.preinscripcion_generada = preinscripcion
                     matriculas.append(matricula)

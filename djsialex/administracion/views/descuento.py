@@ -47,7 +47,10 @@ class CancelDescuento(LoginRequiredMixin, DeleteView):
         self.object.descuento_solicitado
         preinscripcion_id = self.object.id
         try:
-            descuento_solicitado = DescuentoAplicado.objects.get(preinscripcion_generada_id=preinscripcion_id)
+            descuento_solicitado = DescuentoAplicado.objects.get(
+                preinscripcion_generada_id=preinscripcion_id,
+                estado_descuento__in=(1, 2, 4)
+            )
             if descuento_solicitado.estado_descuento == 1:
                 descuento_solicitado.estado_descuento = 3
                 descuento_solicitado.save()
@@ -78,7 +81,7 @@ class CrearDescuento(LoginRequiredMixin, UpdateView):
             messages.warning(self.request, 'Se requiere seleccionar al menos un descuento')
             return redirect(reverse('descuento_aplicado_crear', kwargs={'pk': self.object.id}))
         else:
-            valor_descuento = (self.object.valor_preinscripcion * descuento.porcentaje) / 100
+            valor_descuento = ((self.object.recibopreinscripcion.valor_requerido - self.object.horario_cupo.curso.nivel.costo_materiales) * descuento.porcentaje) / 100
 
             try:
                 descuento_aplicado = DescuentoAplicado(
@@ -128,7 +131,7 @@ class ModificarDescuento(LoginRequiredMixin, UpdateView):
             self.object.preinscripcion_generada.valor_preinscripcion += anterior_valor
             self.object.preinscripcion_generada.save()
 
-            valor_descuento = (self.object.preinscripcion_generada.valor_preinscripcion * descuento.porcentaje) / 100
+            valor_descuento = ((self.object.preinscripcion_generada.recibopreinscripcion.valor_requerido - self.object.preinscripcion_generada.preinscripcionhorariocurso.horario_cupo.curso.nivel.costo_materiales) * descuento.porcentaje) / 100
             self.object.preinscripcion_generada.valor_preinscripcion -= valor_descuento
             self.object.preinscripcion_generada.save()
             self.object.valor = valor_descuento

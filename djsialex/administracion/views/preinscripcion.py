@@ -64,7 +64,7 @@ class CancelPreinscripcion(LoginRequiredMixin, DeleteView):
         except PreinscripcionHorarioCurso.DoesNotExist:
             preinscripcion = None
         try:
-            preinscrito = Profile.objects.get(pk=request.user.profile.id)
+            preinscrito = Profile.objects.get(pk=preinscripcion.persona.id)
         except Profile.DoesNotExist:
             preinscrito = None
         try:
@@ -807,7 +807,15 @@ def formalizar_vista(request, pk):
                 pago_descuento = None
             # si todos los documentos de documento estan entregados y no existe un pago para este descuento crear pago
             if validar_descuento and not pago_descuento:
-                pago = Pago(realizado_por=preinscripcionhorariocurso.persona,financiero=descuento_aplicado, tipo_preinscripcion=1,recibo_preinscripcion=recibopreinscripcion, aprobo=request.user.profile,fecha_hora=datetime.now(), tipo='Descuento')
+                pago = Pago(
+                    realizado_por=preinscripcionhorariocurso.persona,
+                    financiero=descuento_aplicado,
+                    tipo_preinscripcion=1,
+                    recibo_preinscripcion=recibopreinscripcion,
+                    aprobo=request.user.profile,
+                    fecha_hora=datetime.now(),
+                    tipo='Descuento'
+                )
                 pago.save()
                 #actualizar estado de descuento aplicado
                 descuento_aplicado.estado_descuento = 2
