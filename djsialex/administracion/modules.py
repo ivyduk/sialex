@@ -141,6 +141,7 @@ class AyudanteFinancieros(object):
 
     def actualizar_financieros_cancelacion_preinscripcion_sin_pago(self, preinscripcion, tipo_curso):
         self._buscar_saldos_a_favor_disponibles()
+        self._buscar_beca(preinscripcion.horario_cupo.curso.nivel, 3)
         if self.beca:
             self.beca.valor = 0
             self.beca.estado_beca = 1
@@ -158,12 +159,15 @@ class AyudanteFinancieros(object):
                 self.descuento_aplicado.estado_descuento = 3
                 self.descuento_aplicado.save()
 
-            self._buscar_beca(preinscripcion.horario_cupo.curso.nivel,2)
+            self._buscar_beca(preinscripcion.horario_cupo.curso.nivel, 2)
             if self.beca:
                 self.beca.valor = 0
                 self.beca.estado_beca = 1
                 self.beca.save()
-        
+            elif self._buscar_beca(preinscripcion.horario_cupo.curso.nivel, 3):
+                self.beca.valor = 0
+                self.beca.estado_beca = 1
+                self.beca.save()
 
     def _buscar_saldos_a_favor_disponibles(self):
         self.saldos = SaldoAFavor.objects.filter(activo=True, periodo_generado__inicio__gte=self.periodo.inicio-4, beneficiario=self.persona).order_by('-valor')
@@ -173,6 +177,7 @@ class AyudanteFinancieros(object):
             self.beca = Beca.objects.get(estado_beca=estado, beneficiario=self.persona, periodo_generado__inicio__gte=self.periodo.inicio-4, nivel_idioma=nivel)
         except Beca.DoesNotExist:
             self.beca = None
+        return self.beca
 
     def _buscar_descuento_aplicado(self, descuento, preinscripcion, estado):
         try:

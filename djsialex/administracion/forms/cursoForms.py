@@ -25,7 +25,7 @@ HorarioCursoFormset = inlineformset_factory(
 
 
 class CursoModelForm(forms.ModelForm):
-    oferta_academica = forms.ModelChoiceField(queryset=OfertaAcademica.objects.all())
+    oferta_academica = forms.ModelChoiceField(queryset=OfertaAcademica.objects.all().order_by('idioma__nombre', 'orden'))
     nivel = forms.ModelChoiceField(queryset=Nivel.objects.all().order_by('idioma__nombre', 'orden'), widget=forms.Select(attrs={"class" : "form-control"}))
     conjunto_notas = forms.ModelChoiceField(queryset=ConjuntoNotas.objects.all(), widget=forms.Select(attrs={"class" : "form-control"}))
 

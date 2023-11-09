@@ -165,6 +165,7 @@ def actualizarBeca(request, beca):
         return redirect('becados')
     return render(request, 'administracion/beca/seleccionar_nivel.html', context)
 
+
 @login_required
 def nivelesBecaEstudiante(request):
 
