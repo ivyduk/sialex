@@ -15,4 +15,4 @@
 ----------------------------Cada Periodo----------------------------
 13. Crear Oferta(s) Académica(s)
 14. Crear Curso(s) para las Ofertas Académicas
-15. Crear los Horario(s) cupo(s) para cad curso
+15. Crear los Horario(s) cupo(s) para cada curso
