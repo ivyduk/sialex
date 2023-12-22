@@ -87,6 +87,9 @@ ALTER TABLE ONLY public.administracion_discapacidad ALTER COLUMN id SET DEFAULT 
 ALTER TABLE administracion_periodo ADD COLUMN fecha_calificacion DATE;
 ```
 
+
+###Migraciones agregadas
+
 ``` sql
 ALTER TABLE administracion_periodo ADD COLUMN fecha_inicio DATE;
 ```
@@ -98,3 +101,20 @@ ALTER TABLE administracion_periodo ADD COLUMN fecha_final DATE;
 ``` sql
 ALTER TABLE administracion_periodo ADD COLUMN fecha_pendientes DATE;
 ```
+
+###Migraciones agregadas a la tabla administracion_grupoacademico
+
+``` sql
+ALTER TABLE administracion_grupoacademico ADD COLUMN fecha_inicio DATE;
+```
+
+``` sql
+ALTER TABLE administracion_grupoacademico ADD COLUMN fecha_final DATE;
+```
+
+``` sql
+ALTER TABLE administracion_grupoacademico ADD COLUMN enlace_virtual TEXT;
+```
+
+
+
