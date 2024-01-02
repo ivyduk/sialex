@@ -13,6 +13,7 @@ from ..models import GrupoAcademico, OfertaAcademica, HorarioCurso, Curso, Prein
     DocentesGrupoAcademico, TipoDocente, Docente, Salon, ESTADOS_ACADEMICOS_MATRICULA, getEstadoMatricula, \
     ContenidoNivel, ContenidoNivelVersion, Nivel, Preinscripcion
 from django.shortcuts import render, redirect, get_object_or_404
+from operator import attrgetter
 import json
 from django.views.generic.edit import CreateView
 from ..forms import GrupoAcademicoForm, CambioGrupoForm, AsignarSalonDocenteAGrupoForm
@@ -65,7 +66,6 @@ def guardarGruposYMatriculas(grupos, horario_curso):
                     preinscripcion_curso = PreinscripcionHorarioCurso.objects.get(horario_cupo_id=horario_curso.id,
                                                                                   persona_id=preinscrito.persona,
                                                                                   estado_preinscripcion__in=[1, 3])
-                    }
                     preinscripcion = Preinscripcion.objects.get(pk=preinscripcion_curso.id)
                     matricula.preinscripcion_generada = preinscripcion
                     matriculas.append(matricula)
@@ -85,14 +85,15 @@ def guardarGruposYMatriculas(grupos, horario_curso):
     return errores
 
 def asignarGrupoAPreinscritos(numero_grupos, preinscritos_curso, horario_curso):
-
     errores = ''
-    nombre_curso = horario_curso.curso.nivel.nombre + '-' + horario_curso.curso.nivel.idioma.nombre + '-' + horario_curso.horario.nombre + '-' + horario_curso.curso.oferta_academica.periodo.alias
+    nombre_curso = f"{horario_curso.curso.nivel.nombre}-{horario_curso.curso.nivel.idioma.nombre}-{horario_curso.horario.nombre}-{horario_curso.curso.oferta_academica.periodo.alias}"
     len_preinscritos = len(preinscritos_curso)
-
+    preinscritos_list = list(preinscritos_curso)
+    preinscritos_list.sort(key=attrgetter('persona.fecha_nacimiento'))
+    preinscritos_list.reverse()
     grupos_existentes = GrupoAcademico.objects.filter(horarioCurso_id=horario_curso.id)
     inicio_grupos = 0
-    fin_grupos = numero_grupos +  1
+    fin_grupos = numero_grupos + 1
 
     if len(grupos_existentes) > 0:
         for grupo in grupos_existentes:
@@ -103,34 +104,30 @@ def asignarGrupoAPreinscritos(numero_grupos, preinscritos_curso, horario_curso):
 
     inicio_grupos += 1
 
-    grupos = {num_grupo : ['GRU-' + str(num_grupo) + '-' + nombre_curso, []] for num_grupo in range(inicio_grupos,fin_grupos)}
-    preinscritos_list = list(preinscritos_curso)
+    grupos = {num_grupo: ['GRU-' + str(num_grupo) + '-' + nombre_curso, []] for num_grupo in range(inicio_grupos, fin_grupos)}
+
     if len_preinscritos >= numero_grupos and numero_grupos > 0:
         personas_por_grupo = int(len_preinscritos / numero_grupos)
         if personas_por_grupo > 0:
-            g = inicio_grupos
             inicio = 0
-            fin = personas_por_grupo - 1
-            resto = len(preinscritos_curso) % numero_grupos
-            numero_grupos += inicio_grupos - 1
-            while g <= numero_grupos:
-                personas = preinscritos_list[inicio: fin+1]
-                inicio = fin + 1
-                fin = inicio + personas_por_grupo -1
+
+            for g in range(inicio_grupos, fin_grupos):
+                fin = inicio + personas_por_grupo
+                if g <= len_preinscritos % numero_grupos:  
+                    fin += 1
+
+                personas = preinscritos_list[inicio:fin]
                 grupos[g][1] = personas
-                g += 1
-            if resto != 0:
-                g = inicio_grupos
-                personas = preinscritos_list[-resto:]
-                for p in personas:
-                    persona_grupo = grupos[g][1]
-                    if p not in persona_grupo:
-                        persona_grupo.append(p)
-                        g += 1
+
+                inicio = fin
+
             errores += guardarGruposYMatriculas(grupos, horario_curso)
     else:
         errores += '.El número de inscritos sin matrícula debe ser mayor al número de grupos a crear'
+
     return errores
+
+
 
 def get_matriculas_numero(grupo):
     conteo = 0
