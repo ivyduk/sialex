@@ -39,7 +39,7 @@ class AsignarSalonDocenteAGrupoForm(forms.Form):
     edificio = forms.ModelChoiceField(queryset=Edificio.objects.all(), required=False)
     salones = forms.ModelMultipleChoiceField(queryset=Salon.objects.all(), required=False)
     observaciones = forms.CharField(widget=forms.Textarea(attrs={"rows": 5, "cols": 200}), required=False)
-    codigo_proyecto = forms.CharField(widget=forms.TextInput())
+    codigo_proyecto = forms.CharField(widget=forms.TextInput(), required=False)
     fecha_inicio = forms.DateField(widget=DatePickerInput(format=FORMAT),  required=False)
     fecha_final = forms.DateField(widget=DatePickerInput(format=FORMAT),  required=False)
     enlace_virtual = forms.URLField(required=False)
