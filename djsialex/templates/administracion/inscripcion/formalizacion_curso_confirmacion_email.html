@@ -1,0 +1,26 @@
+{% load widget_tweaks %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "css/base_formalizacion.css" %}">
+{% block content %}
+
+    <div class="wrap-formalizacion" style="text-align: center">
+        <h2 class="title-project">Formalización completada con éxito</h2>
+        Test correo de formalizacion de curso.
+        {% if documentos %}
+            {% if pagado == tarifa_plena and validar_descuento %}
+                <p>Felicitaciones, la formalización se ha completado con éxito. Tanto los documentos como el pago han sido recibidos.</p>
+            {% elif pagado == tarifa_plena %}
+                <p>La formalización se ha completado con éxito, pero aún falta la entrega de documentos.</p>
+            {% elif validar_descuento %}
+                <p>La formalización se ha completado con éxito, pero aún falta realizar el pago.</p>
+            {% else %}
+                <p>Aunque la formalización se ha realizado, aún faltan documentos y el pago correspondiente.</p>
+            {% endif %}
+        {% else %}
+            <p>Es necesario entregar documentos para completar la formalización.</p>
+        {% endif %}
+
+    </div>
+
+
+{% endblock %}
