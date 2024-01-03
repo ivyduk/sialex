@@ -9,6 +9,8 @@ from django.http import request
 from django.db.models.signals import post_save, m2m_changed
 from django.conf import settings
 from datetime import date
+from dateutil.relativedelta import relativedelta
+
 
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
@@ -751,6 +753,36 @@ class Profile(models.Model):
         edad = hoy.year - self.fecha_nacimiento.year - \
                ((hoy.month, hoy.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
         return edad < 18
+    
+    @property
+    def edad(self):
+        hoy = date.today()
+        diferencia = relativedelta(hoy, self.fecha_nacimiento)
+        anios = diferencia.years
+        meses = diferencia.months
+
+        if anios == 0:
+            if meses == 1:
+                return f'{meses} mes'
+            else:
+                return f'{meses} meses'
+        elif anios == 1:
+            if meses == 0:
+                return f'{anios} año'
+            elif meses == 1:
+                return f'{anios} año y {meses} mes'
+            else:
+                return f'{anios} año y {meses} meses'
+        else:
+            if meses == 0:
+                return f'{anios} años'
+            elif meses == 1:
+                return f'{anios} años y {meses} mes'
+            else:
+                return f'{anios} años y {meses} meses'
+
+    
+
 
     def get_absolute_url(self):
         """
