@@ -39,30 +39,32 @@
                           </thead>
                         <tbody>
                             <tr>
-                                <td># Documento :</td>
+                                <td> Documento :</td>
                                 <td class="table-info">{{ preinscripcionexamen.persona.numero_documento}}</td>
-                                <td>Idioma</td>
+                                <td>Idioma:</td>
                                 <td>{{ preinscripcionexamen.examen.idioma.nombre}}</td>
+                            </tr>
+                            <tr>
+                                <td>Edad: </td>
+                                <td>{{ preinscripcionexamen.persona.edad}} </td>
+                                <td>Nombre Examen:</td>
+                                <td>{{ preinscripcionexamen.examen.nombre }}</td>
                             </tr>
                             <tr>
                                 <td>Nombres: </td>
                                 <td>{{ preinscripcionexamen.persona.primer_nombre}} {{ preinscripcionexamen.persona.segundo_nombre}}</td>
-                                <td>Nombre Examen</td>
-                                <td>{{ preinscripcionexamen.examen.nombre }}</td>
+                                <td>Lugar: </td>
+                                <td>{{ preinscripcionexamen.examen.lugar_aplicacion }}</td>
                             </tr>
                             <tr>
-                                <td>Apellidos</td>
+                                <td>Apellidos:</td>
                                 <td>{{ preinscripcionexamen.persona.primer_apellido}} {{ preinscripcionexamen.persona.segundo_apellido}}</td>
-                                <td>Lugar: </td>
-                                <td>
-                                    {{ preinscripcion.examen.lugar_aplicacion }}
-                                </td>
+                                <td>Fecha presentación: </td>
+                                <td>{{ preinscripcionexamen.examen.fecha_hora }}</td>
                             </tr>
                             <tr>
                                 <td>Fecha De Preinscripción: </td>
                                 <td>{{ preinscripcionexamen.fecha_preinscripcion }}</td>
-                                <td>Fecha presentación: </td>
-                                <td>{{ preinscripcionexamen.examen.fecha_hora }}</td>
                             </tr>
                         </tbody>
                     </table>
