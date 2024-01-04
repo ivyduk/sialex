@@ -122,7 +122,8 @@ class EditProfileForm(forms.ModelForm):
     es_egresado = forms.TypedChoiceField(
         initial='No',
         coerce=lambda x: x == 'True',
-        choices=((False, 'No'), (True, 'Si'))
+        choices=((False, 'No'), (True, 'Si')),
+        label='Es egresado de la UNAL'
     )
     telefono_celular = forms.CharField(widget=forms.TextInput(attrs={'pattern': '[0-9]{10}'}))
 
