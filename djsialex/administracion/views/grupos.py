@@ -34,6 +34,7 @@ def getInscritosSinMatricula(inscritos, horario_curso):
     inscritos_sin_matricula = inscritos.exclude(persona__in = matriculados)
     return inscritos_sin_matricula
 
+
 def guardarGruposYMatriculas(grupos, horario_curso):
 
     errores = ''
@@ -83,6 +84,7 @@ def guardarGruposYMatriculas(grupos, horario_curso):
             errores += ' , El grupo con nombre ' + nombre_grupo + ' ya existe'
     return errores
 
+
 def asignarGrupoAPreinscritos(numero_grupos, preinscritos_curso, horario_curso):
 
     errores = ''
@@ -131,6 +133,7 @@ def asignarGrupoAPreinscritos(numero_grupos, preinscritos_curso, horario_curso):
         errores += '.El número de inscritos sin matrícula debe ser mayor al número de grupos a crear'
     return errores
 
+
 def get_matriculas_numero(grupo):
     conteo = 0
     grupos = GrupoAcademico.objects.annotate(numero_de_matriculas=Count('matricula'))
@@ -138,6 +141,7 @@ def get_matriculas_numero(grupo):
         if grupo_anotado.id == grupo.id:
             conteo = grupo_anotado.numero_de_matriculas
     return conteo
+
 
 @login_required
 def seleccionOfertaAcademica(request, template_name='administracion/grupos/seleccionar_oferta.html'):
