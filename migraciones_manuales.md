@@ -17,13 +17,12 @@ ALTER TABLE administracion_reportehermesconfiguracion OWNER TO sialex;
 ```
 
 ``` sql
-INSERT INTO administracion_reportehermesconfiguracion (id, fecha_inicio, fecha_final) VALUES ('0e2b51a1-9646-423d-8796-75c18fb067db'::uuid, '2022-01-01'::date, '2022-12-31'::date)
+INSERT INTO administracion_reportehermesconfiguracion (id, fecha_inicio, fecha_final) VALUES ('0e2b51a1-9646-423d-8796-75c18fb067db'::uuid, '2022-01-01'::date, '2022-12-31'::date);
 ```
 
 ``` sql
 ALTER TABLE administracion_programaacademico ADD COLUMN para_ninios boolean;
 ```
-### version 1.8.0
 
 ``` sql
 ALTER TABLE public.administracion_profile
@@ -32,7 +31,7 @@ ADD COLUMN direccion_sin_formato varchar(1000);
 
 ``` sql
 update  public.administracion_profile
-set direccion_sin_formato = CONCAT('||||||||||', direccion_residencia::varchar)
+set direccion_sin_formato = CONCAT('||||||||||', direccion_residencia::varchar);
 ```
 
 ``` sql
@@ -86,3 +85,14 @@ ALTER TABLE ONLY public.administracion_discapacidad ALTER COLUMN id SET DEFAULT 
 ALTER TABLE administracion_periodo ADD COLUMN fecha_calificacion DATE;
 ```
 
+``` sql
+ALTER TABLE administracion_periodo ADD COLUMN fecha_inicio DATE;
+```
+
+``` sql
+ALTER TABLE administracion_periodo ADD COLUMN fecha_final DATE;
+```
+
+``` sql
+ALTER TABLE administracion_periodo ADD COLUMN fecha_pendientes DATE;
+```
