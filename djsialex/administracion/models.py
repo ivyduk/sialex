@@ -761,28 +761,17 @@ class Profile(models.Model):
         anios = diferencia.years
         meses = diferencia.months
 
+        # Pluralidad
+        anios_str = f'{anios} año{"s" if anios != 1 else ""}'
+        meses_str = f'{meses} mes{"es" if meses != 1 else ""}'
+
+        # Construir la cadena basada en el valor de las variables
         if anios == 0:
-            if meses == 1:
-                return f'{meses} mes'
-            else:
-                return f'{meses} meses'
-        elif anios == 1:
-            if meses == 0:
-                return f'{anios} año'
-            elif meses == 1:
-                return f'{anios} año y {meses} mes'
-            else:
-                return f'{anios} año y {meses} meses'
+            return meses_str
+        elif meses == 0:
+            return anios_str
         else:
-            if meses == 0:
-                return f'{anios} años'
-            elif meses == 1:
-                return f'{anios} años y {meses} mes'
-            else:
-                return f'{anios} años y {meses} meses'
-
-    
-
+            return f'{anios_str} y {meses_str}'
 
     def get_absolute_url(self):
         """
