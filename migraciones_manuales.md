@@ -24,8 +24,6 @@ INSERT INTO administracion_reportehermesconfiguracion (id, fecha_inicio, fecha_f
 ALTER TABLE administracion_programaacademico ADD COLUMN para_ninios boolean;
 ```
 
-### version 1.8.0
-
 ``` sql
 ALTER TABLE public.administracion_profile
 ADD COLUMN direccion_sin_formato varchar(1000);
@@ -87,9 +85,6 @@ ALTER TABLE ONLY public.administracion_discapacidad ALTER COLUMN id SET DEFAULT 
 ALTER TABLE administracion_periodo ADD COLUMN fecha_calificacion DATE;
 ```
 
-
-###Migraciones agregadas
-
 ``` sql
 ALTER TABLE administracion_periodo ADD COLUMN fecha_inicio DATE;
 ```
@@ -115,6 +110,5 @@ ALTER TABLE administracion_grupoacademico ADD COLUMN fecha_final DATE;
 ``` sql
 ALTER TABLE administracion_grupoacademico ADD COLUMN enlace_virtual TEXT;
 ```
-
 
 
