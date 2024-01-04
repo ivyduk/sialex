@@ -65,7 +65,6 @@ def guardarGruposYMatriculas(grupos, horario_curso):
                     preinscripcion_curso = PreinscripcionHorarioCurso.objects.get(horario_cupo_id=horario_curso.id,
                                                                                   persona_id=preinscrito.persona,
                                                                                   estado_preinscripcion__in=[1, 3])
-                    }
                     preinscripcion = Preinscripcion.objects.get(pk=preinscripcion_curso.id)
                     matricula.preinscripcion_generada = preinscripcion
                     matriculas.append(matricula)
