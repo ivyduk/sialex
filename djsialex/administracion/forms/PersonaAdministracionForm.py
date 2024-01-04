@@ -18,7 +18,8 @@ class PersonaAdministracionForm(forms.ModelForm):
     es_egresado = forms.TypedChoiceField(
         initial='No',
         coerce=lambda x: x == 'True',
-        choices=((False, 'No'), (True, 'Si'))
+        choices=((False, 'No'), (True, 'Si')),
+        label='Es egresado de la UNAL'
     )
     discapacidad = forms.ModelChoiceField(queryset=Discapacidad.objects.order_by('nombre'), required=False)
     direccion_sin_formato = DireccionField(widget=DireccionSelectorWidget(), required=False, label='Dirección de residencia')
