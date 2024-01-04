@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.10.0
+- Agregar descargo de Responsabilidad en vista de inicio 
+- Agregar especificación de egresado Unal
+- Eliminar obligatoriedad en campo de código hermes para grupos
+- Asignar Estudiantes por edad en la creación de grupos
+- Mostrar placeholder de contraseña en el formulario de autenticación
+- Remover el campo tipo de documento que no cumple función en la validación
+- Mostrar Edad calculada de usuario en vistas de preinscripción y formalización
+- Eliminar Mensaje de preferencia correo gmail para formulario de registro
+
+
 ## 1.9.0
 - Agregada fechas para el generación de reporte y servicio web que se integra con Hermes
 - Agregar funcionalidad para exportar en csv el mismo reporte que se envía a través del servicio web con Hermes

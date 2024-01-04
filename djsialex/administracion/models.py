@@ -9,6 +9,8 @@ from django.http import request
 from django.db.models.signals import post_save, m2m_changed
 from django.conf import settings
 from datetime import date
+from dateutil.relativedelta import relativedelta
+
 
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
@@ -751,6 +753,25 @@ class Profile(models.Model):
         edad = hoy.year - self.fecha_nacimiento.year - \
                ((hoy.month, hoy.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
         return edad < 18
+    
+    @property
+    def edad(self):
+        hoy = date.today()
+        diferencia = relativedelta(hoy, self.fecha_nacimiento)
+        anios = diferencia.years
+        meses = diferencia.months
+
+        # Pluralidad
+        anios_str = f'{anios} año{"s" if anios != 1 else ""}'
+        meses_str = f'{meses} mes{"es" if meses != 1 else ""}'
+
+        # Construir la cadena basada en el valor de las variables
+        if anios == 0:
+            return meses_str
+        elif meses == 0:
+            return anios_str
+        else:
+            return f'{anios_str} y {meses_str}'
 
     def get_absolute_url(self):
         """
@@ -913,7 +934,7 @@ class Salon(models.Model):
 class GrupoAcademico(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=500)
-    codigo_proyecto  = models.CharField(max_length=15, unique=True) #AGREGADO
+    codigo_proyecto  = models.CharField(max_length=15, unique=True, null=True, blank=True) #AGREGADO
     horarioCurso = models.ForeignKey(HorarioCurso, on_delete=models.PROTECT)
     salones = models.ManyToManyField(Salon)
     codigo = models.IntegerField(default=9001)

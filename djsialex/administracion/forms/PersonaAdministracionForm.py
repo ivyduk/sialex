@@ -4,6 +4,12 @@ from django import forms
 from ..models import Profile, Discapacidad
 from ..forms import DireccionField, DireccionSelectorWidget
 
+class SinBordeTextInput(forms.TextInput):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.attrs['style'] = 'border: none !important;'
+        self.attrs['style'] += 'outline: none !important;'
+
 
 class PersonaAdministracionForm(forms.ModelForm):
 
@@ -12,10 +18,13 @@ class PersonaAdministracionForm(forms.ModelForm):
     es_egresado = forms.TypedChoiceField(
         initial='No',
         coerce=lambda x: x == 'True',
-        choices=((False, 'No'), (True, 'Si'))
+        choices=((False, 'No'), (True, 'Si')),
+        label='Es egresado de la UNAL'
     )
     discapacidad = forms.ModelChoiceField(queryset=Discapacidad.objects.order_by('nombre'), required=False)
     direccion_sin_formato = DireccionField(widget=DireccionSelectorWidget(), required=False, label='Dirección de residencia')
+    edad = forms.CharField(label='Edad',required=False,widget=SinBordeTextInput(attrs={'readonly': 'readonly'}))
+
 
     class Meta:
         model = Profile
@@ -54,3 +63,4 @@ class PersonaAdministracionForm(forms.ModelForm):
 
         cleaned_data = super(PersonaAdministracionForm, self).clean()
         return cleaned_data
+    
