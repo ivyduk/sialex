@@ -849,7 +849,8 @@ def formalizar_vista(request, pk):
 
         # Lógica para determinar documentos faltantes
         if not validar_descuento and documentos:
-            documentos_faltantes = [d.nombre for d in documentos if not d.entregado]
+                documentos_faltantes = [d.documento_requerido for d in documentos if not d.entregado]
+
 
         # Lógica para determinar monto pendiente
         if pendiente > 0:
@@ -858,6 +859,7 @@ def formalizar_vista(request, pk):
         if pendiente == 0 and validar_descuento and preinscripcionhorariocurso.persona.documento_identificacion_entregado and (preinscripcionhorariocurso.estado_preinscripcion == 5 or preinscripcionhorariocurso.estado_preinscripcion == 3):
             preinscripcionhorariocurso.estado_preinscripcion = 1
             preinscripcionhorariocurso.save()
+            
 
         html_message = loader.render_to_string(
             'administracion/inscripcion/formalizacion_curso_confirmacion_email.html',
