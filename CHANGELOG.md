@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.10.1
+- Arreglar filtro de examenes de clasificación por periodo en obtener presinscritos a examen
+- Arreglar renderización de mensaje de formalización en preinscripcion de cursos
+
+
 ## 1.10.0
 - Agregar descargo de Responsabilidad en vista de inicio 
 - Agregar especificación de egresado Unal
