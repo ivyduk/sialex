@@ -344,11 +344,13 @@ class PreinscripcionCursoUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'administracion/inscripcion/cursos_opciones.html'
     fields = '__all__'
 
+
 class PreinscripcionCursoDelete(LoginRequiredMixin, DeleteView):
 
     model = PreinscripcionHorarioCurso
     template_name = 'administracion/inscripcion/preinscripcion_confirm_delete.html'
     success_url = reverse_lazy('mis-inscripciones')
+
 
 class PreinscripcionCursoDetailView(LoginRequiredMixin,generic.DetailView):
     model = PreinscripcionHorarioCurso
