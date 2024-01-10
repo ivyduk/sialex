@@ -201,6 +201,29 @@ def calcularEdad(fechaNacimiento):
 
     return int((diferencia.days + diferencia.seconds/86400.0) / 365.2425)
 
+
+@login_required
+def cargar_examenes_disponibles_admin(request):
+    if request.user.is_authenticated:
+        periodo = request.session["periodo_contextualizado_id"]
+        idioma_id = request.GET.get('idioma')
+        if idioma_id:
+            try:
+                periodo = Periodo.objects.get(pk=periodo)
+            except Periodo.DoesNotExist:
+                periodo = None
+
+            examenes_por_idioma = ExamenClasificacion.objects.filter(idioma=idioma_id, periodo_id=periodo)
+
+            data = {}
+            for i in examenes_por_idioma:
+                data[str(i.id)] = i.nombre
+            serialized_obj = json.dumps(data)
+            return render(request, 'webservices/index.html', {'resultset': serialized_obj})
+
+    return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
+
 @login_required
 def cargar_examenes_disponibles(request):
 
@@ -231,7 +254,7 @@ def cargar_examenes_disponibles(request):
                     examen = None
                 if examen and examen not in examenes_disponibles:
                     examenes_disponibles |= examen
-            data={}
+            data = {}
             for i in examenes_disponibles:
                 data[str(i.id)]=i.nombre
             serialized_obj = json.dumps(data)
