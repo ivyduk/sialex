@@ -138,7 +138,7 @@ def preinscripcionExamenView(request):
 
                             html_message = loader.render_to_string('administracion/inscripcion/preinscripcion_examen_email.html', {'preinscripcion_examen': preinscripcion_examen,
                                     'detallado' : detallado_preinscripcion}, request=request)
-                            send_mail('Confirmación Preinscripción Examen','','sialex_fchbog@unal.edu.co',[preinscrito.usuario.email],fail_silently=True,html_message=html_message)
+                            """send_mail('Confirmación Preinscripción Examen','','sialex_fchbog@unal.edu.co',[preinscrito.usuario.email],fail_silently=True,html_message=html_message)"""
 
                             return render(request, 'administracion/inscripcion/preinscripcion_examen_confirmacion.html',
                                     {'preinscripcion_examen': preinscripcion_examen,
@@ -162,14 +162,14 @@ def preinscripcionExamenView(request):
                                 {'preinscripcion_examen': preinscripcion_examen,
                                  'detallado' : detallado_preinscripcion}, request=request
                             )
-                            send_mail(
+                            """send_mail(
                                 'Confirmación Preinscripción Examen',
                                 '',
                                 'sialex_fchbog@unal.edu.co',
                                 [preinscrito.usuario.email],
                                 fail_silently=True,
                                 html_message=html_message
-                            )
+                            )"""
 
                             return render(request, 'administracion/inscripcion/preinscripcion_examen_confirmacion.html',
                                     {'preinscripcion_examen': preinscripcion_examen,

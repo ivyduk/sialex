@@ -243,14 +243,14 @@ def preinscripcionView(request):
                             },
                             request=request
                         )
-                        send_mail(
+                        """send_mail(
                             'Confirmación Preinscripción Curso',
                             '',
                             'sialex_fchbog@unal.edu.co',
                             [preinscrito.usuario.email],
                             fail_silently=True,
                             html_message=html_message
-                        )
+                        )"""
 
                         return render(
                             request,
@@ -295,14 +295,14 @@ def preinscripcionView(request):
                             },
                             request=request
                         )
-                        send_mail(
+                        """send_mail(
                             'Confirmación Preinscripción Curso',
                             '',
                             'sialex_fchbog@unal.edu.co',
                             [preinscrito.usuario.email],
                             fail_silently=True,
                             html_message=html_message
-                        )
+                        )"""
                         return render(
                             request,
                             'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
@@ -344,11 +344,13 @@ class PreinscripcionCursoUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'administracion/inscripcion/cursos_opciones.html'
     fields = '__all__'
 
+
 class PreinscripcionCursoDelete(LoginRequiredMixin, DeleteView):
 
     model = PreinscripcionHorarioCurso
     template_name = 'administracion/inscripcion/preinscripcion_confirm_delete.html'
     success_url = reverse_lazy('mis-inscripciones')
+
 
 class PreinscripcionCursoDetailView(LoginRequiredMixin,generic.DetailView):
     model = PreinscripcionHorarioCurso
@@ -1006,8 +1008,8 @@ def preinscribir_persona(persona, descuento, horario_curso, periodo):
                     'administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
                     {'preinscripcion_curso': preinscripcion_curso, 'documentos_requeridos': documentos_requeridos,
                      'detallado': detallado_preinscripcion})
-                send_mail('Confirmación Preinscripción Curso', '', 'sialex_fchbog@unal.edu.co',
-                          ['sialex_fchbog@unal.edu.co'], fail_silently=True, html_message=html_message)
+                """send_mail('Confirmación Preinscripción Curso', '', 'sialex_fchbog@unal.edu.co',
+                          ['sialex_fchbog@unal.edu.co'], fail_silently=True, html_message=html_message)"""
                 preinscripcion = {'preinscripcion_curso': preinscripcion_curso,
                                'documentos_requeridos': documentos_requeridos, 'detallado': detallado_preinscripcion}
                 return error, preinscripcion

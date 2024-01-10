@@ -107,7 +107,9 @@
                         </ul>
                     <h2>Instrucciones:</h2>
                     <div>
-                    {{ mensaje_formalizacion|safe}}
+                        {% autoescape off %}
+                            {{ mensaje_formalizacion.mensaje_formalizacion}}
+                        {% endautoescape %}
                     </div>
 
                       </div>
