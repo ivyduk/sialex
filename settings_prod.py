@@ -116,7 +116,7 @@ DATABASES = {
         'NAME': 'sialex',
         'USER': 'sialex',
         'PASSWORD': 'sialex',
-        'HOST': 'localhost',
+        'HOST': '168.176.18.19',
         'PORT': '',
     }
 }
