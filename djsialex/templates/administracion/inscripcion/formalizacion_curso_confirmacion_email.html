@@ -1,37 +1,35 @@
 {% load widget_tweaks %}
 {% block content %}
 
-    
-
     <div class="wrap-formalizacion" style="text-align: center">
-        <h2 class="title-project">Formalización completada con éxito</h2>
-        <p>Estimado/a <strong>{{ preinscripcionhorariocurso.persona.primer_nombre }} {{ preinscripcionhorariocurso.persona.primer_apellido }}</strong></p>
-    
+        <p>Apreciado(a) estudiante: <strong>{{ preinscripcionhorariocurso.persona.primer_nombre }} {{ preinscripcionhorariocurso.persona.primer_apellido }}</strong></p>
 
-        <p>Le informamos que la formalización de su curso ha sido completada con éxito.</p>
-        <div style="text-align: center">
-            <ul style="list-style-type: none;">
-        {% if documentos_faltantes %}
-            <p style="text-decoration: underline;">Le informamos que aún faltan entregar los siguientes documentos:</p>
-            
+        {% if documentos_faltantes and monto_pendiente %}
+            <p >La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que para poder continuar con el proceso de formalización es indispensable que nos allegue  
+                {% for documento_requerido in documentos_faltantes %}
+                    <strong>{{ documento_requerido.nombre }}</strong>
+                {% endfor %}
+                y consigne el saldo <strong>$ {{ monto_pendiente }}</strong>, dado que los comprobantes no vienen anexos. <br><br>
+                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em> formulario de formalización</em></u></a> con todos los documentos requeridos.
+            </p>
+        {% elif documentos_faltantes %}
+            <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que para poder continuar con el proceso de formalización es indispensable que nos allegue  
                 {% for documento_requerido in documentos_faltantes %}
                     <li><strong>{{ documento_requerido.nombre }}</strong></li>
-                {% endfor %}
-            </ul>
-        </div>
+                {% endfor %}, dado que este no viene anexo. <br><br>
+                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em> formulario  de formalización</em></u></a> con todos los documentos requeridos.
+            </p>
+        {% elif monto_pendiente %}
+            <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que para poder continuar con el proceso de formalización es indispensable que consigne el saldo <strong>$ {{ monto_pendiente }}</strong>,
+                 dado que el comprobante no viene anexo. <br><br>
+                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em> formulario de formalización</em></u></a> con todos los documentos requeridos.
+            </p>
+        {% else %} 
+            <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que la formalización se realizó con éxito. Por favor, estar pendiente de su correo electrónico (registrado en SIALEX) para la recepción de información relevante. <br><br>
+                NOTA: Por favor no responder este mensaje
+            </p>
         {% endif %}
-        
-        {% if monto_pendiente %}
-            <p style="text-decoration: underline;"> Le recordamos que aún tiene un monto pendiente por pagar: <strong> $ {{ monto_pendiente }}.</strong></p>
-        {% endif %}
-
-        <p>Agradecemos su atención y le deseamos éxito en su curso.</p>
-
 
     </div>
 
-
 {% endblock %}
-
-   
-    

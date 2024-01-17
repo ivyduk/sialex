@@ -1,0 +1,33 @@
+{% load widget_tweaks %}
+{% block content %}
+
+    <div class="wrap-formalizacion" style="text-align: center">
+        <p>Programa de Extensión y Educación Continua Apreciado(a) aspirante: <strong>{{ preinscripcionexamen.persona.primer_nombre }} {{ preinscripcionexamen.persona.primer_apellido }}</strong></p>
+        
+        {% if not preinscripcionexamen.persona.documento_identificacion_entregado and monto_pendiente %}
+            <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que para poder continuar con el proceso de formalización es indispensable que nos allegue  
+                <strong>Documento de Identificación</strong> y consigne el saldo <strong>$ {{ monto_pendiente }}</strong>, dado que los comprobantes no vienen anexos. <br><br>
+                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em>formulario de formalización</em></u></a> con todos los documentos requeridos.
+            </p>
+        {% elif not preinscripcionexamen.persona.documento_identificacion_entregado  %}
+            <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que para poder continuar con el proceso de formalización es indispensable que nos allegue  
+                <strong>Documento de Identificación</strong>, dado que este no viene anexo. <br><br>
+                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em>formulario  de formalización</em></u></a> con todos los documentos requeridos.
+            </p>
+        {% elif monto_pendiente %}
+            <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que para poder continuar con el proceso de formalización es indispensable que consigne el saldo <strong>$ {{ monto_pendiente }}</strong>,
+                 dado que el comprobante no viene anexo. <br><br>
+                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em>formulario de formalización</em></u></a> con todos los documentos requeridos.
+            </p>
+        {% else %}    
+            <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo.</p>
+            
+            <p>Le informamos que la formalización de su preinscripción se realizó con éxito. El día del examen le enviaremos un correo con la información pertinente para presentar el examen de acuerdo con la selección realizada por usted en nuestra plataforma.</p>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
+
+
+

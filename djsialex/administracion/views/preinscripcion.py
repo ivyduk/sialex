@@ -929,6 +929,7 @@ def formalizar_vista_examen(request, pk):
     saldo_flag = check_saldo_cargado(recibopreinscripcion)
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionexamen)
     grupo_estudiante = Group.objects.get(name='Estudiante')
+    monto_pendiente = None
     try:
         calificacion = CalificacionExamen.objects.get(preinscripcion_examen=preinscripcionexamen)
     except CalificacionExamen.DoesNotExist:
@@ -973,11 +974,44 @@ def formalizar_vista_examen(request, pk):
                     comprobante.save()
         calcularPagos = CalcularPagosRecibo(recibopreinscripcion)
         pagado, sobrante, pendiente, pagos = calcularPagos.calcular_pagos()
+        
+        documento_faltante = None
+        if not preinscripcionexamen.persona.documento_identificacion_entregado:
+            documento_faltante = "Documento de Identificación"
         if pendiente < 0:
             pendiente = 0
+        if pendiente > 0:
+            monto_pendiente = pendiente
         if pendiente == 0 and preinscripcionexamen.persona.documento_identificacion_entregado and (preinscripcionexamen.estado_preinscripcion == 5 or preinscripcionexamen.estado_preinscripcion == 3):
             preinscripcionexamen.estado_preinscripcion = 1
             preinscripcionexamen.save()
+
+        html_message = loader.render_to_string(
+            'administracion/inscripcion/formalizacion_examen_confirmacion_email.html',
+            {   'preinscripcionexamen': preinscripcionexamen,
+                'recibo': recibopreinscripcion,
+                'reservas': reservas_saldos,
+                'periodo': periodo,
+                'pagos': pagos,
+                'pagado': pagado,
+                'sobrante': sobrante,
+                'pendiente': pendiente,
+                'comprobantes_banco': comprobantes_banco,
+                'documento_faltante': documento_faltante,
+                'monto_pendiente': monto_pendiente,
+            },
+            request=request
+        )
+
+        send_mail(
+            'Confirmación de Formalización de Examem',
+            '',
+            'sialex_fchbog@unal.edu.co',
+            [preinscripcionexamen.persona.usuario.email],
+            fail_silently=True,
+            html_message=html_message
+        )
+
         return HttpResponseRedirect(request.path_info)
     return render(request, "administracion/inscripcion/formalizar_preinscripcion_examen.html", {'preinscripcionexamen' : preinscripcionexamen, 'reservas' : reservas_saldos,\
         'recibo' : recibopreinscripcion, 'nivel_asignado' : nivel_asignado, 'pagos' : pagos, 'pagado': pagado, 'sobrante' : sobrante, \
