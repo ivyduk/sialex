@@ -58,7 +58,7 @@ def signup(request):
 
                 current_site = get_current_site(request)
 
-                subject = 'Activar su cuenta de usuario en SIALEX'
+                """subject = 'Activar su cuenta de usuario en SIALEX'
                 message = render_to_string('auth/account_activation_email.html', {
                     'user': user,
                     # 'domain': current_site.domain,
@@ -68,7 +68,12 @@ def signup(request):
                 })
                 user.email_user(subject, message)
 
-                return redirect('account_activation_sent')
+                return redirect('account_activation_sent')"""
+                user.is_active = True
+                user.profile.email_confirmed = True
+                user.save()
+                login(request, user)
+                return redirect('complete-profile')
             else:
                 form.add_error('numero_documento', 'Usuario con Número de documento ya existente en base de datos')
         return render(request, 'auth/signup.html', {'form': form})
