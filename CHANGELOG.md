@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.10.2
+- Agregar columna tarifa_materiales a reporte hermes
+
 ## 1.10.1
 - Arreglar filtro de examenes de clasificación por periodo en obtener presinscritos a examen
 - Arreglar renderización de mensaje de formalización en preinscripcion de cursos
