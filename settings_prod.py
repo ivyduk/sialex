@@ -27,7 +27,17 @@ SECRET_KEY = '-plag545x0!5y9&v7jclhy@o!&ekam7_!lt38736c8-e84c(34'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['168.176.18.33','127.0.0.1', 'localhost','168.176.84.35', '168.176.18.15','http://www.extensionidiomas.unal.edu.co','www.extensionidiomas.unal.edu.co','extensionidiomas.unal.edu.co']
+ALLOWED_HOSTS = [
+    '168.176.18.33',
+    '127.0.0.1',
+    'localhost',
+    '168.176.84.35',
+    '168.176.18.15',
+    'http://www.extensionidiomas.unal.edu.co',
+    'www.extensionidiomas.unal.edu.co',
+    'extensionidiomas.unal.edu.co'
+]
+
 DJANGO_EASY_AUDIT_WATCH_REQUEST_EVENTS = False
 
 
@@ -198,7 +208,7 @@ EMAIL_HOST_USER = 'sialex_fchbog@unal.edu.co'
 EMAIL_HOST_PASSWORD = 'Unal2021'
 EMAIL_USE_TLS = True
 
-DEFAULT_FROM_EMAIL='sialex_fchbog@unal.edu.co'
+DEFAULT_FROM_EMAIL = 'sialex_fchbog@unal.edu.co'
 
 
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
