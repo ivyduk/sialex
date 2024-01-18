@@ -63,12 +63,45 @@ def descargarReporteHermes(request):
                              estudiante[i].email, estudiante[i].direccion_residencia, estudiante[i].pais_residencia,
                              estudiante[i].departamento_residencia, estudiante[i].ciudad_residencia, estudiante[i].descuento,
                              estudiante[i].valor_inscripcion, estudiante[i].valor_pago, estudiante[i].fecha_pago,
-                             estudiante[i].no_soporte_de_pago, estudiante[i].tipo_pago]
+                             estudiante[i].no_soporte_de_pago, estudiante[i].tipo_pago, estudiante[i].tarifa_materiales]
         data[i+1] = data_calificacion
 
-    header = ['#','id_sub_proyecto_curso','tipo_documento','numero_documento','primer_nombre','segundo_nombre','primer_apellido','segundo_apellido','sexo_biologico','estado_civil','fecha_nacimiento','pais_nacimiento','departamento_nacimiento','ciudad_nacimiento','nivel_formacion','egresado_un','vinculacion','telefono_fijo','ext','celular','email','direccion_residencia','pais_residencia','departamento_residencia','ciudad_residencia','descuento','valor_inscripcion','valor_pago','fecha_pago','no_soporte_de_pago','tipo_pago']
+    header = [
+        '#',
+        'id_sub_proyecto_curso',
+        'tipo_documento',
+        'numero_documento',
+        'primer_nombre',
+        'segundo_nombre',
+        'primer_apellido',
+        'segundo_apellido',
+        'sexo_biologico',
+        'estado_civil',
+        'fecha_nacimiento',
+        'pais_nacimiento',
+        'departamento_nacimiento',
+        'ciudad_nacimiento',
+        'nivel_formacion',
+        'egresado_un',
+        'vinculacion',
+        'telefono_fijo',
+        'ext',
+        'celular',
+        'email',
+        'direccion_residencia',
+        'pais_residencia',
+        'departamento_residencia',
+        'ciudad_residencia',
+        'descuento',
+        'valor_inscripcion',
+        'valor_pago',
+        'fecha_pago',
+        'no_soporte_de_pago',
+        'tipo_pago',
+        'tarifa_materiales'
+    ]
     csv_writer = CSVWriter()
-    response = csv_writer.download_csv_file(data, header, 'Calificaciones-Examenes')
+    response = csv_writer.download_csv_file(data, header, 'Reporte-{}-{}'.format(fechainicio, fechafinal))
     return response
 
 
