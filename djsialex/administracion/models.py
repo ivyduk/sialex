@@ -63,6 +63,7 @@ class DatosEstudiantesModel(models.Model):
     fecha_pago              = models.DateField()
     no_soporte_de_pago      = models.CharField(max_length=100)
     tipo_pago               = models.IntegerField()
+    tarifa_materiales       = models.FloatField(null=False)
 
 
 class Pais(models.Model):
