@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.10.3
+- Reactivar envios de correo y activación de los usuarios en dos pasos al registrarse
+
 ## 1.10.2
 - Agregar columna tarifa_materiales a reporte hermes
 
