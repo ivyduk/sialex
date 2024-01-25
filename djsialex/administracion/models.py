@@ -965,6 +965,9 @@ class Preinscripcion(models.Model):
         default=True,
         help_text='Determina si esta preinscripción requiere facturación electrónica'
     )
+    observaciones = models.TextField(blank=True, null=True)
+
+
 
 
 class PreinscripcionHorarioCurso(Preinscripcion):
@@ -1171,6 +1174,8 @@ class ReciboPreinscripcion(models.Model):
     valor_requerido = models.FloatField(default=0)
     valor_pagado = models.FloatField(default=0)
     estado_recibo = models.IntegerField(choices=ESTADOS_RECIBO, default=2)
+    
+
 
 class SaldoAFavor(Financiero):
     activo = models.BooleanField(default=False)

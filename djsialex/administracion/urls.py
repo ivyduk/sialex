@@ -35,6 +35,9 @@ from .views import *
 from administracion.views.DatosEstudiantesView import escogerOpcionReportes,reporteFechaCreate,descargarReporteHermes, \
 	DatosEstudiantesAPI
 
+from administracion.views.ObservacionesPreinscripcion import ObservacionesCreateView
+
+
 from rest_framework.routers import DefaultRouter
 
 router=DefaultRouter()
@@ -271,10 +274,13 @@ urlpatterns = [
 	#Documentos requeridos
 	path('administracion/documento-descuento-requerido/editar/<pk>', DocumentoDescuentoUpdateView.as_view(), name='documento-descuento-requerido_update'),
 
-	#Documentos requeridosb
+	#Documentos requeridos
 	url(r'^administracion/comprobante-pago/crear/(?P<preinscripcionhorariocurso>[-\w]+)', ComprobantePagoCreateView.as_view(), name='comprobante_pago_create'),
 	url(r'^administracion/comprobante-pago/editar/(?P<pk>[0-9]+)/(?P<preinscripcionhorariocurso>[-\w]+)', ComprobantePagoUpdateView.as_view(), name='comprobante_pago_update'),
 	url(r'^administracion/comprobante-pago/borrar/(?P<pk>[0-9]+)', ComprobantePagoDeleteView.as_view(), name='comprobante_pago_delete'),
+
+	#Observaciones preinscripcion cursos
+    path('observaciones/create/<int:preinscripcion_id>/', ObservacionesCreateView.as_view(), name='observaciones_create'),
 
 
 	#Configuracion mensaje de formalizacion

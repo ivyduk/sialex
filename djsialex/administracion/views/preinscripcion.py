@@ -795,7 +795,7 @@ def formalizar_vista(request, pk):
         facturacion_form = RequiereFacturacionForm(request.POST)
         if facturacion_form.is_valid():
             preinscripcionhorariocurso.requiere_facturacion = facturacion_form.cleaned_data['requiere_facturacion']
-            preinscripcionhorariocurso.save()
+            preinscripcionhorariocurso.save()     
         if preinscripcionhorariocurso.estado_preinscripcion == 5:
             preinscripcionhorariocurso.estado_preinscripcion = 3
             preinscripcionhorariocurso.save()

@@ -3,9 +3,7 @@
 {% block content %}
     <div class="modal fade" tabindex="-1" role="dialog" id="modal" xmlns="http://www.w3.org/1999/html">
         <div class="modal-dialog">
-        <div class="modal-content">
-    
-        </div>
+            <div class="modal-content"></div>
         </div>
     </div>
     <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
@@ -79,10 +77,10 @@
                                 <td></td>
                             </tr>
 
-                        <tr>
-                            <form action = "{% url 'formalizar-curso' preinscripcionhorariocurso.id %}" method = "post" id="requiere_facturacion">
-                                {{facturacion_form}}
-                            </form>
+                        <tr>   
+                                <form action = "{% url 'formalizar-curso' preinscripcionhorariocurso.id %}" method = "post" id="requiere_facturacion">
+                                    {{facturacion_form}}
+                                </form>
                         </tr>
                         </tbody>
                     </table>
@@ -187,14 +185,23 @@
                 <li class="list-group-item row">
                         <div class="col-md-4">
                             {% if pendiente > 0 %}
-                                <button type="button" class="btn btn-primary js-create-pago">
+                                <button type="button" class="btn btn-primary js-create-pago" >
                                 <span class="glyphicon glyphicon-plus"></span>
                                 Agregar Pago
                                 </button>
                             {% endif %}
                     </div>
+
                     <div class="col-md-4"></div>
+                    <div class="col-md-4" id="observaciones-section"></div>
                     <div class="col-md-4"></div>
+                    <div class="col-md-12">
+                        <br><br>                        
+                        <button type="button" class="btn btn-primary js-create-observacion" >
+                            <span class="glyphicon glyphicon-plus"></span>
+                            Agregar Observaciones
+                        </button> 
+                    </div>
                 </li>
                 
           </ul>
@@ -362,7 +369,8 @@ input[type='button']
 }
 
 </style>
-    <script type="text/javascript">
+
+<script type="text/javascript">
     $(function () {
 
         $(".js-create-pago").click(function () {
@@ -371,7 +379,7 @@ input[type='button']
             type: 'get',
             dataType: 'json',
             beforeSend: function () {
-            $("#modal").modal("show");
+                $("#modal").modal("show");
             },
             success: function (data) {
             $("#modal .modal-content").html(data.html_form);
@@ -394,5 +402,42 @@ input[type='button']
         });
 
     });
-    </script>
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".js-create-observacion").click(function () {
+            $.ajax({
+                url: "{% url 'observaciones_create' preinscripcionhorariocurso.id %}",
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                    $("#modal").modal("show");
+                },
+                success: function (data) {
+                    console.log("Contenido del formulario antes de guardar:", $("textarea[name='observaciones']").val());
+                    $("#modal .modal-content").html(data.html_form);
+
+                    // Aquí puedes agregar un log para imprimir el contenido del formulario antes de guardarlo
+                    console.log("Contenido del formulario antes de guardar:", $("#id_observaciones").val());
+
+                    $("#observaciones-section").html(data.observacion_texto);
+
+                    // Agrega un log para imprimir la respuesta después de recibir la respuesta del servidor
+                    console.log("Respuesta del servidor después de guardar:", data);
+
+                },
+
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log("Error AJAX:", xhr.status, thrownError);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
 {% endblock %}
