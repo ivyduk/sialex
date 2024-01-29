@@ -1040,6 +1040,7 @@ class ExamenClasificacion(models.Model):
     docentes_evaluadores = models.ManyToManyField(Docente)
     lugar_aplicacion = models.CharField(max_length=300, default='')
     fecha_hora = models.DateTimeField(null=True)
+    codigo_proyecto = models.IntegerField(null=True, blank=True)
     fecha_hora_recepcion_documentos = models.TextField(max_length=3000, default='')
     mensaje_formalizacion = RichTextField(blank=True, null=True)
 

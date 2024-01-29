@@ -21,6 +21,7 @@ class ExamenClasificacionForm(forms.ModelForm):
                   'edad_minima',
                   'lugar_aplicacion',
                   'fecha_hora',
+                  'codigo_proyecto',
                   'mensaje_formalizacion',
                   'docentes_evaluadores')
 
@@ -30,6 +31,7 @@ class ExamenClasificacionForm(forms.ModelForm):
             'cupo_autorizado': 'Cupos autorizados',
             'lugar_aplicacion': 'Lugar aplicación',
             'fecha_hora': 'Fecha y hora examen',
+            'codigo_proyecto': 'Codigo proyecto',
             'mensaje_formalizacion': 'Información acerca del examen y de la recepción de documentos'
         }
 
