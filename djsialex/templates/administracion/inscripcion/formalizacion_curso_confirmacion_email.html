@@ -10,19 +10,19 @@
                     <strong>{{ documento_requerido.nombre }}</strong>
                 {% endfor %}
                 y consigne el saldo <strong>$ {{ monto_pendiente }}</strong>, dado que los comprobantes no vienen anexos. <br><br>
-                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em> formulario de formalización</em></u></a> con todos los documentos requeridos.
+                Por lo anterior, es necesario diligenciar nuevamente el <a  href="{{ link_carga_documentos }}"><u><em> formulario de formalización</em></u></a> con todos los documentos requeridos.
             </p>
         {% elif documentos_faltantes %}
             <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que para poder continuar con el proceso de formalización es indispensable que nos allegue  
                 {% for documento_requerido in documentos_faltantes %}
                     <li><strong>{{ documento_requerido.nombre }}</strong></li>
                 {% endfor %}, dado que este no viene anexo. <br><br>
-                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em> formulario  de formalización</em></u></a> con todos los documentos requeridos.
+                Por lo anterior, es necesario diligenciar nuevamente el <a  href="{{ link_carga_documentos }}"><u><em> formulario  de formalización</em></u></a> con todos los documentos requeridos.
             </p>
         {% elif monto_pendiente %}
             <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que para poder continuar con el proceso de formalización es indispensable que consigne el saldo <strong>$ {{ monto_pendiente }}</strong>,
                  dado que el comprobante no viene anexo. <br><br>
-                Por lo anterior, es necesario diligenciar nuevamente el <a href="URL"><u><em> formulario de formalización</em></u></a> con todos los documentos requeridos.
+                Por lo anterior, es necesario diligenciar nuevamente el <a  href="{{ link_carga_documentos }}"><u><em> formulario de formalización</em></u></a> con todos los documentos requeridos.
             </p>
         {% else %} 
             <p>La Coordinación de los cursos de extensión de lenguas extranjeras le envía un cordial saludo y le informa que la formalización se realizó con éxito. Por favor, estar pendiente de su correo electrónico (registrado en SIALEX) para la recepción de información relevante. <br><br>

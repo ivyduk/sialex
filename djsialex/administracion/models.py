@@ -1325,7 +1325,7 @@ class InformacionPreinscripcionFormalizacion(models.Model):
     horario_citacion = models.TextField(max_length=1000, default='De 8 am a 6 pm')
     periodo = models.OneToOneField(Periodo, on_delete=models.PROTECT, help_text='Selección de periodo', unique=True)
     mensaje_formalizacion = RichTextField(blank=True, null=True)
-    link_carga_documentos = models.URLField(_("Link carga documentos"), blank=True, null=True)
+    link_carga_documentos = models.URLField(_("Link carga de documentos"), blank=True, null=True)
 
     def __str__(self):
         """

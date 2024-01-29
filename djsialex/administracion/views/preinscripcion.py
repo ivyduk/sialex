@@ -18,6 +18,7 @@ from itertools import chain
 
 from administracion.forms.inscripcionForm import PreinscripcionCursoForm, PreinscripcionCursoLoteForm
 from administracion.forms.requiereFacturacionForms import RequiereFacturacionForm
+from administracion.forms.mensajeFormalizacionForm import MensajeFormalizacionForm
 
 from administracion.util.Barcode import *
 from ..models import PreinscripcionHorarioCurso, ProgramaAcademico, Nivel, OfertaAcademica, Curso, HorarioCurso, \
@@ -766,6 +767,7 @@ def formalizar_vista(request, pk):
     saldo_flag = check_saldo_cargado(recibopreinscripcion)
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionhorariocurso)
     facturacion_form = RequiereFacturacionForm(instance=preinscripcionhorariocurso)
+    informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
 
     if descuento_aplicado:
         documentos = DocumentosDescuentoSolicitado.objects.filter(descuento_aplicado=descuento_aplicado[0])
@@ -882,6 +884,8 @@ def formalizar_vista(request, pk):
                 'facturacion_form': facturacion_form,
                 'documentos_faltantes': documentos_faltantes,
                 'monto_pendiente': monto_pendiente,
+                'link_carga_documentos': informacion_formalizacion.link_carga_documentos,
+
             },
             request=request
         )
@@ -930,6 +934,7 @@ def formalizar_vista_examen(request, pk):
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionexamen)
     grupo_estudiante = Group.objects.get(name='Estudiante')
     monto_pendiente = None
+    informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
     try:
         calificacion = CalificacionExamen.objects.get(preinscripcion_examen=preinscripcionexamen)
     except CalificacionExamen.DoesNotExist:
@@ -999,6 +1004,8 @@ def formalizar_vista_examen(request, pk):
                 'comprobantes_banco': comprobantes_banco,
                 'documento_faltante': documento_faltante,
                 'monto_pendiente': monto_pendiente,
+                'link_carga_documentos': informacion_formalizacion.link_carga_documentos,
+
             },
             request=request
         )
