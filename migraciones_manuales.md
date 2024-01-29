@@ -111,4 +111,8 @@ ALTER TABLE administracion_grupoacademico ADD COLUMN fecha_final DATE;
 ALTER TABLE administracion_grupoacademico ADD COLUMN enlace_virtual TEXT;
 ```
 
+###Migracion campo observaciones en preinscripcion
 
+``` sql
+ALTER TABLE administracion_preinscripcion ADD COLUMN observaciones TEXT NULL;
+``` 
