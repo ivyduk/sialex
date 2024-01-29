@@ -1327,7 +1327,6 @@ class InformacionPreinscripcionFormalizacion(models.Model):
     mensaje_formalizacion = RichTextField(blank=True, null=True)
     link_carga_documentos = models.URLField(_("Link carga documentos"), blank=True, null=True)
 
-
     def __str__(self):
         """
         :return: nombre
