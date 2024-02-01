@@ -13,8 +13,8 @@ from administracion.enums import *
 
 pn = os.path.dirname(os.path.abspath(__file__))
 reportlab.rl_config.TTFSearchPath.append(pn + "/fonts/")
-pdfmetrics.registerFont(TTFont('unal_italic', 'AncizarSans-ExtraboldItalic_02042016.ttf'))
-pdfmetrics.registerFont(TTFont('unal_simple', 'AncizarSans-LightItalic_02042016.ttf'))
+#pdfmetrics.registerFont(TTFont('unal_italic', 'AncizarSans-ExtraboldItalic_02042016.ttf'))
+#pdfmetrics.registerFont(TTFont('unal_simple', 'AncizarSans-LightItalic_02042016.ttf'))
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
