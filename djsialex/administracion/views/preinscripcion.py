@@ -245,14 +245,14 @@ def preinscripcionView(request):
                             },
                             request=request
                         )
-                        """send_mail(
+                        send_mail(
                             'Confirmación Preinscripción Curso',
                             '',
                             'sialex_fchbog@unal.edu.co',
                             [preinscrito.usuario.email],
                             fail_silently=True,
                             html_message=html_message
-                        )"""
+                        )
 
                         return render(
                             request,
@@ -297,14 +297,14 @@ def preinscripcionView(request):
                             },
                             request=request
                         )
-                        """send_mail(
+                        send_mail(
                             'Confirmación Preinscripción Curso',
                             '',
                             'sialex_fchbog@unal.edu.co',
                             [preinscrito.usuario.email],
                             fail_silently=True,
                             html_message=html_message
-                        )"""
+                        )
                         return render(
                             request,
                             'administracion/inscripcion/preinscripcion_curso_confirmacion.html',
@@ -1138,8 +1138,8 @@ def preinscribir_persona(persona, descuento, horario_curso, periodo):
                     'administracion/inscripcion/preinscripcion_curso_confirmacion_email.html',
                     {'preinscripcion_curso': preinscripcion_curso, 'documentos_requeridos': documentos_requeridos,
                      'detallado': detallado_preinscripcion})
-                """send_mail('Confirmación Preinscripción Curso', '', 'sialex_fchbog@unal.edu.co',
-                          ['sialex_fchbog@unal.edu.co'], fail_silently=True, html_message=html_message)"""
+                send_mail('Confirmación Preinscripción Curso', '', 'sialex_fchbog@unal.edu.co',
+                          ['sialex_fchbog@unal.edu.co'], fail_silently=True, html_message=html_message)
                 preinscripcion = {'preinscripcion_curso': preinscripcion_curso,
                                'documentos_requeridos': documentos_requeridos, 'detallado': detallado_preinscripcion}
                 return error, preinscripcion
