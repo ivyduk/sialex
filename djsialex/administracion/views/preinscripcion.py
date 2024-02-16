@@ -829,7 +829,7 @@ def formalizar_vista(request, pk):
         facturacion_form = RequiereFacturacionForm(request.POST)
         if facturacion_form.is_valid():
             preinscripcionhorariocurso.requiere_facturacion = facturacion_form.cleaned_data['requiere_facturacion']
-            preinscripcionhorariocurso.save()
+            preinscripcionhorariocurso.save()     
 
         if preinscripcionhorariocurso.estado_preinscripcion == 5:
             preinscripcionhorariocurso.estado_preinscripcion = 3
@@ -952,6 +952,7 @@ def formalizar_vista(request, pk):
                       'facturacion_form': facturacion_form,
                       'documentos_faltantes': documentos_faltantes,
                       'monto_pendiente': monto_pendiente,
+                      'observaciones': preinscripcionhorariocurso.observaciones
                   })
 
 
@@ -1036,6 +1037,7 @@ def formalizar_vista_examen(request, pk):
                 'documento_faltante': documento_faltante,
                 'monto_pendiente': monto_pendiente,
                 'link_carga_documentos': informacion_formalizacion.link_carga_documentos,
+                'observaciones': preinscripcionexamen.observaciones
 
             },
             request=request
@@ -1051,9 +1053,21 @@ def formalizar_vista_examen(request, pk):
         )
 
         return HttpResponseRedirect(request.path_info)
-    return render(request, "administracion/inscripcion/formalizar_preinscripcion_examen.html", {'preinscripcionexamen' : preinscripcionexamen, 'reservas' : reservas_saldos,\
-        'recibo' : recibopreinscripcion, 'nivel_asignado' : nivel_asignado, 'pagos' : pagos, 'pagado': pagado, 'sobrante' : sobrante, \
-        'pendiente' : pendiente, 'comprobantes_banco' : comprobantes_banco, 'tarifa_plena' : tarifa_plena, 'saldo_flag' : saldo_flag})
+    return render(request, "administracion/inscripcion/formalizar_preinscripcion_examen.html",
+                  {
+                      'preinscripcionexamen': preinscripcionexamen,
+                      'reservas': reservas_saldos,
+                      'recibo': recibopreinscripcion,
+                      'nivel_asignado': nivel_asignado,
+                      'pagos': pagos,
+                      'pagado': pagado,
+                      'sobrante' : sobrante,
+                      'pendiente' : pendiente,
+                      'comprobantes_banco': comprobantes_banco,
+                      'tarifa_plena': tarifa_plena,
+                      'saldo_flag': saldo_flag,
+                      'observaciones': preinscripcionexamen.observaciones
+                  })
 
 
 def preinscribir_persona(persona, descuento, horario_curso, periodo):
