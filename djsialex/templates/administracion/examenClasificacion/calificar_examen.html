@@ -7,22 +7,23 @@
 
             <div class="well">
                     <h3> Escoja el idioma que calificará en el examen de clasificación</h3>
-                <div class="form-group">
-                    <form action="{% url 'buscar-examen' %}" method="get">
-                        <label for="idioma" class="col-sm-2 control-label">Idioma</label>
-                        <div class="col-sm-6">
-                            <select class="form-control" name="idioma">
-                            {% for idioma in idiomas %}
-                                <option value="{{ idioma.id }}" {% if idioma.id|stringformat:"s" == current_idioma %} selected="True"{% endif %}>{{ idioma.nombre }}</option>
-                            {% endfor %}
-                            </select>
-                        </div>
-
-                    {% csrf_token %}
-                    <input class="btn btn-primary" type="submit" value="Seleccionar">
-                    </form>
-
-                </div>
+                    <div class="form-group">
+                        <form action="{% url 'buscar-examen' %}" method="get">
+                            <label for="idioma" class="col-sm-2 control-label">Idioma</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="idioma">
+                                    {% for idioma in idiomas %}
+                                        <option value="{{ idioma.id }}" {% if idioma.id|stringformat:"s" == current_idioma %} selected="True"{% endif %}>
+                                            {{ idioma.nombre }} 
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                    
+                            {% csrf_token %}
+                            <input class="btn btn-primary" type="submit" value="Seleccionar">
+                        </form>
+                    </div>
 
             </div>
 

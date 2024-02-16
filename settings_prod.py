@@ -202,10 +202,10 @@ MAX_IMAGE_SIZE = '20971520'
 SESSION_COOKIE_AGE = 60*60
 
 
-EMAIL_HOST = 'smtp-relay.gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'sialex_fchbog@unal.edu.co'
-EMAIL_HOST_PASSWORD = 'Unal2021'
+EMAIL_HOST_PASSWORD = 'aynjczheriztvgyb'
 EMAIL_USE_TLS = True
 
 DEFAULT_FROM_EMAIL = 'sialex_fchbog@unal.edu.co'
