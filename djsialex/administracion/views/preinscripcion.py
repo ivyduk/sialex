@@ -19,6 +19,7 @@ from itertools import chain
 
 from administracion.forms.inscripcionForm import PreinscripcionCursoForm, PreinscripcionCursoLoteForm
 from administracion.forms.requiereFacturacionForms import RequiereFacturacionForm
+from administracion.forms.mensajeFormalizacionForm import MensajeFormalizacionForm
 
 from administracion.util.Barcode import *
 from ..models import PreinscripcionHorarioCurso, ProgramaAcademico, Nivel, OfertaAcademica, Curso, HorarioCurso, \
@@ -797,6 +798,7 @@ def formalizar_vista(request, pk):
     saldo_flag = check_saldo_cargado(recibopreinscripcion)
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionhorariocurso)
     facturacion_form = RequiereFacturacionForm(instance=preinscripcionhorariocurso)
+    informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
 
     if descuento_aplicado:
         documentos = DocumentosDescuentoSolicitado.objects.filter(descuento_aplicado=descuento_aplicado[0])
@@ -810,7 +812,7 @@ def formalizar_vista(request, pk):
         beca = None
 
     try:
-        matricula = Matricula.objects.get(estudiante=preinscripcionhorariocurso.persona, grupo__horarioCurso__curso=preinscripcionhorariocurso.horario_cupo.curso )
+        matricula = Matricula.objects.get(estudiante=preinscripcionhorariocurso.persona, grupo__horarioCurso__curso=preinscripcionhorariocurso.horario_cupo.curso)
     except Matricula.DoesNotExist:
         matricula = None
 
@@ -820,23 +822,30 @@ def formalizar_vista(request, pk):
     pagado, sobrante, pendiente, pagos = calcularPagos.calcular_pagos()
 
     tarifa_plena = recibopreinscripcion.valor_requerido - preinscripcionhorariocurso.horario_cupo.curso.nivel.costo_materiales
+    documentos_faltantes = []
+    monto_pendiente = 0
+
     if request.method == 'POST':
         facturacion_form = RequiereFacturacionForm(request.POST)
         if facturacion_form.is_valid():
             preinscripcionhorariocurso.requiere_facturacion = facturacion_form.cleaned_data['requiere_facturacion']
             preinscripcionhorariocurso.save()
+
         if preinscripcionhorariocurso.estado_preinscripcion == 5:
             preinscripcionhorariocurso.estado_preinscripcion = 3
             preinscripcionhorariocurso.save()
+
         if descuento_aplicado:
             for d in documentos:
                 if not d.entregado:
                     validar_descuento = False
+
             try:
                 pago_descuento = Pago.objects.get(financiero=descuento_aplicado)
             except Pago.DoesNotExist:
                 pago_descuento = None
-            # si todos los documentos de documento estan entregados y no existe un pago para este descuento crear pago
+
+            # Si todos los documentos de descuento están entregados y no existe un pago para este descuento, crear pago
             if validar_descuento and not pago_descuento:
                 pago = Pago(
                     realizado_por=preinscripcionhorariocurso.persona,
@@ -848,29 +857,81 @@ def formalizar_vista(request, pk):
                     tipo='Descuento'
                 )
                 pago.save()
-                #actualizar estado de descuento aplicado
+                # Actualizar estado de descuento aplicado
                 descuento_aplicado.estado_descuento = 2
                 descuento_aplicado.save()
+
         if comprobantes_banco:
             for comprobante in comprobantes_banco:
                 try:
                     comprobante_pago = Pago.objects.get(financiero=comprobante)
                 except Pago.DoesNotExist:
                     comprobante_pago = None
+
                 if not comprobante_pago:
                     pago_banco = Pago(realizado_por=preinscripcionhorariocurso.persona, financiero=comprobante,
-                                tipo_preinscripcion=1, recibo_preinscripcion=recibopreinscripcion,
-                                aprobo=request.user.profile, fecha_hora=datetime.now(), tipo='Pago Usuario')
+                                      tipo_preinscripcion=1, recibo_preinscripcion=recibopreinscripcion,
+                                      aprobo=request.user.profile, fecha_hora=datetime.now(), tipo='Pago Usuario')
                     pago_banco.save()
                     comprobante.estado_pago = 2
                     comprobante.save()
+
         pagado, sobrante, pendiente, pagos = calcularPagos.calcular_pagos()
         if pendiente < 0:
             pendiente = 0
+
+        # Lógica para determinar documentos faltantes
+        if not validar_descuento and documentos:
+                documentos_faltantes = [d.documento_requerido for d in documentos if not d.entregado]
+
+
+        # Lógica para determinar monto pendiente
+        if pendiente > 0:
+            monto_pendiente = pendiente
+
         if pendiente == 0 and validar_descuento and preinscripcionhorariocurso.persona.documento_identificacion_entregado and (preinscripcionhorariocurso.estado_preinscripcion == 5 or preinscripcionhorariocurso.estado_preinscripcion == 3):
             preinscripcionhorariocurso.estado_preinscripcion = 1
             preinscripcionhorariocurso.save()
+            
+
+        html_message = loader.render_to_string(
+            'administracion/inscripcion/formalizacion_curso_confirmacion_email.html',
+            {
+                'preinscripcionhorariocurso': preinscripcionhorariocurso,
+                'recibo': recibopreinscripcion,
+                'descuento_aplicado': descuento_aplicado,
+                'documentos': documentos,
+                'beca': beca,
+                'valor_descuento': valor_descuento,
+                'reservas': reservas_saldos,
+                'matricula': matricula,
+                'pagos': pagos,
+                'pagado': pagado,
+                'sobrante': sobrante,
+                'pendiente': pendiente,
+                'comprobantes_banco': comprobantes_banco,
+                'tarifa_plena': tarifa_plena,
+                'saldo_flag': saldo_flag,
+                'facturacion_form': facturacion_form,
+                'documentos_faltantes': documentos_faltantes,
+                'monto_pendiente': monto_pendiente,
+                'link_carga_documentos': informacion_formalizacion.link_carga_documentos,
+
+            },
+            request=request
+        )
+
+        send_mail(
+            'Confirmación de Formalización de Curso',
+            '',
+            'sialex_fchbog@unal.edu.co',
+            [preinscripcionhorariocurso.persona.usuario.email],
+            fail_silently=True,
+            html_message=html_message
+        )
+
         return HttpResponseRedirect(request.path_info)
+
     return render(request, "administracion/inscripcion/formalizar_preinscripcion_curso.html",
                   {
                       'preinscripcionhorariocurso': preinscripcionhorariocurso,
@@ -888,8 +949,11 @@ def formalizar_vista(request, pk):
                       'comprobantes_banco': comprobantes_banco,
                       'tarifa_plena': tarifa_plena,
                       'saldo_flag': saldo_flag,
-                      'facturacion_form': facturacion_form
+                      'facturacion_form': facturacion_form,
+                      'documentos_faltantes': documentos_faltantes,
+                      'monto_pendiente': monto_pendiente,
                   })
+
 
 @login_required()
 @csrf_exempt
@@ -900,6 +964,8 @@ def formalizar_vista_examen(request, pk):
     saldo_flag = check_saldo_cargado(recibopreinscripcion)
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionexamen)
     grupo_estudiante = Group.objects.get(name='Estudiante')
+    monto_pendiente = None
+    informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
     try:
         calificacion = CalificacionExamen.objects.get(preinscripcion_examen=preinscripcionexamen)
     except CalificacionExamen.DoesNotExist:
@@ -944,11 +1010,46 @@ def formalizar_vista_examen(request, pk):
                     comprobante.save()
         calcularPagos = CalcularPagosRecibo(recibopreinscripcion)
         pagado, sobrante, pendiente, pagos = calcularPagos.calcular_pagos()
+        
+        documento_faltante = None
+        if not preinscripcionexamen.persona.documento_identificacion_entregado:
+            documento_faltante = "Documento de Identificación"
         if pendiente < 0:
             pendiente = 0
+        if pendiente > 0:
+            monto_pendiente = pendiente
         if pendiente == 0 and preinscripcionexamen.persona.documento_identificacion_entregado and (preinscripcionexamen.estado_preinscripcion == 5 or preinscripcionexamen.estado_preinscripcion == 3):
             preinscripcionexamen.estado_preinscripcion = 1
             preinscripcionexamen.save()
+
+        html_message = loader.render_to_string(
+            'administracion/inscripcion/formalizacion_examen_confirmacion_email.html',
+            {   'preinscripcionexamen': preinscripcionexamen,
+                'recibo': recibopreinscripcion,
+                'reservas': reservas_saldos,
+                'periodo': periodo,
+                'pagos': pagos,
+                'pagado': pagado,
+                'sobrante': sobrante,
+                'pendiente': pendiente,
+                'comprobantes_banco': comprobantes_banco,
+                'documento_faltante': documento_faltante,
+                'monto_pendiente': monto_pendiente,
+                'link_carga_documentos': informacion_formalizacion.link_carga_documentos,
+
+            },
+            request=request
+        )
+
+        send_mail(
+            'Confirmación de Formalización de Examem',
+            '',
+            'sialex_fchbog@unal.edu.co',
+            [preinscripcionexamen.persona.usuario.email],
+            fail_silently=True,
+            html_message=html_message
+        )
+
         return HttpResponseRedirect(request.path_info)
     return render(request, "administracion/inscripcion/formalizar_preinscripcion_examen.html", {'preinscripcionexamen' : preinscripcionexamen, 'reservas' : reservas_saldos,\
         'recibo' : recibopreinscripcion, 'nivel_asignado' : nivel_asignado, 'pagos' : pagos, 'pagado': pagado, 'sobrante' : sobrante, \

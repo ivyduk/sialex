@@ -10,6 +10,8 @@ from django.db.models.signals import post_save, m2m_changed
 from django.conf import settings
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from django.utils.translation import gettext_lazy as _
+
 
 
 from django.urls import reverse
@@ -1040,6 +1042,7 @@ class ExamenClasificacion(models.Model):
     docentes_evaluadores = models.ManyToManyField(Docente)
     lugar_aplicacion = models.CharField(max_length=300, default='')
     fecha_hora = models.DateTimeField(null=True)
+    codigo_proyecto = models.IntegerField(null=True, blank=True)
     fecha_hora_recepcion_documentos = models.TextField(max_length=3000, default='')
     mensaje_formalizacion = RichTextField(blank=True, null=True)
 
@@ -1324,6 +1327,7 @@ class InformacionPreinscripcionFormalizacion(models.Model):
     horario_citacion = models.TextField(max_length=1000, default='De 8 am a 6 pm')
     periodo = models.OneToOneField(Periodo, on_delete=models.PROTECT, help_text='Selección de periodo', unique=True)
     mensaje_formalizacion = RichTextField(blank=True, null=True)
+    link_carga_documentos = models.URLField(_("Link carga de documentos"), blank=True, null=True)
 
     def __str__(self):
         """
