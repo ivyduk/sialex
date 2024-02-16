@@ -87,7 +87,7 @@
 
         </div>
         <h2>Documentos Requeridos</h2>
-        <div class="row">
+        <li class="row">
          <ul class="list-group">
               <li class="list-group-item row">
                   <div class="col-md-4">
@@ -182,30 +182,42 @@
                             </li>                            
                         {% endfor %}
                 {% endif %}
-                <li class="list-group-item row">
+                {% if pendiente > 0 %}
+                    <li class="list-group-item row">
                         <div class="col-md-4">
-                            {% if pendiente > 0 %}
-                                <button type="button" class="btn btn-primary js-create-pago" >
+                            <button type="button" class="btn btn-primary js-create-pago" >
                                 <span class="glyphicon glyphicon-plus"></span>
                                 Agregar Pago
-                                </button>
-                            {% endif %}
-                    </div>
+                            </button>
+                        </div>
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4"></div>
+                    </li>
+                {% endif %}
 
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4" id="observaciones-section"></div>
-                    <div class="col-md-4"></div>
-                    <div class="col-md-12">
-                        <br><br>                        
-                        <button type="button" class="btn btn-primary js-create-observacion" >
-                            <span class="glyphicon glyphicon-plus"></span>
-                            Agregar Observaciones
-                        </button> 
-                    </div>
-                </li>
+                {% if observaciones %}
+                    <li class="list-group-item list-group-flush row">
+                            <div class="col-md-9">
+                                <h4><b>Observaciones: </b>{{ observaciones }}</h4>
+                            </div>
+                    <div class="col-md-3">
+                        <button class="observaciones_update btn btn-primary btn-xs" data-id="{% url 'observaciones_update' preinscripcionhorariocurso.id %}">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                    </li>
+                {% else %}
+                    <li class="list-group-item row">
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-primary observaciones_update" data-id="{% url 'observaciones_update' preinscripcionhorariocurso.id %}">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Agregar Observaciones
+                            </button>
+                        </div>
+                    </li>
+                {% endif %}
                 
           </ul>
-        </div>
         <div class="row">
                 <div class="column">
                     <div class="panel panel-default">
@@ -374,17 +386,17 @@ input[type='button']
     $(function () {
 
         $(".js-create-pago").click(function () {
-        $.ajax({
-            url: "{% url 'comprobante_pago_create' preinscripcionhorariocurso.id %}",
-            type: 'get',
-            dataType: 'json',
-            beforeSend: function () {
-                $("#modal").modal("show");
-            },
-            success: function (data) {
-            $("#modal .modal-content").html(data.html_form);
-            }
-        });
+            $.ajax({
+                url: "{% url 'comprobante_pago_create' preinscripcionhorariocurso.id %}",
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                    $("#modal").modal("show");
+                },
+                success: function (data) {
+                $("#modal .modal-content").html(data.html_form);
+                }
+            });
         });
 
         });
@@ -397,47 +409,18 @@ input[type='button']
         });
     });
     $(document).ready(function() {
+        $(".observaciones_update").each(function () {
+            $(this).modalForm({formURL: $(this).data('id')});
+        });
+
+    });
+
+    $(document).ready(function() {
         $(".comprobante_pago_update").each(function () {
             $(this).modalForm({formURL: $(this).data('id')});
         });
 
     });
 </script>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $(".js-create-observacion").click(function () {
-            $.ajax({
-                url: "{% url 'observaciones_create' preinscripcionhorariocurso.id %}",
-                type: 'get',
-                dataType: 'json',
-                beforeSend: function () {
-                    $("#modal").modal("show");
-                },
-                success: function (data) {
-                    console.log("Contenido del formulario antes de guardar:", $("textarea[name='observaciones']").val());
-                    $("#modal .modal-content").html(data.html_form);
-
-                    // Aquí puedes agregar un log para imprimir el contenido del formulario antes de guardarlo
-                    console.log("Contenido del formulario antes de guardar:", $("#id_observaciones").val());
-
-                    $("#observaciones-section").html(data.observacion_texto);
-
-                    // Agrega un log para imprimir la respuesta después de recibir la respuesta del servidor
-                    console.log("Respuesta del servidor después de guardar:", data);
-
-                },
-
-                error: function (xhr, ajaxOptions, thrownError) {
-                    console.log("Error AJAX:", xhr.status, thrownError);
-                }
-            });
-        });
-    });
-</script>
-
-
-
-
 
 {% endblock %}
