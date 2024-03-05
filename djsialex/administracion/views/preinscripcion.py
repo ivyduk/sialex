@@ -124,9 +124,8 @@ class PreinscripcionCursoListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         perfil = Profile.objects.get(usuario=self.request.user)
-        periodo_id = self.request.session["periodo_contextualizado_id"]
-        preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(persona=perfil, horario_cupo__curso__oferta_academica__periodo_id=periodo_id)
-        preinscripcionesExamen = PreinscripcionExamen.objects.filter(persona=perfil, examen__periodo_id=periodo_id)
+        preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(persona=perfil, horario_cupo__curso__oferta_academica__periodo__activo=True)
+        preinscripcionesExamen = PreinscripcionExamen.objects.filter(persona=perfil, examen__periodo__activo=True)
         return list(chain(preinscripcionesCurso, preinscripcionesExamen))
 
 

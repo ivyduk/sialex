@@ -228,7 +228,6 @@ def cargar_examenes_disponibles_admin(request):
 def cargar_examenes_disponibles(request):
 
     if request.user.is_authenticated:
-        periodo = request.session["periodo_contextualizado_id"]
         idioma_id = request.GET.get('idioma')
         if idioma_id:
             try:
@@ -236,16 +235,11 @@ def cargar_examenes_disponibles(request):
             except Profile.DoesNotExist:
                 aspirante = None
 
-            try:
-                periodo = Periodo.objects.get(pk=periodo)
-            except Periodo.DoesNotExist:
-                periodo = None
-
             fecha_nacimiento = aspirante.fecha_nacimiento
             edad_aspirante = calcularEdad(fecha_nacimiento)
-            examenes_por_idioma = ExamenClasificacion.objects.filter(idioma=idioma_id, edad_minima__lte = edad_aspirante, periodo_id=periodo)
+            examenes_por_idioma = ExamenClasificacion.objects.filter(idioma=idioma_id, edad_minima__lte=edad_aspirante, periodo__activo=True)
             examenes_disponibles = examenes_por_idioma.filter(cupo_disponible__gt=0)
-            autorizaciones = AutorizadoExamen.objects.filter(numero_documento=aspirante.numero_documento, periodo=periodo,estado__in=[1,3], examen__in=examenes_por_idioma).all() #Estado: AUTORIZADO o AUTORIZACION_CANCELADA
+            autorizaciones = AutorizadoExamen.objects.filter(numero_documento=aspirante.numero_documento, estado__in=[1,3], examen__in=examenes_por_idioma).all() #Estado: AUTORIZADO o AUTORIZACION_CANCELADA
             for autorizacion in autorizaciones:
 
                 try:
@@ -256,7 +250,7 @@ def cargar_examenes_disponibles(request):
                     examenes_disponibles |= examen
             data = {}
             for i in examenes_disponibles:
-                data[str(i.id)]=i.nombre
+                data[str(i.id)] = i.nombre
             serialized_obj = json.dumps(data)
             return render(request, 'webservices/index.html', {'resultset': serialized_obj})
 
