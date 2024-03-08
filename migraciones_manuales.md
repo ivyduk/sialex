@@ -153,6 +153,8 @@ SELECT ag.codigo_proyecto                   AS ID_SUB_PROYECTO_CURSO,
                         WHEN recpre.descuento_id = 30 then NULL --'Nivel asesor' -- ESTAS PERSONAS SALEN DE LA CONSULTA DEBIDO A TEMAS FUNCIONALES '' estan omitidos en en WHERE
                         WHEN recpre.descuento_id = 31
                             then NULL --'Docente'                     TODO: REEMPLAZAR NULOS POR LOS VALORES REQUERIDOS
+                        WHEN recpre.descuento_id = NULL
+                            then NULL --'Tarifa plena'
                         END                              AS Descuento,
                     -- *** las personas pueden aplicar a mas de un descuento a la vez Rta No
                     ao.tarifa as valor_inscripcion,
@@ -184,12 +186,14 @@ SELECT ag.codigo_proyecto                   AS ID_SUB_PROYECTO_CURSO,
             join administracion_curso cur ON ahc.curso_id = cur.id
             join administracion_nivel nivel ON cur.nivel_id = nivel.id
             join administracion_ofertaacademica ao ON cur.oferta_academica_id = ao.id
-            join administracion_periodo per ON ao.periodo_id = per.id 
+            join administracion_periodo per ON ao.periodo_id = per.id        /*
+    WHERE ag.nombre LIKE '%Introductorio%' AND (per.alias LIKE '2019%' OR per.alias LIKE '2020%' OR per.alias LIKE '2021%')
+    */
 
     WHERE preinscr.estado_preinscripcion in (1, 3)
       AND preinscr.fecha_preinscripcion between fechaInicial and fechaFinal
       AND preinscr.requiere_facturacion IS TRUE
-      AND recpre.descuento_id NOT IN ( 26, 27, 28, 29, 30 ) -- POR SOLICITUD ESPECIAL, LAS PERSONAS CON ESTOS DESCUENTOS NO VIAJAN POR EL WEB SERVICE Y LA DEPENDENCIA SE ENCARGA DE ENTREGARLOS A HERMES
+      -- AND descap.descuento_id NOT IN ( 26, 27, 28, 29, 30 ) -- POR SOLICITUD ESPECIAL, LAS PERSONAS CON ESTOS DESCUENTOS NO VIAJAN POR EL WEB SERVICE Y LA DEPENDENCIA SE ENCARGA DE ENTREGARLOS A HERMES
     ORDER BY ID_SUB_PROYECTO_CURSO,
              Tipo_Documento, numero_documento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
              sexo_biologico, estado_civil,
