@@ -1155,6 +1155,7 @@ class Beca(Financiero):
     class Meta:
         ordering = ['-id']
 
+
 class ComprobanteBanco(Financiero):
 
     numero_recibo = models.CharField(max_length=100, null=False)
@@ -1171,11 +1172,21 @@ class ReciboPreinscripcion(models.Model):
     valor_requerido = models.FloatField(default=0)
     valor_pagado = models.FloatField(default=0)
     estado_recibo = models.IntegerField(choices=ESTADOS_RECIBO, default=2)
+    valor_pagado_usuario = models.FloatField(default=0)
+    valor_pagado_beca = models.FloatField(default=0)
+    valor_pagado_saldo = models.FloatField(default=0)
+    valor_pagado_descuento = models.FloatField(default=0)
+    descuento_id = models.IntegerField(null=True)
+    valor_materiales = models.FloatField(default=0)
+    fecha_pago = models.DateTimeField()
+    migrado = models.BooleanField(default=False)
+
 
 class SaldoAFavor(Financiero):
     activo = models.BooleanField(default=False)
     recibo_preinscripcion_generado = models.ForeignKey(ReciboPreinscripcion, on_delete=models.PROTECT, null=True)
     devuelto = models.BooleanField(default=False)
+
 
 class ReservasSaldo(models.Model):
     saldo = models.ForeignKey(SaldoAFavor, on_delete=models.PROTECT)
@@ -1183,15 +1194,19 @@ class ReservasSaldo(models.Model):
     preinscripcion_reserva = models.ForeignKey(Preinscripcion, on_delete=models.PROTECT, null=True)
     pagado = models.BooleanField(default=False)
 
+
 class Pago(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     realizado_por = models.ForeignKey(Profile, related_name='pago_realizado_por', on_delete=models.CASCADE, null=True)
     financiero = models.ForeignKey(Financiero, on_delete=models.CASCADE, null=True)
     tipo_preinscripcion = models.IntegerField(choices=TIPOS_PREINSCRIPCION, default=1)
-    recibo_preinscripcion = models.ForeignKey(ReciboPreinscripcion, on_delete=models.CASCADE, null=True)
+    recibo_preinscripcion = models.ForeignKey(
+        ReciboPreinscripcion, on_delete=models.CASCADE, null=True, related_name='pagos'
+    )
     aprobo = models.ForeignKey(Profile, related_name='pago_aprobo', on_delete=models.CASCADE, null=True)
     fecha_hora = models.DateTimeField()
     tipo = models.CharField(max_length=50, default='Pago', null=False)
+
 
 class Devolucion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -1205,6 +1220,7 @@ class Devolucion(models.Model):
     def get_valor_devuelto(self):
         valor_devuelto = ((self.saldo_a_favor.valor * self.porcentaje)/100)
         return valor_devuelto
+
 
 class CalificacionExamen(models.Model):
 
@@ -1220,6 +1236,8 @@ class CalificacionExamen(models.Model):
         :return: nombre
         """
         return self.preinscripcion_examen.examen.nombre + ' ' + self.preinscripcion_examen.persona.numero_documento
+
+
 
 class Evento(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
