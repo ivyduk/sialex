@@ -62,7 +62,7 @@ class ComprobantePagoCreateView(LoginRequiredMixin,CreateView):
             return reverse_lazy('formalizar-curso', kwargs={'pk': self.object.preinscripcion_generada_id})
 
 
-class ComprobantePagoUpdateView(LoginRequiredMixin,BSModalUpdateView):
+class ComprobantePagoUpdateView(LoginRequiredMixin, BSModalUpdateView):
     model = ComprobanteBanco
     template_name = 'administracion/comprobanteBanco/comprobante_banco_update.html'
     form_class = PagoBancoFormUpdate

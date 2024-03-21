@@ -1,3 +1,20 @@
+### version 1.11.0
+###Migracion agregada para link de carga de documentos en un periodo academico
+``` sql
+ALTER TABLE administracion_informacionpreinscripcionformalizacion 
+ADD COLUMN link_carga_documentos VARCHAR(300);
+```
+
+###Migracion codigo Hermes examen de clasificacion
+``` sql
+ALTER TABLE administracion_examenclasificacion ADD COLUMN codigo_proyecto INTEGER NULL;
+```
+
+###Migracion campo observaciones en preinscripcion
+``` sql
+ALTER TABLE administracion_preinscripcion ADD COLUMN observaciones TEXT NULL;
+``` 
+
 ### version 1.9.0
 
 ``` sql
@@ -110,16 +127,4 @@ ALTER TABLE administracion_grupoacademico ADD COLUMN fecha_final DATE;
 ``` sql
 ALTER TABLE administracion_grupoacademico ADD COLUMN enlace_virtual TEXT;
 ```
-
-###Migracion agregada para link de carga de documentos en un periodo academico
-``` sql
-ALTER TABLE administracion_informacionpreinscripcionformalizacion 
-ADD COLUMN link_carga_documentos VARCHAR(300);
-```
-
-###Migracion codigo Hermes examen de clasificacion
-``` sql
-ALTER TABLE administracion_examenclasificacion ADD COLUMN codigo_proyecto INTEGER NULL;
-```
-
 

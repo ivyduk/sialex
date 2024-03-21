@@ -1,7 +1,7 @@
 from django import forms
 
-from administracion.models import PreinscripcionHorarioCurso, Periodo, ProgramaAcademico, Nivel, Curso, OfertaAcademica, \
-    HorarioCurso, PreinscripcionExamen, Idioma
+from administracion.models import PreinscripcionHorarioCurso, Idioma, ProgramaAcademico, Nivel, Curso, OfertaAcademica, \
+    HorarioCurso, PreinscripcionExamen, Preinscripcion, Idioma, Periodo
 
 
 class PreinscripcionCursoForm(forms.ModelForm):
@@ -16,7 +16,6 @@ class PreinscripcionCursoForm(forms.ModelForm):
     )
 
     class Meta:
-        pass
         model = PreinscripcionHorarioCurso
         exclude = ['horario_cupo','persona','estado_preinscripcion','estado_matriculado','fecha_preinscripcion', 'descuento_solicitado', 'valor_preinscripcion', 'codigo_hash']
 
@@ -34,3 +33,20 @@ class PreinscripcionCursoLoteForm(forms.Form):
 
     idioma = forms.ModelChoiceField(queryset=Idioma.objects.all().order_by('nombre'))
     archivo = forms.FileField(required=True)
+
+
+class ObservacionPreinscripcionForm(forms.ModelForm):
+
+    class Meta:
+        model = Preinscripcion
+        exclude = [
+            'horario_cupo',
+            'persona',
+            'estado_preinscripcion',
+            'estado_matriculado',
+            'fecha_preinscripcion',
+            'descuento_solicitado',
+            'valor_preinscripcion',
+            'codigo_hash',
+            'requiere_facturacion'
+        ]

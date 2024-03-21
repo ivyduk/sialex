@@ -3,9 +3,7 @@
 {% block content %}
     <div class="modal fade" tabindex="-1" role="dialog" id="modal" xmlns="http://www.w3.org/1999/html">
         <div class="modal-dialog">
-        <div class="modal-content">
-    
-        </div>
+            <div class="modal-content"></div>
         </div>
     </div>
     <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
@@ -79,10 +77,10 @@
                                 <td></td>
                             </tr>
 
-                        <tr>
-                            <form action = "{% url 'formalizar-curso' preinscripcionhorariocurso.id %}" method = "post" id="requiere_facturacion">
-                                {{facturacion_form}}
-                            </form>
+                        <tr>   
+                                <form action = "{% url 'formalizar-curso' preinscripcionhorariocurso.id %}" method = "post" id="requiere_facturacion">
+                                    {{facturacion_form}}
+                                </form>
                         </tr>
                         </tbody>
                     </table>
@@ -184,18 +182,40 @@
                             </li>                            
                         {% endfor %}
                 {% endif %}
-                <li class="list-group-item row">
+                {% if pendiente > 0 %}
+                    <li class="list-group-item row">
                         <div class="col-md-4">
-                            {% if pendiente > 0 %}
-                                <button type="button" class="btn btn-primary js-create-pago">
+                            <button type="button" class="btn btn-primary js-create-pago" >
                                 <span class="glyphicon glyphicon-plus"></span>
                                 Agregar Pago
-                                </button>
-                            {% endif %}
-                    </div>
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4"></div>
-                </li>
+                            </button>
+                        </div>
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4"></div>
+                    </li>
+                {% endif %}
+
+                {% if observaciones %}
+                    <li class="list-group-item list-group-flush row">
+                            <div class="col-md-9">
+                                <h4><b>Observaciones: </b>{{ observaciones }}</h4>
+                            </div>
+                    <div class="col-md-3">
+                        <button class="observaciones_update btn btn-primary btn-xs" data-id="{% url 'observaciones_update' preinscripcionhorariocurso.id %}">
+                            <span class="glyphicon glyphicon-pencil">
+                            </span>
+                        </button>
+                    </li>
+                {% else %}
+                    <li class="list-group-item row">
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-primary observaciones_update" data-id="{% url 'observaciones_update' preinscripcionhorariocurso.id %}">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Agregar Observaciones
+                            </button>
+                        </div>
+                    </li>
+                {% endif %}
                 
           </ul>
         </div>
@@ -362,21 +382,22 @@ input[type='button']
 }
 
 </style>
-    <script type="text/javascript">
+
+<script type="text/javascript">
     $(function () {
 
         $(".js-create-pago").click(function () {
-        $.ajax({
-            url: "{% url 'comprobante_pago_create' preinscripcionhorariocurso.id %}",
-            type: 'get',
-            dataType: 'json',
-            beforeSend: function () {
-            $("#modal").modal("show");
-            },
-            success: function (data) {
-            $("#modal .modal-content").html(data.html_form);
-            }
-        });
+            $.ajax({
+                url: "{% url 'comprobante_pago_create' preinscripcionhorariocurso.id %}",
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                    $("#modal").modal("show");
+                },
+                success: function (data) {
+                $("#modal .modal-content").html(data.html_form);
+                }
+            });
         });
 
         });
@@ -389,10 +410,18 @@ input[type='button']
         });
     });
     $(document).ready(function() {
+        $(".observaciones_update").each(function () {
+            $(this).modalForm({formURL: $(this).data('id')});
+        });
+
+    });
+
+    $(document).ready(function() {
         $(".comprobante_pago_update").each(function () {
             $(this).modalForm({formURL: $(this).data('id')});
         });
 
     });
-    </script>
+</script>
+
 {% endblock %}
