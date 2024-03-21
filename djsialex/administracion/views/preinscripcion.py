@@ -409,6 +409,40 @@ def isAutorizacionNivelMenor():
 
 
 @login_required()
+def cargar_idiomas(request):
+    if request.user.is_authenticated:
+        periodo_id = request.GET.get('modalidad')
+        request.session["periodo_contextualizado_id"] = str(periodo_id)
+
+        if not periodo_id:
+            RejectedError = f"ERROR|Este periodo no tiene idiomas ofertados en la modalidad seleccionada."
+        else:
+            idiomas = Idioma.objects.filter(
+                    programaacademico__activo=True,
+                    programaacademico__ofertaacademica__periodo__activo=True,
+                    programaacademico__ofertaacademica__periodo__finalizado=False,
+                    programaacademico__ofertaacademica__periodo__id=periodo_id
+                ).prefetch_related(
+                    'programaacademico_set',
+                    'programaacademico_set__ofertaacademica_set'
+                ).distinct().order_by(
+                    'nombre'
+                )
+
+        data = {}
+        if idiomas:
+            for i in idiomas:
+                data[str(i.id)] = i.nombre
+        else:
+            data[str(id)] = RejectedError
+
+        serialized_obj = json.dumps(data)
+
+        return render(request, 'webservices/index.html', {'resultset': serialized_obj})
+    return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
+
+@login_required()
 def cargar_programas_academicos(request):
     autorizaciones_dict = {}
     if request.user.is_authenticated:

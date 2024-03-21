@@ -230,6 +230,8 @@ urlpatterns = [
 	path('inscripcion/descuento/borrar/<pk>', CancelDescuento.as_view(), name='descuento_aplicado_borrar'),
 	path('inscripcion/descuento/crear/<pk>', CrearDescuento.as_view(), name='descuento_aplicado_crear'),
 	path('inscripcion/descuento/editar/<pk>', ModificarDescuento.as_view(), name='descuento_aplicado_editar'),
+
+	path('ajax/cargar-idiomas/', cargar_idiomas, name='ajax_cargar_idiomas'),
 	path('ajax/cargar-programas/', cargar_programas_academicos, name='ajax_cargar_programas'),  # <-- this one here
 	path('ajax/cargar-niveles/', cargar_niveles, name='ajax_cargar_niveles'),  # <-- this one here
 	path('ajax/cargar-horarios/', cargar_horarios_disponibles, name='ajax_cargar_horarios'),  # <-- this one here
@@ -302,7 +304,7 @@ urlpatterns = [
 	url(r'^docente/cursos/mis-cursos', cursosAsociadosList, name='mis-cursos'),
     url(r'^docente/cursos/mis-estudiantes/(?P<grupoacademico>[-\w]+)', listadoEstudiantesPorGrupo, name='mis-estudiantes'),
     url(r'^docente/cursos/calificaciones-estudiantes/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPorGrupo, name='calificaciones-estudiantes'),
-url(r'^docente/cursos/calificaciones-listas/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPlanilla, name='calificaciones-listas'),
+	url(r'^docente/cursos/calificaciones-listas/(?P<grupoacademico>[-\w]+)', listadoCalificacionesPlanilla, name='calificaciones-listas'),
 	url(r'^docente/cursos/calificar-grupo/(?P<grupoacademico>[-\w]+)', calificarGrupo, name='calificar-grupo'),
 	url(r'^docente/cursos/actualizar-estados-todos', actualizarEstadoMatriculasGrupos, name='actualizar-estados-todos'),
 	url(r'^docente/cursos/actualizar-estados/(?P<grupoacademico>[-\w]+)', actualizarEstadoMatriculas,name='actualizar-estados'),
