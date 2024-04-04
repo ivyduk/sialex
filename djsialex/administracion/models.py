@@ -994,6 +994,10 @@ class Matricula(models.Model):
     	"""
         return self.estudiante.numero_documento + '-' + self.estudiante.primer_nombre + '-' + self.estudiante.primer_apellido
 
+    @property
+    def periodo(self):
+        return self.preinscripcion_generada.horario_cupo.curso.oferta_academica.periodo if self.preinscripcion_generada else None
+
 
 class Observacion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

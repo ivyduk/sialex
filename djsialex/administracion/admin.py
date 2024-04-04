@@ -9,8 +9,6 @@ from .models import *
 
 from django.contrib.auth.models import User, Group
 
-
-
 admin.site.register(Pais)
 admin.site.register(Ciudad)
 admin.site.register(Periodicidad)
@@ -31,16 +29,59 @@ admin.site.register(Descuento)
 admin.site.register(Docente)
 admin.site.register(Edificio)
 admin.site.register(Discapacidad)
+admin.site.register(EPS)
+
 
 class SalonAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'edificio']
 
-admin.site.register(Salon , SalonAdmin)
+
+admin.site.register(Salon, SalonAdmin)
+
+
+class GrupoAcademicoAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'codigo', 'codigo_proyecto']
+    search_fields = ('id', 'codigo_proyecto', 'nombre')
+
+
+admin.site.register(GrupoAcademico, GrupoAcademicoAdmin)
+
+
+@admin.register(Profile)
+class PreinscripcionCursoAdmin(admin.ModelAdmin):
+    list_display = ('numero_documento', 'id', 'primer_nombre',
+                    'primer_apellido')
+    search_fields = ('numero_documento', 'primer_nombre', 'primer_apellido')
+    readonly_fields = ('direccion_sin_formato', 'usuario')
+
+
+@admin.register(PreinscripcionHorarioCurso)
+class PreinscripcionCursoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'fecha_preinscripcion', 'persona',
+                    'estado_preinscripcion', 'valor_preinscripcion', 'requiere_facturacion',
+                    'horario_cupo')
+    search_fields = ( 'id', 'persona__numero_documento')
+    readonly_fields = ('valor_preinscripcion', 'codigo_hash')
+
+
+@admin.register(PreinscripcionExamen)
+class PreinscripcionExamenAdmin(admin.ModelAdmin):
+    list_display = ('id', 'fecha_preinscripcion', 'persona',
+                    'estado_preinscripcion', 'valor_preinscripcion', 'requiere_facturacion')
+    search_fields = ('id', 'persona__numero_documento')
+    readonly_fields = ('valor_preinscripcion', 'codigo_hash')
+
 
 @admin.register(Periodo)
 class PeriodoAdmin(admin.ModelAdmin):
 	list_display = ('alias', 'secuencia', 'anio','secuencia', 'nombre')
 
+
+@admin.register(Matricula)
+class MatriculaAdmin(admin.ModelAdmin):
+    list_display = ('estudiante', 'estado_matricula', 'grupo_id', 'calificacionFinal', 'total_fallas')
+    search_fields = ('estudiante__numero_documento', )
+    readonly_fields = ('calificacionFinal', )
 
 @admin.register(Horario)
 class HorarioAdmin(admin.ModelAdmin):
@@ -109,6 +150,7 @@ class ResponseAdmin(admin.ModelAdmin):
     inlines = [AnswerBaseInline]
     # specifies the order as well as which fields to act on
     readonly_fields = ["survey", "created", "updated", "interview_uuid", "user"]
+
 
 admin.site.register(Survey, SurveyAdmin)
 admin.site.register(Response, ResponseAdmin)
