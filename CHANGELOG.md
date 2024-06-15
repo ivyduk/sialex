@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.10.4
+- Agregar script para agregar información de pagos en recibo de preinscripción y migrarla
+
 ## 1.10.3
 - Reactivar envios de correo y activación de los usuarios en dos pasos al registrarse
 
