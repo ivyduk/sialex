@@ -245,7 +245,7 @@ class Nivel(models.Model):
     edad_minima = models.IntegerField(default=1, help_text='Edad mínima permitida', null=True)
     edad_maxima = models.IntegerField(default=100, help_text='Edad máxima permitida', null=True)
     documentos_pago = models.CharField(max_length=300, default='Recibo Original y copia')
-    mensaje_formalizacion = RichTextField(blank=True, null=True)
+    mensaje_formalizacion = RichTextField(blank=True, null=True, verbose_name="Instrucciones Formalización")
 
     def get_absolute_url(self):
         """
@@ -1047,7 +1047,7 @@ class ExamenClasificacion(models.Model):
     fecha_hora = models.DateTimeField(null=True)
     codigo_proyecto = models.IntegerField(null=True, blank=True)
     fecha_hora_recepcion_documentos = models.TextField(max_length=3000, default='')
-    mensaje_formalizacion = RichTextField(blank=True, null=True)
+    mensaje_formalizacion = RichTextField(blank=True, null=True, verbose_name="Instrucciones Formalización")
 
     def __str__(self):
         """
@@ -1347,8 +1347,8 @@ class InformacionPreinscripcionFormalizacion(models.Model):
     lugar_citacion = models.CharField(max_length=300, default='Oficina de extensión')
     horario_citacion = models.TextField(max_length=1000, default='De 8 am a 6 pm')
     periodo = models.OneToOneField(Periodo, on_delete=models.PROTECT, help_text='Selección de periodo', unique=True)
-    mensaje_formalizacion = RichTextField(blank=True, null=True)
-    link_carga_documentos = models.URLField(_("Link carga de documentos"), blank=True, null=True)
+    mensaje_formalizacion = RichTextField(blank=True, null=True, verbose_name="Instrucciones Formalización (Solo cursos)")
+    link_carga_documentos = models.URLField(_("Link carga de documentos (Cursos y exámenes)"), blank=True, null=True)
 
     def __str__(self):
         """
