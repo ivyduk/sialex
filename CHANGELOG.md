@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.11.0
+- Agregar campo de URL para formulario de captura de documentos en mensaje de formalización
+- Enviar un correo de formalización al usuario una vez se realice el proceso
+- Agregar código hermes para los exámenes de clasificación
+- Agregar filtro para calificaciones de exámenes
+- Agregar campo de texto para registrar observaciones en los datos de preinscripción.
+- Ajustar mensajes de error en formulario de preinscripción
+
 ## 1.10.4
 - Agregar script para agregar información de pagos en recibo de preinscripción y migrarla
 
