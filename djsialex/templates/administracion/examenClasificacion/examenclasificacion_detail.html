@@ -18,6 +18,9 @@
                     {{ examenclasificacion.lugar_aplicacion }}
             </li>
             <li class="list-group-item">Fecha-Hora Aplicación: {{ examenclasificacion.fecha_hora|date:"Y-m-d, H:i" }}</li>
+            <li class="list-group-item">Codigo proyecto:
+                {{ examenclasificacion.codigo_proyecto }}
+            </li>
             <li class="list-group-item">Instrucciones:
                 {% if examenclasificacion.mensaje_formalizacion %}
                     {{ examenclasificacion.mensaje_formalizacion|safe }}

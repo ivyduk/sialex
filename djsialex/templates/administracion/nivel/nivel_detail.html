@@ -23,7 +23,7 @@
             </li>
             <li class="list-group-item">Sección Documentos: {{ nivel.documentos_pago }}</li>
             {{ form.media }}
-            <li class="list-group-item">Mensaje Formalización:
+            <li class="list-group-item">Instrucciones Formalización:
                 {% if nivel.mensaje_formalizacion%}{{ nivel.mensaje_formalizacion|safe }}
                 {% else %} No tiene mensaje para formalización, se tomará el que esta definido en el periodo
                 {% endif %}
