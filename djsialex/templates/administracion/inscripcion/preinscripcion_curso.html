@@ -2,6 +2,11 @@
 {% load widget_tweaks %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static "css/base_preinscripcion.css" %}">
+{% if error_message %}
+    <div id="id_idioma_error" class="alert alert-warning">
+        {{ error_message }}
+    </div>
+{% endif %}
 {% block form %}
 <script>
     var table_reset = null
@@ -16,6 +21,8 @@
             dataObject["descuento"] = $("#id_descuento").prop("value");
             dataObject["horario_curso"] = $("#id_horario_curso").prop("value");
             dataObject["programa_academico"] = $("#id_programa_academico").prop("value");
+            dataObject["horario_id"] = $("#id_horario_curso").prop("value");
+
             $.getJSON("{% url 'preinscripcion_fase_previa' %}", dataObject, function(data) {
                 $("#idioma_reg").val(data["idioma"])
                 $("#horario_curso_reg").val(data["horario"])
@@ -62,6 +69,13 @@
                 Recuerde seleccionar el descuento de menores de edad en caso que aplique para el curso de su elección
             </div>
         {% endif %}
+
+        {% if error_message %}
+            <div id="id_idioma_error" class="alert alert-warning">
+                {{ error_message }}
+            </div>
+        {% endif %}
+
         {% if form.errors %}
         <!-- Error messaging -->
         <div id="errors" class="alert alert-warning" role="alert">
@@ -113,7 +127,7 @@
                     </div>
                     <label class="col-md-3">Horario</label>
                     <div class="col-md-9">
-                        <select name="horario_curso" required="" id="id_horario_curso" class="form-control cascadeDropDown" nextfield="#id_descuento" nextblock="#bloque_descuento,#bloque_enviar" dataurl="{% url 'ajax_cargar_descuentos' %}" parametro="programa_academico" datafield="#id_programa_academico">
+                        <select name="horario_curso" required="" id="id_horario_curso" class="form-control cascadeDropDown" nextfield="#id_descuento" nextblock="#bloque_descuento,#bloque_enviar" dataurl="{% url 'ajax_cargar_descuentos' %}" parametro="programa_academico" datafield="#id_programa_academico" parametro2="horario", datafield2="#id_horario_curso">
                             <option value="" selected="">---------</option>
                         </select>
                     </div>
@@ -235,6 +249,7 @@
                                 </span>
                                 <br />
                                 <br />
+                                <input type="hidden" name="horario_id" id="horario_id">
 
                                 <div class="container-login100-form-btn col-md-6 col-md-offset-3">
                                     <input type="submit" class="btn-primary-login" value="Confirmar preinscripción"
@@ -262,6 +277,7 @@
         $(".cascadeDropDown").change(function () {
             var url = $(this).attr("dataurl");
             var parametro = $(this).attr("parametro");
+            var parametro2 =  $(this).attr("parametro2");
             var id= $(this).prop("value")
 
             nextblock = $(this).attr("nextblock")
@@ -295,7 +311,12 @@
                 datafield=$(this).attr("datafield")
                 id=$(datafield).prop("value")
             }
+            if($(this).attr("datafield2")!="0"){
+                datafield=$(this).attr("datafield2")
+                id2=$(datafield).prop("value")
+            }
             dataObject[parametro] = id;
+            dataObject[parametro2] = id2;
             skipElement=false
             $.getJSON(url, dataObject, function(data) {
                 $.each(data, function(index, label) {
