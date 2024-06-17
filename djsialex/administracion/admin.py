@@ -30,6 +30,7 @@ admin.site.register(Docente)
 admin.site.register(Edificio)
 admin.site.register(Discapacidad)
 admin.site.register(EPS)
+admin.site.register(InformacionPreinscripcionFormalizacion)
 
 
 class SalonAdmin(admin.ModelAdmin):
@@ -48,7 +49,7 @@ admin.site.register(GrupoAcademico, GrupoAcademicoAdmin)
 
 
 @admin.register(Profile)
-class PreinscripcionCursoAdmin(admin.ModelAdmin):
+class ProfileAdmin(admin.ModelAdmin):
     list_display = ('numero_documento', 'id', 'primer_nombre',
                     'primer_apellido')
     search_fields = ('numero_documento', 'primer_nombre', 'primer_apellido')
@@ -83,6 +84,7 @@ class MatriculaAdmin(admin.ModelAdmin):
     search_fields = ('estudiante__numero_documento', )
     readonly_fields = ('calificacionFinal', )
 
+
 @admin.register(Horario)
 class HorarioAdmin(admin.ModelAdmin):
 	form = HorarioAdminForm
@@ -98,8 +100,9 @@ class HorarioAdmin(admin.ModelAdmin):
 
 from .models import Answer, Category, Question, Response, Survey
 
-from .encuesta_actions import  activar_plantillas
+from .encuesta_actions import activar_plantillas
 from functools import partial
+
 
 class QuestionInline(admin.TabularInline):
     model = Question

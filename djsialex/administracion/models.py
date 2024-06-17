@@ -1320,6 +1320,7 @@ class EventoPeriodo(models.Model):
         """
         return self.nombre
 
+
 class SingletonModel(models.Model):
     class Meta:
         abstract = True
@@ -1358,7 +1359,7 @@ class InformacionPreinscripcionFormalizacion(models.Model):
         """
         :return: nombre
         """
-        return "Mensaje Configuración"
+        return "Mensaje-" + self.periodo.alias
 
 
 def usuarioTieneGrupo(usuario, nombre_grupo):
@@ -1405,6 +1406,7 @@ class Survey(models.Model):
 
     def get_absolute_url(self):
         return reverse("survey-detail", kwargs={"id": self.pk})
+
 
 class Category(models.Model):
 
