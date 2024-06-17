@@ -42,7 +42,9 @@ admin.site.register(Salon, SalonAdmin)
 
 class GrupoAcademicoAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'codigo', 'codigo_proyecto']
-    search_fields = ('id', 'codigo_proyecto', 'nombre')
+    search_fields = ('id', 'codigo', 'nombre')
+    exclude = ['horarioCurso']
+    readonly_fields = ('nombre', "salones", )
 
 
 admin.site.register(GrupoAcademico, GrupoAcademicoAdmin)
@@ -62,7 +64,7 @@ class PreinscripcionCursoAdmin(admin.ModelAdmin):
                     'estado_preinscripcion', 'valor_preinscripcion', 'requiere_facturacion',
                     'horario_cupo')
     search_fields = ( 'id', 'persona__numero_documento')
-    readonly_fields = ('valor_preinscripcion', 'codigo_hash')
+    readonly_fields = ('valor_preinscripcion', 'codigo_hash', "persona")
 
 
 @admin.register(PreinscripcionExamen)
@@ -70,7 +72,7 @@ class PreinscripcionExamenAdmin(admin.ModelAdmin):
     list_display = ('id', 'fecha_preinscripcion', 'persona',
                     'estado_preinscripcion', 'valor_preinscripcion', 'requiere_facturacion')
     search_fields = ('id', 'persona__numero_documento')
-    readonly_fields = ('valor_preinscripcion', 'codigo_hash')
+    readonly_fields = ('valor_preinscripcion', 'codigo_hash', "persona", "examen")
 
 
 @admin.register(Periodo)
@@ -80,9 +82,9 @@ class PeriodoAdmin(admin.ModelAdmin):
 
 @admin.register(Matricula)
 class MatriculaAdmin(admin.ModelAdmin):
-    list_display = ('estudiante', 'estado_matricula', 'grupo_id', 'calificacionFinal', 'total_fallas')
+    list_display = ('estudiante', 'estado_matricula', 'calificacionFinal')
     search_fields = ('estudiante__numero_documento', )
-    readonly_fields = ('calificacionFinal', )
+    readonly_fields = ('calificacionFinal', "grupo_id", "grupo", "preinscripcion_generada", "estudiante")
 
 
 @admin.register(Horario)

@@ -937,7 +937,7 @@ class Salon(models.Model):
 class GrupoAcademico(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=500)
-    codigo_proyecto  = models.CharField(max_length=15, unique=True, null=True, blank=True) #AGREGADO
+    codigo_proyecto = models.CharField(max_length=15, unique=True, null=True, blank=True) #AGREGADO
     horarioCurso = models.ForeignKey(HorarioCurso, on_delete=models.PROTECT)
     salones = models.ManyToManyField(Salon)
     codigo = models.IntegerField(default=9001)
@@ -956,6 +956,13 @@ class GrupoAcademico(models.Model):
 
         super(GrupoAcademico, self).save(*args, **kwargs)
 
+    def __str__(self):
+        """
+    	Cadena para representar el modelo GrupoAcademico
+    	:return: nombre
+    	"""
+        return self.nombre
+
 
 class Preinscripcion(models.Model):
     persona = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
@@ -969,7 +976,11 @@ class Preinscripcion(models.Model):
     )
     observaciones = models.TextField(blank=True, null=True)
 
-
+    def __str__(self):
+        """
+    	Cadena para representar el modelo Presinscripcion
+    	"""
+        return str(self.id) + "-" + self.persona.numero_documento
 
 
 class PreinscripcionHorarioCurso(Preinscripcion):
