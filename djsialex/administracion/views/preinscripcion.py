@@ -169,9 +169,13 @@ def preinscripcionView(request):
                 mensaje_formalizacion = horario.curso.nivel.mensaje_formalizacion
                 documentos_mensaje = horario.curso.nivel.documentos_pago
             else:
-                informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
-                mensaje_formalizacion = informacion_formalizacion.mensaje_formalizacion
-                documentos_mensaje = informacion_formalizacion.documentos_pago
+                informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.filter(periodo=periodo).first()
+                if not informacion_formalizacion:
+                    mensaje_formalizacion = 'Instrucciones de Formalización no configuradas'
+                    documentos_mensaje = None
+                else:
+                    mensaje_formalizacion = informacion_formalizacion.mensaje_formalizacion
+                    documentos_mensaje = informacion_formalizacion.documentos_pago
 
             if preinscrito and horario and periodo:
 
@@ -798,7 +802,7 @@ def formalizar_vista(request, pk):
     saldo_flag = check_saldo_cargado(recibopreinscripcion)
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionhorariocurso)
     facturacion_form = RequiereFacturacionForm(instance=preinscripcionhorariocurso)
-    informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
+    informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.filter(periodo=periodo).first()
 
     if descuento_aplicado:
         documentos = DocumentosDescuentoSolicitado.objects.filter(descuento_aplicado=descuento_aplicado[0])
@@ -915,7 +919,7 @@ def formalizar_vista(request, pk):
                 'facturacion_form': facturacion_form,
                 'documentos_faltantes': documentos_faltantes,
                 'monto_pendiente': monto_pendiente,
-                'link_carga_documentos': informacion_formalizacion.link_carga_documentos,
+                'link_carga_documentos': informacion_formalizacion.link_carga_documentos if informacion_formalizacion else "",
 
             },
             request=request
@@ -966,7 +970,7 @@ def formalizar_vista_examen(request, pk):
     reservas_saldos = ReservasSaldo.objects.filter(preinscripcion_reserva=preinscripcionexamen)
     grupo_estudiante = Group.objects.get(name='Estudiante')
     monto_pendiente = None
-    informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.get(periodo=periodo)
+    informacion_formalizacion = InformacionPreinscripcionFormalizacion.objects.filter(periodo=periodo).first()
     try:
         calificacion = CalificacionExamen.objects.get(preinscripcion_examen=preinscripcionexamen)
     except CalificacionExamen.DoesNotExist:
@@ -1036,7 +1040,7 @@ def formalizar_vista_examen(request, pk):
                 'comprobantes_banco': comprobantes_banco,
                 'documento_faltante': documento_faltante,
                 'monto_pendiente': monto_pendiente,
-                'link_carga_documentos': informacion_formalizacion.link_carga_documentos,
+                'link_carga_documentos': informacion_formalizacion.link_carga_documentos if informacion_formalizacion else "",
                 'observaciones': preinscripcionexamen.observaciones
 
             },

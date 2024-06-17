@@ -245,7 +245,7 @@ class Nivel(models.Model):
     edad_minima = models.IntegerField(default=1, help_text='Edad mínima permitida', null=True)
     edad_maxima = models.IntegerField(default=100, help_text='Edad máxima permitida', null=True)
     documentos_pago = models.CharField(max_length=300, default='Recibo Original y copia')
-    mensaje_formalizacion = RichTextField(blank=True, null=True)
+    mensaje_formalizacion = RichTextField(blank=True, null=True, verbose_name="Instrucciones Formalización")
 
     def get_absolute_url(self):
         """
@@ -937,7 +937,7 @@ class Salon(models.Model):
 class GrupoAcademico(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=500)
-    codigo_proyecto  = models.CharField(max_length=15, unique=True, null=True, blank=True) #AGREGADO
+    codigo_proyecto = models.CharField(max_length=15, unique=True, null=True, blank=True) #AGREGADO
     horarioCurso = models.ForeignKey(HorarioCurso, on_delete=models.PROTECT)
     salones = models.ManyToManyField(Salon)
     codigo = models.IntegerField(default=9001)
@@ -956,6 +956,13 @@ class GrupoAcademico(models.Model):
 
         super(GrupoAcademico, self).save(*args, **kwargs)
 
+    def __str__(self):
+        """
+    	Cadena para representar el modelo GrupoAcademico
+    	:return: nombre
+    	"""
+        return self.nombre
+
 
 class Preinscripcion(models.Model):
     persona = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
@@ -969,7 +976,11 @@ class Preinscripcion(models.Model):
     )
     observaciones = models.TextField(blank=True, null=True)
 
-
+    def __str__(self):
+        """
+    	Cadena para representar el modelo Presinscripcion
+    	"""
+        return str(self.id) + "-" + self.persona.numero_documento
 
 
 class PreinscripcionHorarioCurso(Preinscripcion):
@@ -998,6 +1009,10 @@ class Matricula(models.Model):
     	:return: nombre
     	"""
         return self.estudiante.numero_documento + '-' + self.estudiante.primer_nombre + '-' + self.estudiante.primer_apellido
+
+    @property
+    def periodo(self):
+        return self.preinscripcion_generada.horario_cupo.curso.oferta_academica.periodo if self.preinscripcion_generada else None
 
 
 class Observacion(models.Model):
@@ -1047,7 +1062,7 @@ class ExamenClasificacion(models.Model):
     fecha_hora = models.DateTimeField(null=True)
     codigo_proyecto = models.IntegerField(null=True, blank=True)
     fecha_hora_recepcion_documentos = models.TextField(max_length=3000, default='')
-    mensaje_formalizacion = RichTextField(blank=True, null=True)
+    mensaje_formalizacion = RichTextField(blank=True, null=True, verbose_name="Instrucciones Formalización")
 
     def __str__(self):
         """
@@ -1161,6 +1176,7 @@ class Beca(Financiero):
     class Meta:
         ordering = ['-id']
 
+
 class ComprobanteBanco(Financiero):
 
     numero_recibo = models.CharField(max_length=100, null=False)
@@ -1177,7 +1193,14 @@ class ReciboPreinscripcion(models.Model):
     valor_requerido = models.FloatField(default=0)
     valor_pagado = models.FloatField(default=0)
     estado_recibo = models.IntegerField(choices=ESTADOS_RECIBO, default=2)
-    
+    valor_pagado_usuario = models.FloatField(default=0)
+    valor_pagado_beca = models.FloatField(default=0)
+    valor_pagado_saldo = models.FloatField(default=0)
+    valor_pagado_descuento = models.FloatField(default=0)
+    descuento_id = models.IntegerField(null=True)
+    valor_materiales = models.FloatField(default=0)
+    fecha_pago = models.DateTimeField()
+    migrado = models.BooleanField(default=False)
 
 
 class SaldoAFavor(Financiero):
@@ -1185,21 +1208,26 @@ class SaldoAFavor(Financiero):
     recibo_preinscripcion_generado = models.ForeignKey(ReciboPreinscripcion, on_delete=models.PROTECT, null=True)
     devuelto = models.BooleanField(default=False)
 
+
 class ReservasSaldo(models.Model):
     saldo = models.ForeignKey(SaldoAFavor, on_delete=models.PROTECT)
     valor = models.FloatField(null=False)
     preinscripcion_reserva = models.ForeignKey(Preinscripcion, on_delete=models.PROTECT, null=True)
     pagado = models.BooleanField(default=False)
 
+
 class Pago(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     realizado_por = models.ForeignKey(Profile, related_name='pago_realizado_por', on_delete=models.CASCADE, null=True)
     financiero = models.ForeignKey(Financiero, on_delete=models.CASCADE, null=True)
     tipo_preinscripcion = models.IntegerField(choices=TIPOS_PREINSCRIPCION, default=1)
-    recibo_preinscripcion = models.ForeignKey(ReciboPreinscripcion, on_delete=models.CASCADE, null=True)
+    recibo_preinscripcion = models.ForeignKey(
+        ReciboPreinscripcion, on_delete=models.CASCADE, null=True, related_name='pagos'
+    )
     aprobo = models.ForeignKey(Profile, related_name='pago_aprobo', on_delete=models.CASCADE, null=True)
     fecha_hora = models.DateTimeField()
     tipo = models.CharField(max_length=50, default='Pago', null=False)
+
 
 class Devolucion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -1213,6 +1241,7 @@ class Devolucion(models.Model):
     def get_valor_devuelto(self):
         valor_devuelto = ((self.saldo_a_favor.valor * self.porcentaje)/100)
         return valor_devuelto
+
 
 class CalificacionExamen(models.Model):
 
@@ -1228,6 +1257,8 @@ class CalificacionExamen(models.Model):
         :return: nombre
         """
         return self.preinscripcion_examen.examen.nombre + ' ' + self.preinscripcion_examen.persona.numero_documento
+
+
 
 class Evento(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -1300,6 +1331,7 @@ class EventoPeriodo(models.Model):
         """
         return self.nombre
 
+
 class SingletonModel(models.Model):
     class Meta:
         abstract = True
@@ -1331,14 +1363,14 @@ class InformacionPreinscripcionFormalizacion(models.Model):
     lugar_citacion = models.CharField(max_length=300, default='Oficina de extensión')
     horario_citacion = models.TextField(max_length=1000, default='De 8 am a 6 pm')
     periodo = models.OneToOneField(Periodo, on_delete=models.PROTECT, help_text='Selección de periodo', unique=True)
-    mensaje_formalizacion = RichTextField(blank=True, null=True)
-    link_carga_documentos = models.URLField(_("Link carga de documentos"), blank=True, null=True)
+    mensaje_formalizacion = RichTextField(blank=True, null=True, verbose_name="Instrucciones Formalización (Solo cursos)")
+    link_carga_documentos = models.URLField(_("Link carga de documentos (Cursos y exámenes)"), blank=True, null=True)
 
     def __str__(self):
         """
         :return: nombre
         """
-        return "Mensaje Configuración"
+        return "Mensaje-" + self.periodo.alias
 
 
 def usuarioTieneGrupo(usuario, nombre_grupo):
@@ -1385,6 +1417,7 @@ class Survey(models.Model):
 
     def get_absolute_url(self):
         return reverse("survey-detail", kwargs={"id": self.pk})
+
 
 class Category(models.Model):
 
