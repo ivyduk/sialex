@@ -266,13 +266,22 @@ class Nivel(models.Model):
 		"""
         return self.alias
 
-
     def getNombreNivelIdioma(self):
 
         idioma_nombre = ''
         if self.idioma:
             idioma_nombre = self.idioma.nombre
         return idioma_nombre + '-' + self.nombre
+
+    @staticmethod
+    def getNivelesProgramasActivos(idioma_id):
+        return Nivel.objects.filter(
+            idioma_id=idioma_id,
+            programaacademico__activo=True,
+            programaacademico__ofertaacademica__periodo__activo=True,
+            programaacademico__ofertaacademica__periodo__finalizado=False,
+            activo=True
+        ).order_by('orden')
 
     def save(self, *args, **kwargs):
         if self.mensaje_formalizacion == '':
