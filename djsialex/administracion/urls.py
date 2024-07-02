@@ -251,6 +251,7 @@ urlpatterns = [
 	url(r'^inscripcion/examen-clasificacion/$', preinscripcionExamenView, name='preinscripcion-examen'),
 	url(r'^inscripcion/examen-clasificacion/(?P<pk>[0-9]+)$', PreinscripcionExamenDetailView.as_view(), name='preinscripcion-examen-detail'),
 	path('inscripcion/examen-clasificacion/borrar/<pk>',  PreinscripcionExamenDelete.as_view(), name='preinscripcion_examen_delete'),
+	path('ajax/cargar-idiomas-examen/', cargar_idiomas_examen, name='ajax_cargar_idiomas_examen'),
     path('ajax/cargar-examenes-disponibles/', cargar_examenes_disponibles, name='ajax_cargar_examenes_disponibles'),
 	path('ajax/cargar-examenes-disponibles_admin/', cargar_examenes_disponibles_admin, name='ajax_cargar_examenes_disponibles_admin'),
 	path('ajax/preinsripcion-examen-fase-previa/', preinscripcion_examen_fase_previa, name='preinscripcion_examen_fase_previa'),

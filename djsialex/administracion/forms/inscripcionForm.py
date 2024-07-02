@@ -22,7 +22,14 @@ class PreinscripcionCursoForm(forms.ModelForm):
 
 class PreinscripcionExamenForm(forms.ModelForm):
 
-    idioma = forms.ModelChoiceField(queryset=Idioma.objects.all().order_by('nombre'))
+    modalidad = forms.ModelChoiceField(
+        queryset=Periodo.objects.filter(
+            activo=True,
+            finalizado=False
+        ).distinct().order_by(
+            'nombre'
+        )
+    )
 
     class Meta:
         model = PreinscripcionExamen

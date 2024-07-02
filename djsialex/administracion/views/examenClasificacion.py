@@ -11,7 +11,7 @@ from django_filters.views import FilterView
 
 from administracion.forms.examenClasificacionForms import ExamenClasificacionForm
 from administracion.models import ExamenClasificacion, Profile, Periodo, AutorizadoExamen, CalificacionExamen, \
-    PreinscripcionExamen, getEstadoPreinscripcion
+    PreinscripcionExamen, getEstadoPreinscripcion, Idioma
 from datetime import datetime
 
 import json
@@ -223,6 +223,31 @@ def cargar_examenes_disponibles_admin(request):
 
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
 
+
+@login_required()
+def cargar_idiomas_examen(request):
+    if request.user.is_authenticated:
+        periodo_id = request.GET.get('modalidad')
+        request.session["periodo_contextualizado_id"] = str(periodo_id)
+
+        if not periodo_id:
+            RejectedError = f"ERROR|Este periodo no tiene idiomas ofertados en la modalidad seleccionada."
+        else:
+            idiomas = Idioma.objects.all().distinct().order_by(
+                    'nombre'
+                )
+
+        data = {}
+        if idiomas:
+            for i in idiomas:
+                data[str(i.id)] = i.nombre
+        else:
+            data[str(id)] = RejectedError
+
+        serialized_obj = json.dumps(data)
+
+        return render(request, 'webservices/index.html', {'resultset': serialized_obj})
+    return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
 
 @login_required
 def cargar_examenes_disponibles(request):

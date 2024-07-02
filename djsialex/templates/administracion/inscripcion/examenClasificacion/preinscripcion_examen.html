@@ -11,6 +11,7 @@
                 $("#resumen").replaceWith(table_reset);
             });
             var dataObject={}
+            dataObject["modalidad"] = $("#id_modalidad").prop("value");
             dataObject["idioma"] = $("#id_idioma").prop("value");
             dataObject["examen"] = $("#id_examen").prop("value");
             $.getJSON("{% url 'preinscripcion_examen_fase_previa' %}", dataObject, function(data) {
@@ -76,9 +77,19 @@
             <div class="panel-body">
 
                 <div class="form-group row">
-                    <label class="col-md-3">{{ form.idioma.label }}:</label>
+                    <label class="col-md-3">{{ form.modalidad.label }}:</label>
                     <div class="col-md-9">
-                        {{ form.idioma|add_class:'form-control cascadeDropDown'|attr:"nextfield:#id_examen"|attr:"nextblock:#bloque_examen"|attr:"dataurl:/ajax/cargar-examenes-disponibles/"|attr:"parametro:idioma"|attr:"datafield:0" }}
+                        {{ form.modalidad|add_class:'form-control cascadeDropDown'|attr:"nextfield:#id_idioma"|attr:"nextblock:#bloque_idioma"|attr:"dataurl:/ajax/cargar-idiomas-examen/"|attr:"parametro:modalidad"|attr:"datafield:0" }}
+                    </div>
+                </div>
+                <div class="form-group row stepByStep" id="bloque_idioma">
+                    <div id="id_idioma_error" class="alert alert-warning" style="display: none">
+                    </div>
+                    <label class="col-md-3">Idioma</label>
+                    <div class="col-md-9">
+                        <select name="idioma" required="" id="id_idioma" class="form-control cascadeDropDown" nextblock="#bloque_examen" dataurl="">
+                            <option value="" selected="">---------</option>
+                        </select>
                     </div>
                 </div>
 
@@ -212,7 +223,8 @@
     <script>
         var dependenceCascade = {}
         var skipElement=false
-        dependenceCascade["id_idioma"] ="";
+        dependenceCascade["id_modalidad"] ="";
+        dependenceCascade["id_idioma"] = "bloque_idioma";
         dependenceCascade["id_examen"] ="bloque_examen";
         dependenceCascade["enviar"]="bloque_enviar";
 
