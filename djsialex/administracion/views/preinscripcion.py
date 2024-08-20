@@ -415,7 +415,7 @@ def cargar_idiomas(request):
         request.session["periodo_contextualizado_id"] = str(periodo_id)
 
         if not periodo_id:
-            RejectedError = f"ERROR|Este periodo no tiene idiomas ofertados en la modalidad seleccionada."
+            idiomas = None
         else:
             idiomas = Idioma.objects.filter(
                     programaacademico__activo=True,
@@ -430,11 +430,13 @@ def cargar_idiomas(request):
                 )
 
         data = {}
+
         if idiomas:
             for i in idiomas:
                 data[str(i.id)] = i.nombre
         else:
-            data[str(id)] = RejectedError
+            RejectedError = f"ERROR|Esta modalidad no tiene idiomas ofertados."
+            data[str(periodo_id)] = RejectedError
 
         serialized_obj = json.dumps(data)
 
@@ -483,7 +485,7 @@ def cargar_programas_academicos(request):
             for i in programas_academicos:
                 data[str(i.id)] = i.nombre
         else:
-            data[str(id)] = RejectedError
+            data[str(idioma_id)] = RejectedError
 
         serialized_obj = json.dumps(data)
 

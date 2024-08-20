@@ -231,7 +231,7 @@ def cargar_idiomas_examen(request):
         request.session["periodo_contextualizado_id"] = str(periodo_id)
 
         if not periodo_id:
-            RejectedError = f"ERROR|Este periodo no tiene idiomas ofertados en la modalidad seleccionada."
+            idiomas = None
         else:
             idiomas = Idioma.objects.all().distinct().order_by(
                     'nombre'
@@ -242,12 +242,14 @@ def cargar_idiomas_examen(request):
             for i in idiomas:
                 data[str(i.id)] = i.nombre
         else:
-            data[str(id)] = RejectedError
+            RejectedError = f"ERROR|Esta modalidad no tiene idiomas ofertados."
+            data[str(periodo_id)] = RejectedError
 
         serialized_obj = json.dumps(data)
 
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
 
 @login_required
 def cargar_examenes_disponibles(request):
