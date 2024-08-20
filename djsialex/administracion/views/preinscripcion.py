@@ -124,9 +124,8 @@ class PreinscripcionCursoListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         perfil = Profile.objects.get(usuario=self.request.user)
-        periodo_id = self.request.session["periodo_contextualizado_id"]
-        preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(persona=perfil, horario_cupo__curso__oferta_academica__periodo_id=periodo_id)
-        preinscripcionesExamen = PreinscripcionExamen.objects.filter(persona=perfil, examen__periodo_id=periodo_id)
+        preinscripcionesCurso = PreinscripcionHorarioCurso.objects.filter(persona=perfil, horario_cupo__curso__oferta_academica__periodo__activo=True)
+        preinscripcionesExamen = PreinscripcionExamen.objects.filter(persona=perfil, examen__periodo__activo=True)
         return list(chain(preinscripcionesCurso, preinscripcionesExamen))
 
 
@@ -414,6 +413,42 @@ def isAutorizacionNivelMenor():
 
 
 @login_required()
+def cargar_idiomas(request):
+    if request.user.is_authenticated:
+        periodo_id = request.GET.get('modalidad')
+        request.session["periodo_contextualizado_id"] = str(periodo_id)
+
+        if not periodo_id:
+            idiomas = None
+        else:
+            idiomas = Idioma.objects.filter(
+                    programaacademico__activo=True,
+                    programaacademico__ofertaacademica__periodo__activo=True,
+                    programaacademico__ofertaacademica__periodo__finalizado=False,
+                    programaacademico__ofertaacademica__periodo__id=periodo_id
+                ).prefetch_related(
+                    'programaacademico_set',
+                    'programaacademico_set__ofertaacademica_set'
+                ).distinct().order_by(
+                    'nombre'
+                )
+
+        data = {}
+
+        if idiomas:
+            for i in idiomas:
+                data[str(i.id)] = i.nombre
+        else:
+            RejectedError = f"ERROR|Esta modalidad no tiene idiomas ofertados."
+            data[str(periodo_id)] = RejectedError
+
+        serialized_obj = json.dumps(data)
+
+        return render(request, 'webservices/index.html', {'resultset': serialized_obj})
+    return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
+
+@login_required()
 def cargar_programas_academicos(request):
     autorizaciones_dict = {}
     if request.user.is_authenticated:
@@ -454,7 +489,7 @@ def cargar_programas_academicos(request):
             for i in programas_academicos:
                 data[str(i.id)] = i.nombre
         else:
-            data[str(id)] = RejectedError
+            data[str(idioma_id)] = RejectedError
 
         serialized_obj = json.dumps(data)
 

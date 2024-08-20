@@ -1,6 +1,18 @@
-import hashlib
 
-from django.http import HttpResponse
+from django.contrib.auth.signals import user_logged_in
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+
+from administracion.models import Periodo
+
+
+@receiver(user_logged_in, sender=User)
+def sig_user_logged_in(sender, user, request, **kwargs):
+    if not request.POST._mutable:
+        request.POST._mutable = True
+    periodo = Periodo.objects.filter(activo=True, finalizado=False).latest('fecha_final')
+    request.session["periodo_contextualizado"] = periodo.nombre
+    request.session["periodo_contextualizado_id"] = str(periodo.id)
 
 
 class FilterLoginMiddleware(object):
@@ -14,11 +26,10 @@ class FilterLoginMiddleware(object):
 
         if(request.path_info=="/acceso/login/"):
             myDict = dict(request.POST)
-            if 'periodo' in myDict.keys():
+            if 'numero_documento' in myDict.keys():
                 if not request.POST._mutable:
                     request.POST._mutable = True
                 request.POST['username'] = myDict['numero_documento'][0]
-                request.session["periodo_contextualizado_id"] = myDict['periodo'][0]
 
 
 
