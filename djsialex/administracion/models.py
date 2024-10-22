@@ -85,6 +85,7 @@ class Pais(models.Model):
     def getIndicativo(self, alias):
         return Pais.objects.get(alias=alias).indicativo
 
+
 class Region(models.Model):
     def __str__(self):
         return self.nombre
@@ -672,8 +673,9 @@ class NotaParcial(models.Model):
 
 
 class TipoDocumentoIdentidad(models.Model):
-    id       = models.AutoField(primary_key=True, editable=False)
-    nombre   = models.CharField(max_length=100)
+    id = models.AutoField(primary_key=True, editable=False)
+    nombre = models.CharField(max_length=100)
+    activo = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Tipo de documento"
