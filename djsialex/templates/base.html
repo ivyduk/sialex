@@ -215,8 +215,12 @@
 
 <main class="detalle">
     <div class="breadcrumb-class">{% trans "Está en" %}:<a href="{% url 'home' %}">Inicio</a>/<span>{{ request.session.current_path }}</span>
-        <span style="float: right"><span class="text-default">Fecha y Hora: {% now "jS F Y H:i" %}</span> -  {{ user.profile.primer_nombre }} {{ user.profile.primer_apellido }}  -  {% trans 'Periodo actual' %}<span>{{ request.session.periodo_contextualizado }}</span> - <a
-                href="{% url 'contextualizar_periodo'%}">{% trans 'Cambiar periodo' %}</a> </span></div>
+        <span style="float: right"><span class="text-default">Fecha y Hora: {% now "jS F Y H:i" %}</span> -  {{ user.profile.primer_nombre }} {{ user.profile.primer_apellido }}
+           {% if request.user|has_group:"Administrativo" or request.user|has_group:"Funcionario" or request.user|has_group:"Coordinador" or request.user|has_group:"Docente" %}
+               -  {% trans 'Periodo actual' %}<span>{{ request.session.periodo_contextualizado }}</span> - <a
+                href="{% url 'contextualizar_periodo'%}">{% trans 'Cambiar periodo' %}</a> </span>
+            {% endif %}
+    </div>
     {% block breadcrumb %}
     {% endblock %}
 

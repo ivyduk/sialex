@@ -38,6 +38,8 @@ def evento_permiso(request):
                 available = False
                 global_data = {'url': current_url, "full": FULL_URL_WITH_QUERY_STRING, 'available' : available, 'periodo_nulo' : periodo_nulo}
                 return {'FULL_DATA': global_data}
+    else:
+        periodo_nulo = False
     global_data = {
         'url': current_url, "full" : FULL_URL_WITH_QUERY_STRING, 'available' : available, 'periodo_nulo' : periodo_nulo}
     return {'FULL_DATA': global_data}

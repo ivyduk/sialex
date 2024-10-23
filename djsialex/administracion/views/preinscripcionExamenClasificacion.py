@@ -66,12 +66,12 @@ def preinscripcionExamenView(request):
         form = PreinscripcionExamenForm(request.POST)
         idioma_id = request.POST['idioma']
         examen_id = request.POST['examen']
-        periodo_id = request.session["periodo_contextualizado_id"]
+        periodo_id = request.POST["modalidad"]
         hash_code = request.POST["hash"]
         if form.is_valid():
 
             try:
-                preinscrito = Profile.objects.get(pk = request.user.profile.id)
+                preinscrito = Profile.objects.get(pk=request.user.profile.id)
             except Profile.DoesNotExist:
                 preinscrito = None
             try:

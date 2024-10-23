@@ -7,7 +7,7 @@
         <form id="searchform" action="{% url 'personas' %}" method="get" accept-charset="utf-8">
 
             <div class="input-group">
-                <input type="text" class="form-control" name="q" placeholder="Search" id="txtSearch"/>
+                <input type="text" class="form-control" name="q" placeholder="Buscar" id="txtSearch"/>
         <div class="input-group-btn">
           <button class="btn btn-primary" type="submit">
             <span class="glyphicon glyphicon-search"></span>
@@ -15,7 +15,9 @@
         </div>
       </div>
         </form>
+        {% if query_string %}
         <span class="list-resultados">Mostrando {{ object_list|length }} resultados de {{ total }}</span>
+        {% endif %}
     </div>
 
     {% if object_list %}
@@ -71,41 +73,41 @@
         </div>
 
     {% else %}
-        <div class="alert alert-warning" role="alert">
-            No se encontraron personas registradas.
-        </div>
+        {% if has_query %}
+            <div class="alert alert-warning" role="alert">
+                No se encontraron personas registradas con ese documento, intente nuevamente.
+            </div>
+        {% endif %}
     {% endif %}
 
     <div class="text-center">
-    {% if object_list.has_other_pages %}
-    <ul class="pagination">
-        {% if object_list.has_previous %}
-            <li class="waves-effect"><a href="?page=
-                    {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
-                    class="material-icons">&laquo;</i></a></li>
-        {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
+        {% if object_list.has_other_pages %}
+            <ul class="pagination">
+                {% if object_list.has_previous %}
+                    <li class="waves-effect"><a href="?page=
+                            {{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                            class="material-icons">&laquo;</i></a></li>
+                {% else %}
+                    <li class="disabled"><a href="#!"><i class="material-icons">&laquo;</i></a></li>
+                {% endif %}
+                {% for num in object_list.paginator.page_range %}
+                    {% if object_list.number == num %}
+                        <li class="active"><a href="#!">{{ num }}</a></li>
+                    {% else %}
+                        <li class="waves-effect"><a
+                                href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if object_list.has_next %}
+                    <li class="waves-effect"><a
+                            href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                            class="material-icons">&raquo;</i></a></li>
+                {% else %}
+                    <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
+                {% endif %}
+            </ul>
+                </div>
         {% endif %}
-        {% for num in object_list.paginator.page_range %}
-            {% if object_list.number == num %}
-                <li class="active"><a href="#!">{{ num }}</a></li>
-            {% else %}
-                <li class="waves-effect"><a
-                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
-            {% endif %}
-        {% endfor %}
-        {% if object_list.has_next %}
-            <li class="waves-effect"><a
-                    href="?page={{ object_list.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
-                    class="material-icons">&raquo;</i></a></li>
-        {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">&raquo;</i></a></li>
-        {% endif %}
-    </ul>
-        </div>
-{% endif %}
-
-
     </div>
 
 {% endblock %}

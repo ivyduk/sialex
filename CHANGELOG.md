@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.12.0
+- Se removió la selección de período al ingresar a la plataforma para no contextualizar a los usuarios de tipo aspirante y estudiante
+- Agregar a formulario de preinscripción un campo filtro por periodo antes de seleccion de idioma
+- Agregar a formulario de preinscripción en examen de clasificación un campo filtro por periodo antes de seleccion de idioma
+- El sistema al ingresar a la consulta de personas inmediatamente carga la BD completa en lugar de únicamente dejar la caja de búsqueda, esto representa un problema pues toda la información de los usuarios queda expuesta, además toma tiempo la carga y consume recursos innecesariamente.
+- Se agregan modelos al superadministrador para gestión directa de las siguientes tablas
+- Agregar link corregido a formulario de pre inscripcion con informacion de descuentos
+- Agregar activo para mostrar o no Tipos de documento
+- Agregar codigos mapeo Hermes en tipo de documento
+- Agregar codigos mapeo Hermes en No facturacion
+
 ## 1.11.0
 - Agregar campo de URL para formulario de captura de documentos en mensaje de formalización
 - Enviar un correo de formalización al usuario una vez se realice el proceso

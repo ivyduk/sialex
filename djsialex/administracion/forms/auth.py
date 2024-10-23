@@ -8,9 +8,10 @@ from django.forms.formsets import BaseFormSet
 
 from ..models import TipoDocumentoIdentidad
 
+
 class SignUpForm(UserCreationForm):
     FORMAT = '%Y-%m-%d'
-    tipo_documento = forms.ModelChoiceField(queryset=TipoDocumentoIdentidad.objects.all(), empty_label="--Seleccione tipo de documento--")
+    tipo_documento = forms.ModelChoiceField(queryset=TipoDocumentoIdentidad.objects.filter(activo=True), empty_label="--Seleccione tipo de documento--")
     numero_documento = forms.CharField(help_text='Ingrese el número de documento')
     primer_apellido = forms.CharField(help_text='Ingrese el primer nombre')
     primer_nombre = forms.CharField(help_text='Ingrese el segundo nombre')
@@ -19,9 +20,6 @@ class SignUpForm(UserCreationForm):
     acepta_habeas_data = forms.BooleanField(help_text='Acepta la política de tratamiento de datos personales', required=True)
     fecha_nacimiento = forms.DateTimeField(widget=DateTimePickerInput(format=FORMAT))
     email2 = forms.CharField(initial='')
-
-
-
 
     captcha = CaptchaField()
 

@@ -17,11 +17,16 @@ def isDocente(user):
 
 @login_required
 def seleccionarIdiomaExamen(request):
-    periodo_id = request.session["periodo_contextualizado_id"]
     user = request.user
     context_dict = {}
 
-   
+    try:
+        periodos = Periodo.objects.filter(
+            activo=True,
+            finalizado=False,
+        )
+    except Periodo.DoesNotExist:
+        periodos = None
 
     if request.GET:
         if isDocente(user) or usuarioTieneGrupo(user, "Administrador") or usuarioTieneGrupo(user, 'Coordinador'):
@@ -32,24 +37,19 @@ def seleccionarIdiomaExamen(request):
             except Idioma.DoesNotExist:
                 idioma = None
 
-            try:
-                periodo = Periodo.objects.get(pk=periodo_id)
-            except Periodo.DoesNotExist:
-                periodo = None
-
-            if idioma and periodo:
+            if idioma and periodos:
                 personas = Profile.objects.filter(usuario=user)
                 docentes = Docente.objects.filter(persona__in=personas)
 
                 # Filtrar idiomas que tienen exámenes clasificatorios en el periodo actual
                 idiomas_con_examenes = Idioma.objects.filter(
-                    examenclasificacion__periodo_id=periodo_id
+                    examenclasificacion__periodo__in=periodos
                 ).annotate(num_examenes=Count('examenclasificacion')).filter(num_examenes__gt=0).order_by('nombre')
 
+                niveles = Nivel.getNivelesProgramasActivos(idioma_id=idioma_id)
 
-                niveles = Nivel.objects.filter(idioma_id=idioma_id, activo=True).order_by('orden')
                 examenes_clasificacion = ExamenClasificacion.objects.filter(
-                    periodo_id=periodo_id, idioma_id=idioma_id, docentes_evaluadores__in=docentes
+                periodo__in=periodos, idioma_id=idioma_id, docentes_evaluadores__in=docentes
                 ).all().order_by('fecha_hora')
 
                 calificaciones_examen = CalificacionExamen.objects.filter(
@@ -65,14 +65,13 @@ def seleccionarIdiomaExamen(request):
                     'current_idioma': current_idioma,
                     'niveles': niveles,
                     'user': user,
-                    'idioma_sel': idioma,
-                    'periodo': periodo
+                    'idioma_sel': idioma
                 }
         else:
             messages.add_message(request, messages.WARNING, 'Usted no se encuentra autorizado para utilizar este servicio')
     else:
         idiomas = Idioma.objects.filter(
-            examenclasificacion__periodo_id=periodo_id
+            examenclasificacion__periodo__in=periodos
         ).annotate(num_examenes=Count('examenclasificacion')).filter(num_examenes__gt=0).order_by('nombre')
 
         context_dict = {'idiomas': idiomas, 'user': user}

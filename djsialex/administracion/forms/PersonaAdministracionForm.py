@@ -1,8 +1,9 @@
 from bootstrap_datepicker_plus import DateTimePickerInput, DatePickerInput
 from django import forms
 
-from ..models import Profile, Discapacidad
+from ..models import Profile, Discapacidad, TipoDocumentoIdentidad
 from ..forms import DireccionField, DireccionSelectorWidget
+
 
 class SinBordeTextInput(forms.TextInput):
     def __init__(self, *args, **kwargs):
@@ -12,7 +13,8 @@ class SinBordeTextInput(forms.TextInput):
 
 
 class PersonaAdministracionForm(forms.ModelForm):
-
+    tipo_documento = forms.ModelChoiceField(queryset=TipoDocumentoIdentidad.objects.filter(activo=True),
+                                            empty_label="--Seleccione tipo de documento--")
     segundo_nombre = forms.CharField(required=False)
     segundo_apellido = forms.CharField(required=False)
     es_egresado = forms.TypedChoiceField(
@@ -23,7 +25,7 @@ class PersonaAdministracionForm(forms.ModelForm):
     )
     discapacidad = forms.ModelChoiceField(queryset=Discapacidad.objects.order_by('nombre'), required=False)
     direccion_sin_formato = DireccionField(widget=DireccionSelectorWidget(), required=False, label='Dirección de residencia')
-    edad = forms.CharField(label='Edad',required=False,widget=SinBordeTextInput(attrs={'readonly': 'readonly'}))
+    edad = forms.CharField(label='Edad', required=False,widget=SinBordeTextInput(attrs={'readonly': 'readonly'}))
 
 
     class Meta:

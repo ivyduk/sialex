@@ -85,6 +85,7 @@ class Pais(models.Model):
     def getIndicativo(self, alias):
         return Pais.objects.get(alias=alias).indicativo
 
+
 class Region(models.Model):
     def __str__(self):
         return self.nombre
@@ -266,13 +267,22 @@ class Nivel(models.Model):
 		"""
         return self.alias
 
-
     def getNombreNivelIdioma(self):
 
         idioma_nombre = ''
         if self.idioma:
             idioma_nombre = self.idioma.nombre
         return idioma_nombre + '-' + self.nombre
+
+    @staticmethod
+    def getNivelesProgramasActivos(idioma_id):
+        return Nivel.objects.filter(
+            idioma_id=idioma_id,
+            programaacademico__activo=True,
+            programaacademico__ofertaacademica__periodo__activo=True,
+            programaacademico__ofertaacademica__periodo__finalizado=False,
+            activo=True
+        ).order_by('orden')
 
     def save(self, *args, **kwargs):
         if self.mensaje_formalizacion == '':
@@ -663,8 +673,9 @@ class NotaParcial(models.Model):
 
 
 class TipoDocumentoIdentidad(models.Model):
-    id       = models.AutoField(primary_key=True, editable=False)
-    nombre   = models.CharField(max_length=100)
+    id = models.AutoField(primary_key=True, editable=False)
+    nombre = models.CharField(max_length=100)
+    activo = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Tipo de documento"
@@ -937,7 +948,7 @@ class Salon(models.Model):
 class GrupoAcademico(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=500)
-    codigo_proyecto  = models.CharField(max_length=15, unique=True, null=True, blank=True) #AGREGADO
+    codigo_proyecto = models.CharField(max_length=15, unique=True, null=True, blank=True) #AGREGADO
     horarioCurso = models.ForeignKey(HorarioCurso, on_delete=models.PROTECT)
     salones = models.ManyToManyField(Salon)
     codigo = models.IntegerField(default=9001)
@@ -956,6 +967,13 @@ class GrupoAcademico(models.Model):
 
         super(GrupoAcademico, self).save(*args, **kwargs)
 
+    def __str__(self):
+        """
+    	Cadena para representar el modelo GrupoAcademico
+    	:return: nombre
+    	"""
+        return self.nombre
+
 
 class Preinscripcion(models.Model):
     persona = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
@@ -969,7 +987,11 @@ class Preinscripcion(models.Model):
     )
     observaciones = models.TextField(blank=True, null=True)
 
-
+    def __str__(self):
+        """
+    	Cadena para representar el modelo Presinscripcion
+    	"""
+        return str(self.id) + "-" + self.persona.numero_documento
 
 
 class PreinscripcionHorarioCurso(Preinscripcion):
@@ -998,6 +1020,10 @@ class Matricula(models.Model):
     	:return: nombre
     	"""
         return self.estudiante.numero_documento + '-' + self.estudiante.primer_nombre + '-' + self.estudiante.primer_apellido
+
+    @property
+    def periodo(self):
+        return self.preinscripcion_generada.horario_cupo.curso.oferta_academica.periodo if self.preinscripcion_generada else None
 
 
 class Observacion(models.Model):
@@ -1316,6 +1342,7 @@ class EventoPeriodo(models.Model):
         """
         return self.nombre
 
+
 class SingletonModel(models.Model):
     class Meta:
         abstract = True
@@ -1354,7 +1381,7 @@ class InformacionPreinscripcionFormalizacion(models.Model):
         """
         :return: nombre
         """
-        return "Mensaje Configuración"
+        return "Mensaje-" + self.periodo.alias
 
 
 def usuarioTieneGrupo(usuario, nombre_grupo):
@@ -1401,6 +1428,7 @@ class Survey(models.Model):
 
     def get_absolute_url(self):
         return reverse("survey-detail", kwargs={"id": self.pk})
+
 
 class Category(models.Model):
 

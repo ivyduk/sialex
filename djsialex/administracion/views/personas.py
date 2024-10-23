@@ -55,12 +55,18 @@ def personas_list(request):
               ]
 
     busqueda_generica = BusquedaGenerica()
-    object_list = Profile.objects.all()
     query_string = request.GET.get('q')
+    if query_string:
+        object_list = Profile.objects.all()
+    else:
+        object_list = list()
 
     if query_string:
+        has_query = True
         consulta = busqueda_generica.get_query(query_string, campos)
         object_list = Profile.objects.filter(consulta).order_by('numero_documento')
+    else:
+        has_query = False
     page = request.GET.get('page')
     paginator = Paginator(object_list, 20)
     try:
@@ -70,7 +76,11 @@ def personas_list(request):
     except EmptyPage:
         personas = paginator.page(paginator.num_pages)
 
-    return render(request, 'administracion/persona/persona_list.html', {'object_list': personas, 'total': len(object_list)})
+    return render(request, 'administracion/persona/persona_list.html',
+                  {'object_list': personas,
+                   'total': len(object_list),
+                   'has_query': has_query
+                   })
 
 
 class EditarPersona(LoginRequiredMixin, UpdateView):

@@ -1,19 +1,15 @@
 from django import forms
 
 from administracion.models import PreinscripcionHorarioCurso, Idioma, ProgramaAcademico, Nivel, Curso, OfertaAcademica, \
-    HorarioCurso, PreinscripcionExamen, Preinscripcion
+    HorarioCurso, PreinscripcionExamen, Preinscripcion, Idioma, Periodo
 
 
 class PreinscripcionCursoForm(forms.ModelForm):
 
-    idioma = forms.ModelChoiceField(
-        queryset=Idioma.objects.filter(
-            programaacademico__activo=True,
-            programaacademico__ofertaacademica__periodo__activo=True,
-            programaacademico__ofertaacademica__periodo__finalizado=False
-        ).prefetch_related(
-            'programaacademico_set',
-            'programaacademico_set__ofertaacademica_set'
+    modalidad = forms.ModelChoiceField(
+        queryset=Periodo.objects.filter(
+            activo=True,
+            finalizado=False
         ).distinct().order_by(
             'nombre'
         )
@@ -26,7 +22,14 @@ class PreinscripcionCursoForm(forms.ModelForm):
 
 class PreinscripcionExamenForm(forms.ModelForm):
 
-    idioma = forms.ModelChoiceField(queryset=Idioma.objects.all().order_by('nombre'))
+    modalidad = forms.ModelChoiceField(
+        queryset=Periodo.objects.filter(
+            activo=True,
+            finalizado=False
+        ).distinct().order_by(
+            'nombre'
+        )
+    )
 
     class Meta:
         model = PreinscripcionExamen
