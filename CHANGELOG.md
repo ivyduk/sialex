@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.12.1
+- Agregar validacion cuando se desactivan todos los periodos
+
 ## 1.12.0
 - Se removió la selección de período al ingresar a la plataforma para no contextualizar a los usuarios de tipo aspirante y estudiante
 - Agregar a formulario de preinscripción un campo filtro por periodo antes de seleccion de idioma
