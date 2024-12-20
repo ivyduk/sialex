@@ -17,7 +17,6 @@ admin.site.register(Nivel)
 admin.site.register(ProgramaAcademico)
 admin.site.register(Idioma)
 admin.site.register(NotaParcial)
-admin.site.register(TipoDocumentoIdentidad)
 admin.site.register(DocumentoIdentidad)
 admin.site.register(DocumentoRequerido)
 admin.site.register(Franja)
@@ -31,6 +30,16 @@ admin.site.register(Edificio)
 admin.site.register(Discapacidad)
 admin.site.register(EPS)
 admin.site.register(InformacionPreinscripcionFormalizacion)
+
+
+class TipoDocumentoIdentidadAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'id', 'activo']
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+admin.site.register(TipoDocumentoIdentidad, TipoDocumentoIdentidadAdmin)
 
 
 class SalonAdmin(admin.ModelAdmin):

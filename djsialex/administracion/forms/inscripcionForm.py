@@ -12,12 +12,23 @@ class PreinscripcionCursoForm(forms.ModelForm):
             finalizado=False
         ).distinct().order_by(
             'nombre'
-        )
+        ),
+        required=False
     )
 
     class Meta:
         model = PreinscripcionHorarioCurso
-        exclude = ['horario_cupo','persona','estado_preinscripcion','estado_matriculado','fecha_preinscripcion', 'descuento_solicitado', 'valor_preinscripcion', 'codigo_hash']
+        fields = ['modalidad']
+        exclude = [
+            'horario_cupo',
+            'persona',
+            'estado_preinscripcion',
+            'estado_matriculado',
+            'fecha_preinscripcion',
+            'descuento_solicitado',
+            'valor_preinscripcion',
+            'codigo_hash'
+        ]
 
 
 class PreinscripcionExamenForm(forms.ModelForm):
@@ -28,7 +39,8 @@ class PreinscripcionExamenForm(forms.ModelForm):
             finalizado=False
         ).distinct().order_by(
             'nombre'
-        )
+        ),
+        required=False
     )
 
     class Meta:

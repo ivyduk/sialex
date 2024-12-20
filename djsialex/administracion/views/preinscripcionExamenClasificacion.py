@@ -66,7 +66,7 @@ def preinscripcionExamenView(request):
         form = PreinscripcionExamenForm(request.POST)
         idioma_id = request.POST['idioma']
         examen_id = request.POST['examen']
-        periodo_id = request.POST["modalidad"]
+        periodo_id = request.session["periodo_contextualizado_id"]
         hash_code = request.POST["hash"]
         if form.is_valid():
 
@@ -178,6 +178,7 @@ def preinscripcionExamenView(request):
                             form.add_error('idioma', '¡Lo sentimos, la asignación de cupos ha finalizado!')
     return render(request, 'administracion/inscripcion/examenClasificacion/preinscripcion_examen.html', {'form': form, 'mensaje_examenes': mensaje_examenes_disponibles})
 
+
 def calcularEdad(fechaNacimiento):
 
     fechaNacimiento = datetime.strptime(str(fechaNacimiento), "%Y-%m-%d")
@@ -185,6 +186,7 @@ def calcularEdad(fechaNacimiento):
     diferencia = now - fechaNacimiento
 
     return int((diferencia.days + diferencia.seconds/86400.0) / 365.2425)
+
 
 @login_required
 def preinscripcion_examen_fase_previa(request):
