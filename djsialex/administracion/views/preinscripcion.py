@@ -663,6 +663,7 @@ def cargar_horarios_disponibles(request):
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
 
+
 @login_required()
 def cargar_descuentos(request):
     error = False
@@ -824,6 +825,56 @@ class PreinscripcionesPersonaView(LoginRequiredMixin, generic.ListView):
         return list(chain(preinscripcionesCurso, preinscripcionesExamen))
 
 
+def sincronizar_pagos_recibo(recibo):
+    descuento_id = None
+    pagado_total = 0
+    pagado_usuario = 0
+    pagado_beca = 0
+    pagado_descuento = 0
+    pagado_saldo = 0
+    fecha_pago = None
+
+    logger.info('-- Recibo ' + str(recibo.id) + " Preinscripcion " + str(recibo.preinscripcion.id) + "--sincronizando")
+
+    preinscripcion_curso = PreinscripcionHorarioCurso.objects.filter(id=recibo.preinscripcion.id).first()
+    if preinscripcion_curso and preinscripcion_curso.horario_cupo.curso.nivel.costo_materiales:
+        valor_materiales = preinscripcion_curso.horario_cupo.curso.nivel.costo_materiales
+    else:
+        valor_materiales = 0
+
+    for pago in recibo.pagos.all():
+        pagado_total += pago.financiero.valor
+        if pago.tipo == 'Pago Usuario':
+            pagado_usuario += pago.financiero.valor
+            if not fecha_pago:
+                fecha_pago = pago.fecha_hora
+            elif fecha_pago < pago.fecha_hora:
+                fecha_pago = pago.fecha_hora
+        elif pago.tipo == 'Beca':
+            pagado_beca += pago.financiero.valor
+        elif pago.tipo == 'Descuento':
+            pagado_descuento += pago.financiero.valor
+            descuento_aplicado = DescuentoAplicado.objects.filter(id=pago.financiero.id).first()
+            if not descuento_aplicado:
+                logger.warning("Descuento Aplicado no encontrado Financiero id: " + str(pago.financiero.id))
+            else:
+                descuento_id = descuento_aplicado.descuento_id
+        elif pago.tipo == 'Saldo a favor':
+            pagado_saldo += pago.financiero.valor
+        logger.info('--Pago--' + str(pago.financiero.valor) + '--Tipo--' + str(pago.tipo))
+
+    recibo.valor_pagado = pagado_total
+    recibo.valor_pagado_usuario = pagado_usuario
+    recibo.valor_pagado_beca = pagado_beca
+    recibo.valor_pagado_descuento = pagado_descuento
+    recibo.valor_pagado_saldo = pagado_saldo
+    recibo.descuento_id = descuento_id
+    recibo.valor_materiales = valor_materiales
+    recibo.fecha_pago = fecha_pago
+    recibo.migrado = True
+    recibo.save()
+
+
 @login_required()
 @csrf_exempt
 def formalizar_vista(request, pk):
@@ -931,6 +982,8 @@ def formalizar_vista(request, pk):
         if pendiente == 0 and validar_descuento and preinscripcionhorariocurso.persona.documento_identificacion_entregado and (preinscripcionhorariocurso.estado_preinscripcion == 5 or preinscripcionhorariocurso.estado_preinscripcion == 3):
             preinscripcionhorariocurso.estado_preinscripcion = 1
             preinscripcionhorariocurso.save()
+
+        sincronizar_pagos_recibo(recibopreinscripcion)
             
 
         html_message = loader.render_to_string(
