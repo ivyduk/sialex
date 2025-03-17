@@ -9,8 +9,6 @@ from .models import *
 
 from django.contrib.auth.models import User, Group
 
-admin.site.register(Pais)
-admin.site.register(Ciudad)
 admin.site.register(Periodicidad)
 admin.site.register(EscalaNota)
 admin.site.register(Nivel)
@@ -42,6 +40,32 @@ class TipoDocumentoIdentidadAdmin(admin.ModelAdmin):
 admin.site.register(TipoDocumentoIdentidad, TipoDocumentoIdentidadAdmin)
 
 
+<<<<<<< Updated upstream
+=======
+class PaisAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'id', 'hermes_id']
+
+
+admin.site.register(Pais, PaisAdmin)
+
+
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'pais_id', 'hermes_id']
+    list_filter = ['pais']
+
+
+admin.site.register(Region, RegionAdmin)
+
+
+class CiudadAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'id', 'hermes_id']
+    list_filter = ['region']
+
+
+admin.site.register(Ciudad, CiudadAdmin)
+
+
+>>>>>>> Stashed changes
 class SalonAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'edificio']
 
