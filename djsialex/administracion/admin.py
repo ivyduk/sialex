@@ -40,8 +40,6 @@ class TipoDocumentoIdentidadAdmin(admin.ModelAdmin):
 admin.site.register(TipoDocumentoIdentidad, TipoDocumentoIdentidadAdmin)
 
 
-<<<<<<< Updated upstream
-=======
 class PaisAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'id', 'hermes_id']
 
@@ -65,7 +63,6 @@ class CiudadAdmin(admin.ModelAdmin):
 admin.site.register(Ciudad, CiudadAdmin)
 
 
->>>>>>> Stashed changes
 class SalonAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'edificio']
 

@@ -1,5 +1,10 @@
 # Change Log
 
+
+## 1.12.2
+- Agregar codigo hermes para pais, ciudad y region
+- Actualizar reporte hermes para tomar el nuevo codigo
+
 ## 1.12.1
 - Agregar validacion cuando se desactivan todos los periodos
 
