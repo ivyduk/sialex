@@ -51,13 +51,13 @@ SELECT ag.codigo_proyecto                   AS ID_SUB_PROYECTO_CURSO,
                         WHEN perf.estado_civil = 7 THEN 816 -- SEPARADO (A)
                         END                              AS estado_civil,
                     fecha_nacimiento,
-                    apnac.id                             AS Pais_Nacimiento,
+                    apnac.hermes_id                             AS Pais_Nacimiento,
                     CASE
-                        WHEN apnac.id = 47 THEN arnac.id
+                        WHEN apnac.id = 47 THEN arnac.hermes_id
                         ELSE NULL
                         END                              AS Departamento_Nacimiento,
                     CASE
-                        WHEN apnac.id = 47 THEN acnac.id
+                        WHEN apnac.id = 47 THEN acnac.hermes_id
                         ELSE NULL
                         END                              AS Ciudad_Naciemiento,
                     CASE

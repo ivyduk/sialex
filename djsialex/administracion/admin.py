@@ -42,6 +42,7 @@ admin.site.register(TipoDocumentoIdentidad, TipoDocumentoIdentidadAdmin)
 
 class PaisAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'id', 'hermes_id']
+    search_fields = ('nombre',)
 
 
 admin.site.register(Pais, PaisAdmin)
@@ -50,6 +51,7 @@ admin.site.register(Pais, PaisAdmin)
 class RegionAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'pais_id', 'hermes_id']
     list_filter = ['pais']
+    search_fields = ('nombre',)
 
 
 admin.site.register(Region, RegionAdmin)
@@ -58,6 +60,7 @@ admin.site.register(Region, RegionAdmin)
 class CiudadAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'id', 'hermes_id']
     list_filter = ['region']
+    search_fields = ('nombre',)
 
 
 admin.site.register(Ciudad, CiudadAdmin)
