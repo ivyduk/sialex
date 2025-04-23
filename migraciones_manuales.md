@@ -137,7 +137,7 @@ SELECT ag.codigo_proyecto                   AS ID_SUB_PROYECTO_CURSO,
                         END                              AS Descuento,
                     -- *** las personas pueden aplicar a mas de un descuento a la vez Rta No
                     ao.tarifa as valor_inscripcion,
-                    recpre.valor_requerido,
+                    recpre.valor_pagado_usuario,
                     recpre.fecha_pago::date AS fecha_pago,        -- ****************************************** se puede tomar la fecha de inicio del curso ?
                     --- tomar fecha de pago del ultimo recibo
                     soportespago(preinscr.id)            AS NO_SOPORTE_DE_PAGO,
