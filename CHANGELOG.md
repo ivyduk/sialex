@@ -1,5 +1,7 @@
 # Change Log
 
+## 1.12.3
+- Ajustar cancelacion examen de clasificacion
 
 ## 1.12.2
 - Agregar codigo hermes para pais, ciudad y region
