@@ -140,19 +140,20 @@ class AyudanteFinancieros(object):
                 pass
 
     def actualizar_financieros_cancelacion_preinscripcion_sin_pago(self, preinscripcion, tipo_curso):
-        self._buscar_saldos_a_favor_disponibles()
-        self._buscar_beca(preinscripcion.horario_cupo.curso.nivel, 3)
-        if self.beca:
-            self.beca.valor = 0
-            self.beca.estado_beca = 1
-            self.beca.save()
-        if self.saldos:
-            for saldo in self.saldos:
-                reservas_saldo = saldo.reservassaldo_set.all()
-                for reserva in reservas_saldo:
-                    if reserva.preinscripcion_reserva.id == preinscripcion.id:
-                        reserva.valor = 0
-                        reserva.save()
+        if tipo_curso:
+            self._buscar_saldos_a_favor_disponibles()
+            self._buscar_beca(preinscripcion.horario_cupo.curso.nivel, 3)
+            if self.beca:
+                self.beca.valor = 0
+                self.beca.estado_beca = 1
+                self.beca.save()
+            if self.saldos:
+                for saldo in self.saldos:
+                    reservas_saldo = saldo.reservassaldo_set.all()
+                    for reserva in reservas_saldo:
+                        if reserva.preinscripcion_reserva.id == preinscripcion.id:
+                            reserva.valor = 0
+                            reserva.save()
         if tipo_curso:
             self._buscar_descuento_aplicado(preinscripcion.descuento_solicitado, preinscripcion, 1)
             if self.descuento_aplicado:

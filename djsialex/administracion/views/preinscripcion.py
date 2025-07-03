@@ -61,12 +61,15 @@ class CancelPreinscripcion(LoginRequiredMixin, DeleteView):
         self.object = self.get_object()
         preinscripcion_id = self.object.id
         periodo_id = request.session["periodo_contextualizado_id"]
+        is_examen = False
         try:
             preinscripcion = PreinscripcionHorarioCurso.objects.get(pk=preinscripcion_id)
         except PreinscripcionHorarioCurso.DoesNotExist:
-            preinscripcion = None
+            preinscripcion = PreinscripcionExamen.objects.get(pk=self.object.id)
+            is_examen = True
         try:
-            preinscrito = Profile.objects.get(pk=preinscripcion.persona.id)
+            if preinscripcion:
+                preinscrito = Profile.objects.get(pk=preinscripcion.persona.id)
         except Profile.DoesNotExist:
             preinscrito = None
         try:
@@ -76,7 +79,7 @@ class CancelPreinscripcion(LoginRequiredMixin, DeleteView):
 
         if preinscrito and periodo:
             ayudante = AyudanteFinancieros(preinscrito, periodo)
-            if preinscripcion and self.object: #curso
+            if preinscripcion and self.object and (is_examen is not True): #curso
                 ayudante.actualizar_financieros_cancelacion_preinscripcion_sin_pago(preinscripcion, True)
                 try:
                     horario_cupo = HorarioCurso.objects.get(pk=preinscripcion.horario_cupo.id)
@@ -91,8 +94,7 @@ class CancelPreinscripcion(LoginRequiredMixin, DeleteView):
                     horario_cupo.save()
                 except HorarioCurso.DoesNotExist:
                     pass
-            elif self.object: #Examen
-                preinscripcion = PreinscripcionExamen.objects.get(pk=self.object.id)
+            elif self.object and is_examen: #Examen
                 ayudante.actualizar_financieros_cancelacion_preinscripcion_sin_pago(preinscripcion, False)
                 examen = preinscripcion.examen
                 autorizado_examen = AutorizadoExamen.objects.filter(numero_documento=preinscrito.numero_documento,
