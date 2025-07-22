@@ -23,9 +23,14 @@
           <div class="column"><h3>Estado Matrícula:
              {% if preinscripcionhorariocurso.estado_preinscripcion == 1 or preinscripcionhorariocurso.estado_preinscripcion == 3 %}
                     {% if matricula %}
-                    <span class="label label-primary">{{ matricula.get_estado_matricula_display }} </span>
-                    <span class="label label-success">GRUPO: {{ matricula.grupo.codigo }} </span>
-                  {% endif %}
+                        <div>
+                            <span class="label label-primary" style="display: inline-block; margin-top: 10px">{{ matricula.get_estado_matricula_display }} </span>
+                            <span class="label label-success" style="display: inline-block; margin-top: 10px">GRUPO: {{ matricula.grupo.codigo }} </span>
+                        </div>
+                        {% if cambiado %}
+                            <span class="label label-primary" style="display: inline-block; margin-top: 10px">  Cambiado a {{ cambiado }} </span>
+                        {% endif %}
+                    {% endif %}
               {% else %}
                 <span class="label label-primary"> No definida </span>
               {% endif %}

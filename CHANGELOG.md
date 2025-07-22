@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.12.4
+- Ajustar cambio de grupo en matriculado en admin
+- Ajustar lista de preinscritos por horario curso
+
 ## 1.12.3
 - Ajustar cancelacion examen de clasificacion
 

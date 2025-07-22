@@ -903,10 +903,13 @@ def formalizar_vista(request, pk):
     except Beca.DoesNotExist:
         beca = None
 
+    cambiado = None
     try:
         matricula = Matricula.objects.get(estudiante=preinscripcionhorariocurso.persona, grupo__horarioCurso__curso=preinscripcionhorariocurso.horario_cupo.curso)
     except Matricula.DoesNotExist:
-        matricula = None
+        matricula = Matricula.objects.filter(estudiante=preinscripcionhorariocurso.persona, preinscripcion_generada=preinscripcionhorariocurso).first()
+        if matricula:
+            cambiado = matricula.grupo.horarioCurso.curso.nivel.nombre
 
     comprobantes_banco = ComprobanteBanco.objects.filter(preinscripcion_generada=preinscripcionhorariocurso)
 
@@ -1046,7 +1049,8 @@ def formalizar_vista(request, pk):
                       'facturacion_form': facturacion_form,
                       'documentos_faltantes': documentos_faltantes,
                       'monto_pendiente': monto_pendiente,
-                      'observaciones': preinscripcionhorariocurso.observaciones
+                      'observaciones': preinscripcionhorariocurso.observaciones,
+                      'cambiado': cambiado
                   })
 
 
