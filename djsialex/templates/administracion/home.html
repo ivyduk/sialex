@@ -48,8 +48,66 @@
     </div>
 {% else %}
 
+    <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
 
+    #important-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #ffcc00;
+      color: #000;
+      text-align: center;
+      padding: 15px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+    }
 
+    #banner-close {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* Espacio para que no tape contenido */
+    .page-content {
+      margin-top: 80px;
+      padding: 20px;
+    }
+  </style>
+
+    <!--Banner de aviso
+  <div id="important-banner">
+    <button id="banner-close" aria-label="Cerrar">&times;</button>
+       <p> ⚠️ Atención: Esta es una información importante para todos los visitantes.</p>
+      <br>
+      <p>Debido a problemas de conectividad presentados durante la mañana de hoy se informa</p>
+      <br>
+      <p>que las inscripciones a los cursos se habilitarán nuevamente a las 2pm del 04 de Julio</p>
+  </div>-->
+
+      <script>
+    // Cierra el banner al hacer clic en la X
+    document.getElementById("banner-close").addEventListener("click", function () {
+      document.getElementById("important-banner").style.display = "none";
+    });
+
+    // Opcional: ocultar el banner automáticamente después de X segundos (ej. 10s)
+    // setTimeout(() => {
+    //   document.getElementById("important-banner").style.display = "none";
+    // }, 10000);
+  </script>
+git brnach
 <div class="jumbotron text-center">
     <h1>SIALEx</h1>
     <p>Sistema de Información Académica de Lenguas Extranjeras </p>
@@ -108,7 +166,7 @@
         </div>
         <div class="col-sm-3">
             <div class="box text-center">
-                <a target="_blank" href="https://www.humanas.unal.edu.co/extension_lenguas/circulares">
+                <a target="_blank" href="https://www.humanas.unal.edu.co/extension_lenguas/inicio/tramites/circulares">
                 <i class="fas fa-file-alt fa-3x"></i>
                 <h3>Circulares</h3></a>
                 <br />

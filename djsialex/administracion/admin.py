@@ -117,7 +117,21 @@ class PeriodoAdmin(admin.ModelAdmin):
 class MatriculaAdmin(admin.ModelAdmin):
     list_display = ('estudiante', 'estado_matricula', 'calificacionFinal')
     search_fields = ('estudiante__numero_documento', )
-    readonly_fields = ('calificacionFinal', "grupo_id", "grupo", "preinscripcion_generada", "estudiante")
+    readonly_fields = ('calificacionFinal', "preinscripcion_generada", "estudiante")
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+
+        if obj and obj.preinscripcion_generada and obj.preinscripcion_generada.preinscripcionhorariocurso:
+            # Filtrar los grupos según la preinscripción del objeto
+            form.base_fields['grupo'].queryset = GrupoAcademico.objects.filter(
+                horarioCurso__curso__oferta_academica__periodo=obj.preinscripcion_generada.preinscripcionhorariocurso.horario_cupo.curso.oferta_academica.periodo
+            )
+        else:
+            # Comportamiento por defecto si no hay objeto
+            form.base_fields['grupo'].queryset = GrupoAcademico.objects.none()
+
+        return form
 
 
 @admin.register(Horario)
