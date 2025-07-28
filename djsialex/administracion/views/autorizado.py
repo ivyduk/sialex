@@ -140,7 +140,7 @@ def autorizadoUpdate(request, pk):
         motivo = instance.motivo
         curso = None
         try:
-            curso = Curso.objects.get(pk = instance.curso_autorizado_id)
+            curso = Curso.objects.get(pk=instance.curso_autorizado_id)
         except IntegrityError:
             messages.error(request, 'Hubo un error al mostrar el autorizado por la inexistencia del curso')
 
@@ -227,7 +227,7 @@ def autorizadoLoteView(request):
         form = AutorizadoLoteForm(request.POST, request.FILES)
         if form.is_valid():
             curso_id = request.POST['curso']
-            curso = Curso.objects.get(pk = curso_id)
+            curso = Curso.objects.get(pk=curso_id)
             horario_curso = request.POST['horario_curso']
             motivo = request.POST['motivo']
             autoriza = Profile.objects.get(pk=request.user.profile.id)
