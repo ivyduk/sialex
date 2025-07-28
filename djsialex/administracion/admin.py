@@ -1,13 +1,10 @@
-import os
 
 from django.contrib import admin
-from django.contrib.admin import AdminSite
 
 from administracion.forms import HorarioAdminForm
 
 from .models import *
 
-from django.contrib.auth.models import User, Group
 
 admin.site.register(Periodicidad)
 admin.site.register(EscalaNota)
@@ -20,7 +17,6 @@ admin.site.register(DocumentoRequerido)
 admin.site.register(Franja)
 admin.site.register(OfertaAcademica)
 admin.site.register(Curso)
-admin.site.register(HorarioCurso)
 admin.site.register(ConjuntoNotas)
 admin.site.register(Descuento)
 admin.site.register(Docente)
@@ -28,6 +24,47 @@ admin.site.register(Edificio)
 admin.site.register(Discapacidad)
 admin.site.register(EPS)
 admin.site.register(InformacionPreinscripcionFormalizacion)
+
+
+def close_availability(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.cupo_disponible = 0
+        obj.save()
+
+close_availability.short_description = "Cerrar cupos de inscripcion"
+
+
+class PeriodoFilter(admin.SimpleListFilter):
+    title = 'Filtro Periodo Activo'
+    parameter_name = 'periodo_activo'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('activo', 'periodo activo'),
+            ('finalizado', 'Periodo Finalizado'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'activo':
+            return queryset.filter(curso__oferta_academica__periodo__activo=True)
+        elif self.value() == 'finalizado':
+            return queryset.filter(curso__oferta_academica__periodo__finalizado=True)
+        return queryset
+
+
+class HorarioCursoAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'cupo_disponible', 'preinscritos']
+    search_fields = ('nombre',)
+    list_filter = (PeriodoFilter, 'curso__nivel__orden', 'curso__oferta_academica__programa', "curso__oferta_academica__periodo__anio")
+    actions = [close_availability]
+
+    def preinscritos(self, obj):
+        preinscritos_horario_curso = PreinscripcionHorarioCurso.objects.filter(horario_cupo_id=obj.id,
+                                                                               estado_preinscripcion__in=[1, 3]).all()  # estados: Inscrito, Pendiente
+        return preinscritos_horario_curso.__len__()
+
+
+admin.site.register(HorarioCurso, HorarioCursoAdmin)
 
 
 class TipoDocumentoIdentidadAdmin(admin.ModelAdmin):

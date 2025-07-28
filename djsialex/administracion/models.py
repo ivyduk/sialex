@@ -999,7 +999,7 @@ class Preinscripcion(models.Model):
 
 class PreinscripcionHorarioCurso(Preinscripcion):
     horario_cupo = models.ForeignKey(HorarioCurso, on_delete=models.CASCADE, null=True)
-    descuento_solicitado = models.ForeignKey(Descuento, on_delete=models.CASCADE, null=True)
+    descuento_solicitado = models.ForeignKey(Descuento, on_delete=models.CASCADE, null=True, blank=True)
 
     def get_absolute_url(self):
         """
