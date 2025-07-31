@@ -382,7 +382,8 @@ urlpatterns = [
 	#Preinscritos cursos
 	url(r'^administracion/grupos/ver-preinscritos/(?P<horario_curso>[0-9a-f-]+)$', verPreinscritosCurso, name='horario-curso-preinscritos'),
 	url(r'^administracion/grupos/preinscritos-sin-matricula/(?P<horario_curso>[0-9a-f-]+)$', verPreinscritosSinMatriculaCurso, name='preinscritos-sin-matricula'),
-    url(r'^administracion/preinscripciones/curso/filtros/$', preinscripcionFiltros, name='preinscripcion-curso-list'),
+    path("administracion/grupos/matricular-persona/<int:preinscripcion_id>/", matricular_persona, name="matricular-persona"),
+	url(r'^administracion/preinscripciones/curso/filtros/$', preinscripcionFiltros, name='preinscripcion-curso-list'),
 	path('ajax/cargar-programas-grl/', cargar_programas_academicos_grl, name='ajax_cargar_programas_grl'),
 	path('ajax/cargar-niveles-grl/', cargar_niveles_grl, name='ajax_cargar_niveles_grl'),
 	path('ajax/cargar-horarios-grl/', cargar_horarios_disponibles_grl, name='ajax_cargar_horarios_grl'),

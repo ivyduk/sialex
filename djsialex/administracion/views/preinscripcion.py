@@ -18,6 +18,7 @@ from administracion.models import getEstadoPreinscripcion
 from itertools import chain
 
 from administracion.forms.inscripcionForm import PreinscripcionCursoForm, PreinscripcionCursoLoteForm
+from administracion.forms.grupoForms import MatriculaForm
 from administracion.forms.requiereFacturacionForms import RequiereFacturacionForm
 from administracion.forms.mensajeFormalizacionForm import MensajeFormalizacionForm
 
@@ -653,6 +654,7 @@ def cargar_horarios_disponibles(request):
                     ).order_by('nombre').all()
                 else:
                     horario = HorarioCurso.objects.filter(pk=autorizaciones_dict[autorizacion])
+                    request.session['horario_autorizado'] = autorizaciones_dict[autorizacion]
                     if horario not in horarios:
                         horarios |= horario
         data = {}
@@ -668,7 +670,7 @@ def cargar_horarios_disponibles(request):
 
 @login_required()
 def cargar_descuentos(request):
-    error = False
+    RejectedError = None 
     if request.user.is_authenticated:
         nivel_id = request.session.get('nivel_id')
         periodo_id = request.session["periodo_contextualizado_id"]
@@ -681,16 +683,27 @@ def cargar_descuentos(request):
             nivel=nivel_id,
             oferta_academica__periodo_id=periodo_id
         ).all()
-        horarios = HorarioCurso.objects.filter(
-            curso__in=cursos,
-            cupo_disponible__gt=0
-        ).order_by('nombre').all()
+
+        if not request.session.get('horario_autorizado'):
+            horarios = HorarioCurso.objects.filter(
+                curso__in=cursos,
+                cupo_disponible__gt=0
+            ).order_by('nombre').all()
+        else:
+            horarios = HorarioCurso.objects.filter(
+                curso__in=cursos,
+                cupo_disponible_autorizados__gt=0
+            ).order_by('nombre').all()
 
         horario_seleccionado = HorarioCurso.objects.get(pk=horario_id)
 
         # Verificar si el cupo_disponible es menor o igual a cero
-        if horario_seleccionado.cupo_disponible <= 0:
+        if horario_seleccionado.cupo_disponible <= 0 and not request.session.get('horario_autorizado'):
             RejectedError = "ERROR|No existen cupos disponibles en este horario."
+        elif request.session.get('horario_autorizado'):
+            horario_cupo = HorarioCurso.objects.get(pk=request.session['horario_autorizado'])
+            if horario_cupo.cupo_disponible_autorizados <= 0:
+                RejectedError = "ERROR|No existen cupos para autorizados disponibles en este horario."
         
         
         data = {}
@@ -698,7 +711,7 @@ def cargar_descuentos(request):
             for i in descuentos:
                 data[str(i.id)] = i.nombre
         else:
-            data[str(id)] = RejectedError
+            data[str(id)] = RejectedError or "ERROR|No existen cupos disponibles en este horario."
         serialized_obj = json.dumps(data)
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
@@ -1542,6 +1555,38 @@ def cargar_horarios_disponibles_grl(request):
         serialized_obj = json.dumps(data)
         return render(request, 'webservices/index.html', {'resultset': serialized_obj})
     return render(request, 'webservices/error.html', {'resultset': "Error de autenticación"})
+
+
+@login_required
+def matricular_persona(request, preinscripcion_id):
+    preinscripcion = get_object_or_404(PreinscripcionHorarioCurso, id=preinscripcion_id)
+    periodo_id = request.session["periodo_contextualizado_id"]
+
+    grupos = GrupoAcademico.objects.filter(
+        horarioCurso__curso__oferta_academica__periodo_id=periodo_id, 
+        horarioCurso__curso=preinscripcion.horario_cupo.curso
+        ).distinct()
+
+    if request.method == "POST":
+        form = MatriculaForm(request.POST)
+        # actualizar queryset antes de validar
+        form.fields["grupo"].queryset = grupos
+        if form.is_valid():
+            grupo = form.cleaned_data["grupo"]
+            Matricula.objects.create(estudiante=preinscripcion.persona, grupo=grupo,
+                                      estado_matricula=7)
+            # redirige a donde necesites, por ejemplo a una confirmación
+            return render(request, "administracion/grupos/confirmacion_matricula.html", 
+                          {"mensaje": "Matrícula para " + preinscripcion.persona.getNombreCompleto() + " registrada con éxito.", "horario_curso": preinscripcion.horario_cupo})
+    else:
+        form = MatriculaForm()
+        form.fields["grupo"].queryset = grupos  # cargar con los cursos filtrados
+
+    return render(request, "administracion/grupos/matricular_persona.html", {
+        "persona": preinscripcion.persona,
+        "horario_curso": preinscripcion.horario_cupo,
+        "form": form,
+    })
 
 
 @login_required
