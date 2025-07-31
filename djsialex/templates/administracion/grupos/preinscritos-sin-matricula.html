@@ -26,6 +26,7 @@
                 <th scope="col">Estado</th>
                 <th scope="col">Fecha Preinscripción</th>
                 <th scope="col">Valor preinscripción</th>
+                <th scope="col">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -38,6 +39,11 @@
                 <td>{{ preinscripcion.get_estado_preinscripcion_display }}</td>
                 <td>{{ preinscripcion.fecha_preinscripcion|date:"d/m/Y - h:m:s"}}</td>
                 <td>{{ preinscripcion.valor_preinscripcion }}</td>
+                <td>
+                    <form method="get" action="{% url 'matricular-persona' preinscripcion.id %}">
+                        <button type="submit" class="btn btn-success">Matricular</button>
+                    </form>
+                </td>
 
             </tr>
             {% endfor %}

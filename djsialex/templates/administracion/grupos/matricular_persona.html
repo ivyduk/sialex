@@ -1,0 +1,37 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks %}
+
+{% block form %}
+    {% if FULL_DATA.available %}
+        {% if FULL_DATA.periodo_nulo %}
+            <div class="alert alert-warning" role="alert">
+                <strong>¡Periodo sin contextualizar!</strong> Recuerde seleccionar un periodo en la esquina superior derecha
+            </div>
+        {% else %}
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>  
+        <a href="{% url 'preinscritos-sin-matricula' horario_curso.id %}">Volver a listado de matriculas</a>
+
+
+        {% if persona %}
+        <div class="wrap-preinscripcion">
+             <div class="panel panel-primary tab">
+                <div class="panel-heading">
+                    <h2 class="title-project" style="color: white">Matricular a {{ persona.getNombreCompleto }}</h2>
+                </div>
+                <div class="panel-body">
+                    <form method="post" class="form-horizontal">
+                        {% csrf_token %}
+                        {{ form.as_table }}
+                        <button type="submit" class="btn btn-primary" value="Matricular">Matricular</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>¡Lo sentimos!</strong> El presente servicio no se encuentra disponible de acuerdo al calendario del periodo
+        </div>
+    {% endif %}
+{% endblock %}

@@ -65,3 +65,8 @@ class AsignarSalonDocenteAGrupoForm(forms.Form):
             self.fields['fecha_final'].initial = grupo.fecha_final
         if grupo.enlace_virtual:
             self.fields['enlace_virtual'].initial = grupo.enlace_virtual
+
+
+
+class MatriculaForm(forms.Form):
+    grupo = forms.ModelChoiceField(queryset=GrupoAcademico.objects.none(), widget=forms.Select(attrs={"class" : "form-control"}), empty_label="Seleccione un grupo")
