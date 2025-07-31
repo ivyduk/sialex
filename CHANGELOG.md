@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.12.6
+- Agregar funcion para matricular estudiantes individualmente
+- Arreglo de disponibilidad de cupos autorizados cuando regulares se han cerrado
+- Agregar cambio de preinscripcion generada en matricula desde super administrador
+
 ## 1.12.5
 - Agregar funcion en administrador para filtrar y cerrar cupos por horario curso
 
