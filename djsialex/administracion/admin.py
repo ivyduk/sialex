@@ -162,7 +162,7 @@ class MatriculaAdmin(admin.ModelAdmin):
         if obj and obj.preinscripcion_generada and obj.preinscripcion_generada.preinscripcionhorariocurso:
             # Filtrar los grupos según la preinscripción del objeto
             form.base_fields['grupo'].queryset = GrupoAcademico.objects.filter(
-                horarioCurso__curso__oferta_academica__periodo=obj.preinscripcion_generada.preinscripcionhorariocurso.horario_cupo.curso.oferta_academica.periodo
+                horarioCurso__curso__oferta_academica__periodo__inicio=obj.preinscripcion_generada.preinscripcionhorariocurso.horario_cupo.curso.oferta_academica.periodo.inicio-4,
             )
             form.base_fields['preinscripcion_generada'].queryset = Preinscripcion.objects.filter(
                 persona=obj.preinscripcion_generada.persona
