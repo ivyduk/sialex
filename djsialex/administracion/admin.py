@@ -1,5 +1,6 @@
 
 from django.contrib import admin
+from django import forms
 
 from administracion.forms import HorarioAdminForm
 
@@ -119,6 +120,102 @@ class GrupoAcademicoAdmin(admin.ModelAdmin):
 
 admin.site.register(GrupoAcademico, GrupoAcademicoAdmin)
 
+class DescuentoAplicadoAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',                # si tienes un campo id
+        'beneficiario',      # campo heredado de Financiero
+        'periodo_generado',  # campo heredado de Financiero
+        'valor',             # campo heredado de Financiero
+    )
+    list_filter = ('periodo_generado__anio', 'estado_descuento',)
+    readonly_fields = ( 'beneficiario','periodo_generado', 'preinscripcion_generada', 'valor',)
+    search_fields = ('beneficiario__numero_documento',)
+
+admin.site.register(DescuentoAplicado, DescuentoAplicadoAdmin)
+
+class ComprobanteBancoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'beneficiario', 'periodo_generado', 'valor',)
+    readonly_fields = ( 'beneficiario','periodo_generado', 'preinscripcion_generada', 'valor',)
+    search_fields = ('beneficiario__numero_documento',)
+    list_filter = ('periodo_generado__anio',)
+
+admin.site.register(ComprobanteBanco, ComprobanteBancoAdmin)
+
+class ReservasSaldoInline(admin.TabularInline):  # Usa StackedInline si prefieres un diseño vertical
+    model = ReservasSaldo
+    extra = 0  # Número de filas vacías para agregar nuevas reservas
+    fields = ('id', 'saldo', 'valor', 'preinscripcion_reserva', 'pagado')  # Campos que deseas mostrar
+    readonly_fields = ('saldo', 'preinscripcion_reserva', 'valor', 'pagado',)  # Si quieres que algunos campos sean solo de lectura
+    can_delete = False
+
+class SaldoAFavorAdmin(admin.ModelAdmin):
+    list_display = ('id', 'beneficiario', 'periodo_generado', 'valor',)
+    readonly_fields = ( 'beneficiario','periodo_generado', 'recibo_preinscripcion_generado',  'devuelto', 'valor', )
+    search_fields = ('beneficiario__numero_documento',)
+    list_filter = ('activo', 'periodo_generado__anio',)
+    inlines = [ReservasSaldoInline]
+
+admin.site.register(SaldoAFavor, SaldoAFavorAdmin)
+
+class PagoForm(forms.ModelForm):
+    valor = forms.FloatField(label="Valor", required=False)
+
+    class Meta:
+        model = Pago
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.financiero:
+            self.fields['valor'].initial = self.instance.financiero.valor
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        valor = self.cleaned_data.get('valor')
+        if instance.financiero and valor is not None:
+            instance.financiero.valor = valor
+            instance.financiero.save()
+        if commit:
+            instance.save()
+        return instance
+
+class PagoAdmin(admin.ModelAdmin):
+    form = PagoForm
+    list_display = [
+        'valor',
+        'beneficiario',
+        'tipo',      
+        'get_periodo_nombre',
+        'get_estado_preinscripcion', 
+        'aprobo',
+     ]
+    search_fields = ('realizado_por__numero_documento',)
+    readonly_fields = ('aprobo', 'beneficiario','get_periodo_nombre', 'recibo_preinscripcion', 'realizado_por', 'financiero', )
+    list_filter = ('tipo', )
+
+    class Meta:
+        verbose_name = "Pago"
+        verbose_name_plural = "Pagos (Financieros)"
+
+    def get_estado_preinscripcion(self, obj):
+        return obj.recibo_preinscripcion.preinscripcion.get_estado_preinscripcion()
+
+    def periodo_generado(self, obj):
+        return obj.financiero.periodo_generado
+
+    def get_periodo_nombre(self, obj):
+        return obj.financiero.periodo_generado.nombre
+    
+    def beneficiario(self, obj):
+        return obj.financiero.beneficiario.primer_nombre + " " + obj.financiero.beneficiario.primer_apellido
+    
+    def valor(self, obj):
+        return obj.financiero.valor if obj.financiero and obj.financiero.valor else "No disponible"
+    
+
+
+admin.site.register(Pago, PagoAdmin)
+
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -162,7 +259,7 @@ class MatriculaAdmin(admin.ModelAdmin):
         if obj and obj.preinscripcion_generada and obj.preinscripcion_generada.preinscripcionhorariocurso:
             # Filtrar los grupos según la preinscripción del objeto
             form.base_fields['grupo'].queryset = GrupoAcademico.objects.filter(
-                horarioCurso__curso__oferta_academica__periodo__inicio=obj.preinscripcion_generada.preinscripcionhorariocurso.horario_cupo.curso.oferta_academica.periodo.inicio-4,
+                horarioCurso__curso__oferta_academica__periodo__inicio__gte=obj.preinscripcion_generada.preinscripcionhorariocurso.horario_cupo.curso.oferta_academica.periodo.inicio,
             )
             form.base_fields['preinscripcion_generada'].queryset = Preinscripcion.objects.filter(
                 persona=obj.preinscripcion_generada.persona

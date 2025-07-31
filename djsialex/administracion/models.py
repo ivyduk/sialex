@@ -975,7 +975,7 @@ class GrupoAcademico(models.Model):
     	Cadena para representar el modelo GrupoAcademico
     	:return: nombre
     	"""
-        return self.nombre
+        return str(self.codigo)+ "-" + self.nombre
 
 
 class Preinscripcion(models.Model):
@@ -995,6 +995,16 @@ class Preinscripcion(models.Model):
     	Cadena para representar el modelo Presinscripcion
     	"""
         return str(self.id) + "-" + self.persona.numero_documento
+    
+    def get_estado_preinscripcion_display(self):
+        mapping = dict(ESTADOS_ADMINISTRATIVOS_PREINSCRIPCION)
+        return mapping.get(self.estado_preinscripcion, 'Estado desconocido')
+    
+    def get_estado_preinscripcion(self):
+        """
+        Devuelve el estado de la preinscripción en un formato amigable.
+        """
+        return self.get_estado_preinscripcion_display()
 
 
 class PreinscripcionHorarioCurso(Preinscripcion):
@@ -1151,11 +1161,17 @@ class Financiero(models.Model):
     periodo_generado = models.ForeignKey(Periodo, on_delete=models.CASCADE, null=False)
     valor = models.FloatField(null=False)
 
+    def get_tipo(self):
+        raise NotImplementedError("Subclasses must implement get_tipo()")
+
 class DescuentoAplicado(Financiero):
 
     descuento = models.ForeignKey(Descuento, on_delete=models.CASCADE, null=False)
     estado_descuento = models.IntegerField(choices=ESTADOS_DESCUENTO, default=1)
     preinscripcion_generada = models.ForeignKey(Preinscripcion, on_delete=models.DO_NOTHING, null=True)
+
+    def get_tipo(self):
+        return "DescuentoAplicado"
 
 
 class DocumentosDescuentoSolicitado(models.Model):
@@ -1190,6 +1206,9 @@ class Beca(Financiero):
     class Meta:
         ordering = ['-id']
 
+    def get_tipo(self):
+        return "Beca"
+
 
 class ComprobanteBanco(Financiero):
 
@@ -1198,6 +1217,9 @@ class ComprobanteBanco(Financiero):
     preinscripcion_generada = models.ForeignKey(Preinscripcion, on_delete=models.DO_NOTHING, null=False)
     concepto_pago = models.TextField(null=True)
     estado_pago = models.IntegerField(choices=ESTADOS_PAGO, default=1)
+
+    def get_tipo(self):
+            return "ComprobanteBanco"
 
 
 class ReciboPreinscripcion(models.Model):
@@ -1218,13 +1240,16 @@ class ReciboPreinscripcion(models.Model):
 
 
 class SaldoAFavor(Financiero):
-    activo = models.BooleanField(default=False)
+    activo = models.BooleanField(default=False, help_text='Indica si el saldo a favor se puede utilizar para pago o si ya ha sido utilizado')
     recibo_preinscripcion_generado = models.ForeignKey(ReciboPreinscripcion, on_delete=models.PROTECT, null=True)
     devuelto = models.BooleanField(default=False)
 
+    def get_tipo(self):
+        return "SaldoAFavor"
+
 
 class ReservasSaldo(models.Model):
-    saldo = models.ForeignKey(SaldoAFavor, on_delete=models.PROTECT)
+    saldo = models.ForeignKey(SaldoAFavor, on_delete=models.CASCADE)
     valor = models.FloatField(null=False)
     preinscripcion_reserva = models.ForeignKey(Preinscripcion, on_delete=models.PROTECT, null=True)
     pagado = models.BooleanField(default=False)
