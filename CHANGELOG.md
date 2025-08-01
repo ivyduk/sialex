@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.12.7
+- Agregar gestion de financieros desde super administrador
+- Borrado reserva saldo en cascada al borrar saldo a favor
+
 ## 1.12.6
 - Agregar funcion para matricular estudiantes individualmente
 - Arreglo de disponibilidad de cupos autorizados cuando regulares se han cerrado
