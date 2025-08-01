@@ -143,10 +143,26 @@ admin.site.register(ComprobanteBanco, ComprobanteBancoAdmin)
 
 class ReservasSaldoInline(admin.TabularInline):  # Usa StackedInline si prefieres un diseño vertical
     model = ReservasSaldo
-    extra = 0  # Número de filas vacías para agregar nuevas reservas
+    extra = 1  # Número de filas vacías para agregar nuevas reservas
     fields = ('id', 'saldo', 'valor', 'preinscripcion_reserva', 'pagado')  # Campos que deseas mostrar
-    readonly_fields = ('saldo', 'preinscripcion_reserva', 'valor', 'pagado',)  # Si quieres que algunos campos sean solo de lectura
+    readonly_fields = ('saldo', 'valor', 'pagado',)  # Si quieres que algunos campos sean solo de lectura
     can_delete = False
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        """
+        Filtra las preinscripciones asociadas al beneficiario del SaldoAFavor.
+        """
+        if db_field.name == "preinscripcion_reserva":
+            # Obtener el objeto padre (SaldoAFavor) del inline
+            saldo_id = request.resolver_match.kwargs.get('object_id')
+            if saldo_id:
+                saldo = SaldoAFavor.objects.get(pk=saldo_id)
+                # Filtrar las preinscripciones asociadas al beneficiario del SaldoAFavor
+                kwargs["queryset"] = Preinscripcion.objects.filter(persona=saldo.beneficiario)
+            else:
+                # Si no hay un objeto padre, no mostrar preinscripciones
+                kwargs["queryset"] = Preinscripcion.objects.none()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 class SaldoAFavorAdmin(admin.ModelAdmin):
     list_display = ('id', 'beneficiario', 'periodo_generado', 'valor',)
