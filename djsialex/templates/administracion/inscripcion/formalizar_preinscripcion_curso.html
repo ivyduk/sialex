@@ -25,10 +25,11 @@
                     {% if matricula %}
                         <div>
                             <span class="label label-primary" style="display: inline-block; margin-top: 10px">{{ matricula.get_estado_matricula_display }} </span>
-                            <span class="label label-success" style="display: inline-block; margin-top: 10px">GRUPO: {{ matricula.grupo.codigo }} </span>
+                            <span class="label label-success" style="display: inline-block; margin-top: 10px">GRUPO: <a href="{% url 'grupo-detail' matricula.grupo.id %}" style="color:azure;" target="_blank">
+                                                  {{ matricula.grupo.codigo }}</a></span>
                         </div>
                         {% if cambiado %}
-                            <span class="label label-primary" style="display: inline-block; margin-top: 10px">  Cambiado a {{ cambiado }} </span>
+                            <p>Cambiado a:<span class="label label-primary" style="display: inline-block; margin-top: 10px"> {{ cambiado }} </span></p>
                         {% endif %}
                     {% endif %}
               {% else %}
@@ -53,7 +54,7 @@
                             </tr>
                             <tr>
                                 <td>Documento: </td>
-                                <td>{{ preinscripcionhorariocurso.persona.numero_documento}}</td>
+                                <td><a href="{% url 'persona-detail-update' preinscripcionhorariocurso.persona.id %}" target="_blank">{{ preinscripcionhorariocurso.persona.numero_documento}}</a></td>
                                 <td>Programa Académico: </td>
                                 <td>{{ preinscripcionhorariocurso.horario_cupo.curso.oferta_academica }}</td>
                             </tr>
