@@ -1,5 +1,6 @@
 import collections
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Subquery, OuterRef, Sum
@@ -9,13 +10,21 @@ from django.views.decorators.csrf import csrf_exempt
 from administracion.models import Profile, Docente, Nivel, GrupoAcademico, Matricula, Periodo, NotaParcial, Calificacion, \
     DocentesGrupoAcademico, TipoDocente, FallaAsistencia, usuarioTieneGrupo, Observacion, getEstadoMatricula, \
     PreinscripcionHorarioCurso, OfertaAcademica
-import json
+import json, os
 from datetime import datetime, date
-from administracion.util import CSVWriter
+from administracion.util import CSVWriter, humanizar_fecha
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from openpyxl import load_workbook
+from io import BytesIO
+import uuid
+import tempfile
+from PyPDF2 import PdfMerger
+from django.urls import reverse
+from django.utils.safestring import mark_safe
+from xlsx2html import xlsx2html
 
 
 def isDocente(user):
@@ -425,7 +434,282 @@ def descargarNotasGrupos(request):
 
 
 @login_required
-def listadoCalificacionesPlanilla(request, *args, **kwargs):
+def generarListasExcelGruposTodos(request):
+    """
+    Genera archivos Excel de listas de estudiantes para todos los grupos del periodo actual,
+    basándose en la estructura de plantilla_estudiantes_lista.xlsx y usando la lógica
+    del elif de listadoCalificacionesPlanilla. Comprime todos los archivos Excel en un ZIP
+    y genera un enlace temporal usando resultadoListasComprimido.
+    """
+    print("=== INICIO generarListasExcelGruposTodos ===")
+    
+    periodo_actual_id = request.session["periodo_contextualizado_id"]
+    
+    try:
+        periodo = Periodo.objects.get(pk=periodo_actual_id)
+        print(f"Periodo: {periodo.alias}")
+    except Periodo.DoesNotExist:
+        messages.error(request, 'No se encontró el periodo actual.')
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+    # Obtener grupos académicos del periodo (igual que en descargarNotasGrupos)
+    ofertas_academicas = OfertaAcademica.objects.filter(periodo__id=periodo_actual_id)
+    grupos_academicos = GrupoAcademico.objects.filter(
+        horarioCurso__curso__oferta_academica__in=ofertas_academicas
+    ).order_by('horarioCurso__curso__nivel__idioma__nombre', 'horarioCurso__curso__nivel__nombre')
+
+    if not grupos_academicos.exists():
+        messages.warning(request, 'No se encontraron grupos para el periodo actual.')
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+    # Configuración para archivos temporales
+    excel_files = []
+    unique_id = str(uuid.uuid4())[:8]
+    temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp_downloads')
+    os.makedirs(temp_dir, exist_ok=True)
+
+    grupos_con_estudiantes = 0
+
+    try:
+        # Verificar que existe la plantilla base (usa plantilla_listas.xlsx como en el elif)
+        plantilla_path = os.path.join(settings.BASE_DIR, 'plantillas', 'plantilla_estudiantes_lista.xlsx')
+        if not os.path.exists(plantilla_path):
+            messages.error(request, 'No se encontró la plantilla base plantilla_estudiantes_lista.xlsx')
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+        
+        # Procesar cada grupo (igual que en descargarNotasGrupos)
+        for grupo in grupos_academicos:
+            print(f"Procesando grupo: {grupo.codigo}")
+            
+            # Obtener matriculas (excluyendo canceladas/aplazadas)
+            matriculas = Matricula.objects.filter(grupo=grupo).exclude(
+                estado_matricula__in=[4, 5, 6]
+            ).order_by('estudiante__primer_apellido')
+
+            if not matriculas.exists():
+                print(f"Saltando grupo {grupo.codigo} - sin estudiantes")
+                continue
+
+            grupos_con_estudiantes += 1
+
+            # Preparar datos usando la lógica EXACTA del elif de listadoCalificacionesPlanilla
+            salones = grupo.salones.all()
+            docentes_grupo = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo).all()
+            curso = grupo.horarioCurso.curso
+            
+            # Generar archivo Excel usando la MISMA lógica del elif (líneas 623-656)
+            fila_inicio = 11  # Exactamente como en el elif original
+            
+            # Cargar plantilla Excel (igual que en el elif)
+            wb = load_workbook(plantilla_path)
+            ws = wb.active
+
+            fechas = ''
+            complemento_programa = ''
+            salones = (f"Edificio {salones[0].edificio.nombre}  Salón: {salones[0].nombre}".upper() if len(salones) > 0 else '')
+
+            if 'IPARM' in periodo.alias:
+                fechas = 'INICIO 5 DE AGOSTO / FINALIZACIÓN 25 DE NOVIEMBRE DE 2025'
+                complemento_programa = ' SEMESTRAL PRESENCIAL'
+            elif 'SEM' in periodo.alias:
+                fechas = 'INICIO 9 DE AGOSTO / FINALIZACIÓN 22 DE NOVIEMBRE DE 2025'
+                if 'PRES'  in periodo.alias:
+                    complemento_programa = ' SEMESTRAL PRESENCIAL'
+                elif 'VIRT' in periodo.alias:
+                    complemento_programa = ' SEMESTRAL REMOTA SINCRÓNICA'
+                    salones = grupo.enlace_virtual
+            elif 'BIM' in periodo.alias:
+                fechas = 'INICIO 4 DE AGOSTO / FINALIZACIÓN 25 DE SEPTIEMBRE DE 2025'
+                if 'PRES'  in periodo.alias:
+                    complemento_programa = ' SEMESTRAL PRESENCIAL'
+                elif 'VIRT' in periodo.alias:
+                    salones = grupo.enlace_virtual
+                    complemento_programa = ' SEMESTRAL REMOTA SINCRÓNICA'
+
+            # Llenar datos EXACTAMENTE como en el elif de listadoCalificacionesPlanilla
+            ws['B3'] = 'PROGRAMA' + ' ' + curso.oferta_academica.programa.nombre.upper() + ' ' + complemento_programa
+            ws['B4'] = fechas
+            ws['B5'] = 'HORARIO ' + str(humanizar_fecha.humanizar_horario(grupo.horarioCurso.horario.nombre)).upper()
+            ws['B6'] = 'LISTADO DEL GRUPO - ' + str(grupo.codigo)
+            ws['B7'] = 'NIVEL: ' + curso.nivel.nombre
+
+            docente_nombre = docentes_grupo[0].docente.persona.getNombreCompleto() if len(docentes_grupo) > 0 else ''
+            
+            ws['A8'] = 'PROFESOR: ' + docente_nombre.upper()
+            ws['A9'] = 'SALÓN: ' + salones
+
+            # Llenar estudiantes
+            contador = 0
+            for idx, matricula in enumerate(matriculas, start=fila_inicio):
+                contador += 1
+                ws[f"A{idx}"] = contador 
+                ws[f"B{idx}"] = matricula.estudiante.getApellidos().upper() + ' ' + matricula.estudiante.getNombres().upper()
+
+            # Guardar archivo Excel individual
+            excel_filename = f'{grupo.codigo}_{docente_nombre.replace(" ", "_")}_{unique_id}.xlsx'
+            excel_temp_path = os.path.join(temp_dir, excel_filename)
+            
+            wb.save(excel_temp_path)
+            wb.close()
+            
+            # Verificar que el archivo se generó correctamente
+            if os.path.exists(excel_temp_path) and os.path.getsize(excel_temp_path) > 0:
+                excel_files.append({
+                    'path': excel_temp_path,
+                    'name': f'{grupo.codigo}_{docente_nombre.replace(" ", "_")}.xlsx'
+                })
+                print(f"Excel generado exitosamente: {grupo.codigo}")
+            else:
+                print(f"Error: Excel vacío o no generado para grupo {grupo.codigo}")
+
+        if not excel_files:
+            messages.error(request, 'No se pudieron generar archivos Excel para ningún grupo.')
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+
+        # Crear archivo ZIP con todos los archivos Excel
+        import zipfile
+        
+        zip_filename = f'listas_estudiantes_todos_{periodo.alias}_{unique_id}.zip'
+        zip_path = os.path.join(temp_dir, zip_filename)
+        
+        print(f"Creando ZIP con {len(excel_files)} archivos Excel...")
+        
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for excel_file in excel_files:
+                # Agregar archivo al ZIP con nombre limpio
+                zipf.write(excel_file['path'], excel_file['name'])
+                print(f"  Agregado al ZIP: {excel_file['name']}")
+        
+        # Limpiar archivos Excel individuales
+        for excel_file in excel_files:
+            try:
+                os.remove(excel_file['path'])
+            except:
+                pass
+
+        # Verificar que el archivo ZIP final existe
+        if not os.path.exists(zip_path):
+            messages.error(request, 'Error: No se pudo crear el archivo ZIP final.')
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+
+        zip_size = os.path.getsize(zip_path)
+        print(f"Proceso completado: {grupos_con_estudiantes} grupos procesados")
+        print(f"ZIP generado: {zip_filename} ({zip_size} bytes)")
+        
+        # Redirigir a página de resultado usando resultadoListasComprimido
+        return redirect('resultado_listas_comprimido', filename=zip_filename, grupos_count=grupos_con_estudiantes)
+
+    except Exception as e:
+        print(f"ERROR: {str(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        messages.error(request, f'Error al generar los archivos Excel: {str(e)}')
+        
+        # Limpiar archivos temporales en caso de error
+        for excel_file in excel_files:
+            try:
+                os.remove(excel_file['path'])
+            except:
+                pass
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required
+def descargarArchivoTemporal(request, filename):
+    """
+    Descarga un archivo temporal generado previamente.
+    """
+    try:
+        # Validar que el nombre del archivo sea seguro
+        if not (filename.endswith('.pdf') or filename.endswith('.zip')) or '..' in filename or '/' in filename:
+            messages.error(request, 'Nombre de archivo no válido.')
+            return redirect('/')
+        
+        temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp_downloads')
+        temp_file_path = os.path.join(temp_dir, filename)
+        
+        if os.path.exists(temp_file_path):
+            with open(temp_file_path, 'rb') as f:
+                file_content = f.read()
+            
+            # Determinar el tipo de contenido basado en la extensión
+            if filename.endswith('.pdf'):
+                content_type = 'application/pdf'
+            elif filename.endswith('.zip'):
+                content_type = 'application/zip'
+            else:
+                content_type = 'application/octet-stream'
+            
+            response = HttpResponse(file_content, content_type=content_type)
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            # Opcional: eliminar el archivo después de la descarga
+            try:
+                os.remove(temp_file_path)
+            except:
+                pass  # Si no se puede eliminar, continuar
+            
+            return response
+        else:
+            messages.error(request, 'El archivo solicitado no existe o ha expirado.')
+            return redirect('/')
+            
+    except Exception as e:
+        messages.error(request, f'Error al descargar el archivo: {str(e)}')
+        return redirect('/')
+
+
+@login_required
+def resultadoListasComprimido(request, filename, grupos_count):
+    """
+    Muestra la página de resultado con el enlace de descarga del archivo ZIP generado.
+    """
+    print(f"=== RESULTADO LISTAS COMPRIMIDO ===")
+    print(f"Filename: {filename}")
+    print(f"Grupos count: {grupos_count}")
+    
+    # Validar que el archivo existe
+    temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp_downloads')
+    temp_file_path = os.path.join(temp_dir, filename)
+    
+    print(f"Buscando archivo en: {temp_file_path}")
+    print(f"Archivo existe: {os.path.exists(temp_file_path)}")
+    
+    if not os.path.exists(temp_file_path):
+        print("ERROR: Archivo no encontrado")
+        messages.error(request, f'El archivo solicitado "{filename}" no existe o ha expirado.')
+        return redirect('mis-cursos')
+    
+    # Verificar que el archivo no esté vacío
+    file_size = os.path.getsize(temp_file_path)
+    print(f"Tamaño del archivo: {file_size} bytes")
+    
+    if file_size == 0:
+        print("ERROR: Archivo vacío")
+        messages.error(request, 'El archivo está vacío o corrupto.')
+        return redirect('mis-cursos')
+    
+    # Generar URL de descarga
+    download_url = reverse('descargar_archivo_temporal', kwargs={'filename': filename})
+    print(f"URL de descarga: {download_url}")
+    
+    context = {
+        'filename': filename,
+        'grupos_count': grupos_count,
+        'download_url': download_url,
+        'file_exists': True,
+        'file_size': file_size,
+        'file_type': 'ZIP'  # Indicar que es un archivo ZIP
+    }
+    
+    print(f"Context: {context}")
+    print("Renderizando template...")
+    
+    return render(request, 'administracion/docente/resultado_listas_comprimido.html', context)
+
+
+@login_required
+def listadoCalificacionesPlanilla(request, format="excel", tipo='listas', *args, **kwargs):
 
     context = {}
     now = datetime.now()
@@ -451,8 +735,9 @@ def listadoCalificacionesPlanilla(request, *args, **kwargs):
             salones = grupo.salones.all()
             docentes = DocentesGrupoAcademico.objects.filter(grupo_academico=grupo).all()
 
-            curso = grupo.horarioCurso.curso.nivel.id
-            niveles = Nivel.objects.filter(id=curso).first()
+            curso_id = grupo.horarioCurso.curso.nivel.id
+            curso = grupo.horarioCurso.curso
+            niveles = Nivel.objects.filter(id=curso_id).first()
 
             inasistencias_matricula = {}
             matriculas = Matricula.objects.filter(grupo=grupo).exclude(estado_matricula__in=[4,5,6]).order_by('estudiante__primer_apellido')
@@ -473,19 +758,91 @@ def listadoCalificacionesPlanilla(request, *args, **kwargs):
                  for observacion in observaciones:
                      observaciones_matricula[matricula.id].append(observacion.observacion)
 
-            template_path = 'administracion/docente/mis_cursos_export.html'
-            context = {'matriculas': matriculas, 'periodo': periodo, 'grupo': grupo, 'inasistencias_matricula': inasistencias_matricula,
-                       'docentes': docentes, 'salones': salones, 'niveles': niveles, 'fecha':fecha, 'observaciones_matricula': observaciones_matricula}
 
-            response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = 'filename="report.pdf"'
+            if format == "pdf":
+                template_path = 'administracion/docente/mis_cursos_export.html'
+                context = {'matriculas': matriculas, 'periodo': periodo, 'grupo': grupo, 'inasistencias_matricula': inasistencias_matricula,
+                        'docentes': docentes, 'salones': salones, 'niveles': niveles, 'fecha':fecha, 'observaciones_matricula': observaciones_matricula}
 
-            template = get_template(template_path)
-            html = template.render(context)
+                response = HttpResponse(content_type='application/pdf')
+                response['Content-Disposition'] = 'filename="report.pdf"'
 
-            pisa_status = pisa.CreatePDF(
-                html, dest=response)
+                template = get_template(template_path)
+                html = template.render(context)
 
-            if pisa_status.err:
-                return HttpResponse('Algunos errores ocurrieron <pre>' + html + '</pre>')
+                pisa_status = pisa.CreatePDF(
+                    html, dest=response)
+
+                if pisa_status.err:
+                    return HttpResponse('Algunos errores ocurrieron <pre>' + html + '</pre>')
+            elif format == "excel" and tipo =='notas':
+                fila_inicio = 24
+                plantilla_path = os.path.join(settings.BASE_DIR, 'plantillas', 'plantilla.xlsx')
+                print(plantilla_path)
+                wb = load_workbook(plantilla_path)
+                ws = wb.active
+
+                ws['L10'] = grupo.codigo
+                ws['E15'] = curso.nivel.idioma.nombre + " " + str(curso.nivel.orden)
+                ws['E16'] = curso.oferta_academica.programa.nombre
+                ws['E17'] = str(grupo.nombre.split('-')[1])
+                ws['E19'] = "05 DE AGOSTO"
+                ws['V15'] = docentes[0].docente.persona.getNombreCompleto() if len(docentes) > 0 else ''
+                ws['V16'] = "SEMESTRAL"
+                ws['V17'] = periodo.secuencia
+                ws['V19'] = "25 DE NOVIEMBRE"
+                ws['AS15'] = f"Edificio: {salones[0].edificio.nombre} - Salón: {salones[0].nombre}" if len(salones) > 0 else ''
+                ws['AS16'] = grupo.horarioCurso.horario.nombre if grupo.horarioCurso.horario else ''
+
+                for idx, matricula in enumerate(matriculas, start=fila_inicio):
+                    ws[f"D{idx}"] = matricula.estudiante.getApellidos().upper() + ' ' + matricula.estudiante.getNombres().upper()
+                """fila_inicio = 69
+                for idx, matricula in enumerate(matriculas, start=fila_inicio):
+                    ws[f"D{idx}"] = matricula.estudiante.getNombreCompleto()"""
+                
+                # Guardar en memoria
+                output = BytesIO()
+                wb.save(output)
+                output.seek(0)
+
+                # Crear respuesta HTTP
+                response = HttpResponse(output.read(),
+                                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                response['Content-Disposition'] = 'attachment; filename=planilla'+ str(grupo.codigo)+'.xlsx'
+            elif format == "excel" and tipo =='listas':
+                # Lógica para generar la planilla de listas
+                fila_inicio = 11
+                plantilla_path = os.path.join(settings.BASE_DIR, 'plantillas', 'plantilla_listas.xlsx')
+
+                wb = load_workbook(plantilla_path)
+                ws = wb.active
+
+                ws['B3'] = 'PROGRAMA DE IPARM INGLÉS NIÑOS SEMESTRAL PRESENCIAL IPARM'
+                ws['B4'] = 'INICIO 5 DE AGOSTO / FINALIZACIÓN 25 DE NOVIEMBRE DE 2025'
+                ws['B5'] = 'HORARIO: MARTES Y JUEVES 2:30 PM A 4:30 PM'
+                ws['B6'] = 'LISTADO DEL GRUPO - ' + str(grupo.codigo)
+                ws['B7'] = 'NIVEL: ' + curso.nivel.nombre
+
+                docente_nombre = docentes[0].docente.persona.getNombreCompleto() if len(docentes) > 0 else ''
+                
+                ws['A8'] = 'PROFESOR: ' + docente_nombre.upper()
+                ws['A9'] = 'SALÓN: ' + (f"Edificio {salones[0].edificio.nombre}  Salón: {salones[0].nombre}".upper() if len(salones) > 0 else '')
+
+                contador = 0
+                for idx, matricula in enumerate(matriculas, start=fila_inicio):
+                    contador += 1
+                    ws[f"A{idx}"] = contador 
+                    ws[f"B{idx}"] = matricula.estudiante.getApellidos().upper() + ' ' + matricula.estudiante.getNombres().upper()
+                    ws[f"C{idx}"] = matricula.estudiante.telefono_celular
+
+                 # Guardar en memoria
+                output = BytesIO()
+                wb.save(output)
+                output.seek(0)
+
+                # Crear respuesta HTTP
+                response = HttpResponse(output.read(),
+                                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                response['Content-Disposition'] = 'attachment; filename='+ str(grupo.codigo)+'_' + docente_nombre + '.xlsx'
+
             return response

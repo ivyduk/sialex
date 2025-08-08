@@ -19,7 +19,9 @@ from administracion.views.calificaciones_curso.fallasAsistencia import FallaAsis
 from administracion.views.calificarExamenClasificacion import calificarExamen, seleccionarIdiomaExamen
 from administracion.views.calificaciones_curso.notasCurso import cursosAsociadosList, \
 	listadoCalificacionesPorGrupo, calificarGrupo, listadoEstudiantesPorGrupo, actualizarEstadoMatriculas, \
-	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos, listadoCalificacionesPlanilla
+	descargarNotasPorGrupo, actualizarEstadoMatriculasGrupos, descargarNotasGrupos, listadoCalificacionesPlanilla, \
+	generarListasExcelGruposTodos, descargarArchivoTemporal, resultadoListasComprimido
+from administracion.views.excel_zip_processor import upload_excel_zip, process_excel_zip, process_excel_zip_ajax
 from administracion.views.historiaAcademica import miHistoriaAcademica, cursoCalificacionesDetalle, \
 	cursoCalificacionesDetallePDF, misCursosList
 from administracion.views.preinscripcionExamenClasificacion import preinscripcionExamenView, \
@@ -317,6 +319,14 @@ urlpatterns = [
 	url(r'^docente/cursos/actualizar-estados/(?P<grupoacademico>[-\w]+)', actualizarEstadoMatriculas,name='actualizar-estados'),
 	url(r'^administracion/descargar-calificaciones-grupo/(?P<grupoacademico>[-\w]+)', descargarNotasPorGrupo, name='calificaciones-grupo-csv'),
 	url(r'^administracion/descargar-calificaciones-grupos', descargarNotasGrupos, name='calificaciones-csv'),
+	url(r'^administracion/generar-listas-excel-grupos', generarListasExcelGruposTodos, name='generar-listas-excel-grupos'),
+	url(r'^administracion/resultado-listas-comprimido/(?P<filename>[\w\-\.]+)/(?P<grupos_count>\d+)/', resultadoListasComprimido, name='resultado_listas_comprimido'),
+	url(r'^administracion/descargar-temporal/(?P<filename>[\w\-\.]+)', descargarArchivoTemporal, name='descargar_archivo_temporal'),
+	
+	# Procesamiento de ZIP con archivos Excel
+	url(r'^administracion/tools/upload-excel-zip', upload_excel_zip, name='upload_excel_zip'),
+	url(r'^administracion/tools/process-excel-zip', process_excel_zip, name='process_excel_zip'),
+	url(r'^administracion/tools/process-excel-zip-ajax', process_excel_zip_ajax, name='process_excel_zip_ajax'),
 
 	#fallas asistencia
 	url(r'^administracion/falla-asistencia/crear/(?P<matricula>[-\w]+)', FallaAsistenciaCreateView.as_view(), name='falla_asistencia_create'),

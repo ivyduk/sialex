@@ -1,0 +1,244 @@
+{% extends "administracion/base_form.html" %}
+{% load widget_tweaks profile_tags %}
+
+{% block content %}
+{% block administration-title %}
+    <h2 class="title-project">Listas de Estudiantes Comprimidas</h2>
+{% endblock %}
+{% block form %}
+
+<div class="col-sm-9 col-md-9">
+    <div class="alert alert-success" role="alert">
+        <h4><span class="glyphicon glyphicon-ok-circle"></span> ¡Proceso Completado Exitosamente!</h4>
+        <hr>
+        <p><strong>Se han generado las listas de estudiantes para {{ grupos_count }} grupos.</strong></p>
+        <p>Los archivos Excel han sido creados y comprimidos en un archivo ZIP listo para descarga.</p>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-compressed"></span> Archivo Comprimido Generado
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <p><strong>Nombre del archivo:</strong></p>
+                    <code>{{ filename }}</code>
+                    
+                    <p class="margin-top-20"><strong>Contenido:</strong></p>
+                    <ul>
+                        <li>{{ grupos_count }} archivo{{ grupos_count|pluralize }} Excel individual{{ grupos_count|pluralize }} (uno por grupo)</li>
+                        <li>Formato Excel (.xlsx) basado en plantilla institucional</li>
+                        <li>Datos ordenados por apellido</li>
+                        <li>Incluye información de contacto y teléfonos</li>
+                        <li>Estructura idéntica a plantilla original</li>
+                        <li>Comprimido en formato ZIP para fácil descarga</li>
+                    </ul>
+
+                    <div class="alert alert-info margin-top-20">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                        <strong>Nota:</strong> El archivo ZIP se eliminará automáticamente después de la descarga para mantener la seguridad del sistema.
+                    </div>
+
+                    <div class="alert alert-warning margin-top-20">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                        <strong>Instrucciones:</strong> Después de descargar, extraiga el archivo ZIP para acceder a los archivos Excel individuales de cada grupo.
+                    </div>
+                </div>
+                
+                <div class="col-md-4 text-center">
+                    <div class="well">
+                        <span class="glyphicon glyphicon-compressed" style="font-size: 48px; color: #5cb85c;"></span>
+                        <h4>¡Listo para Descargar!</h4>
+                        <p class="text-muted">Archivo ZIP con {{ grupos_count }} archivo{{ grupos_count|pluralize }} Excel</p>
+                        
+                        <a href="{{ download_url }}" class="btn btn-success btn-lg margin-top-20" style="width: 100%;">
+                            <span class="glyphicon glyphicon-download"></span>
+                            Descargar ZIP
+                        </a>
+                        
+                        <p class="text-muted margin-top-10" style="font-size: 12px;">
+                            Tamaño: {{ file_size|filesizeformat }}
+                        </p>
+                        
+                        <p class="text-muted" style="font-size: 12px;">
+                            Haga clic en el botón para iniciar la descarga
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-info-sign"></span> Información del Contenido
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><strong>Estructura de cada archivo Excel:</strong></h5>
+                    <ul class="list-unstyled">
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Información del programa</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Fechas de inicio y finalización</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Horario del grupo</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Código y nivel del grupo</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Información del profesor</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Información del salón</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Lista numerada de estudiantes</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Números de teléfono celular</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5><strong>Formato de nombre de archivos:</strong></h5>
+                    <p class="text-muted">Los archivos Excel se nombran con el formato:</p>
+                    <code>[CÓDIGO_GRUPO]_[NOMBRE_PROFESOR].xlsx</code>
+                    <p class="text-muted margin-top-10">Ejemplo: <code>ING-B1-001_Juan_Perez.xlsx</code></p>
+                    
+                    <h5 class="margin-top-20"><strong>Compatibilidad:</strong></h5>
+                    <ul class="list-unstyled">
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Microsoft Excel 2010+</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> LibreOffice Calc</li>
+                        <li><span class="glyphicon glyphicon-ok text-success"></span> Google Sheets</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-cog"></span> Opciones Adicionales
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="btn-group" role="group">
+                <a href="{% url 'mis-cursos' %}" class="btn btn-default">
+                    <span class="glyphicon glyphicon-arrow-left"></span>
+                    Volver a Mis Cursos
+                </a>
+                
+                <a href="{% url 'generar-listas-excel-grupos' %}" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                    Generar Nuevamente
+                </a>
+            </div>
+            
+            <div class="pull-right">
+                <small class="text-muted">
+                    <span class="glyphicon glyphicon-time"></span>
+                    Generado el {{ "now"|date:"d/m/Y H:i:s" }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.margin-top-10 {
+    margin-top: 10px;
+}
+
+.margin-top-20 {
+    margin-top: 20px;
+}
+
+.well {
+    background-color: #f9f9f9;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    padding: 19px;
+    margin-bottom: 20px;
+}
+
+.panel-title {
+    font-weight: bold;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.btn-success:hover {
+    animation: pulse 0.5s ease-in-out;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.glyphicon-compressed {
+    background: linear-gradient(45deg, #5cb85c, #4cae4c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    // Auto-focus en el botón de descarga
+    $('.btn-success').focus();
+    
+    // Mostrar mensaje de confirmación al hacer clic en descargar
+    $('.btn-success').click(function() {
+        var $btn = $(this);
+        var originalText = $btn.html();
+        
+        // Cambiar texto del botón temporalmente
+        $btn.html('<span class="glyphicon glyphicon-refresh spinning"></span> Descargando ZIP...');
+        $btn.prop('disabled', true);
+        
+        // Restaurar después de 3 segundos
+        setTimeout(function() {
+            $btn.html(originalText);
+            $btn.prop('disabled', false);
+            
+            // Mostrar mensaje de éxito
+            if (!$('.download-success').length) {
+                $btn.after('<div class="download-success alert alert-success margin-top-10" style="display:none;"><span class="glyphicon glyphicon-ok"></span> ¡Descarga ZIP iniciada correctamente!</div>');
+                $('.download-success').fadeIn();
+                
+                // Mostrar instrucción adicional
+                setTimeout(function() {
+                    if (!$('.extract-info').length) {
+                        $('.download-success').after('<div class="extract-info alert alert-info margin-top-10" style="display:none;"><span class="glyphicon glyphicon-info-sign"></span> <strong>Siguiente paso:</strong> Extraiga el archivo ZIP para acceder a los archivos Excel individuales.</div>');
+                        $('.extract-info').fadeIn();
+                    }
+                }, 2000);
+            }
+        }, 3000);
+    });
+    
+    // Añadir efecto hover al icono principal
+    $('.glyphicon-compressed').hover(
+        function() {
+            $(this).addClass('animated pulse');
+        },
+        function() {
+            $(this).removeClass('animated pulse');
+        }
+    );
+});
+</script>
+
+{% endblock %}
+{% endblock %}

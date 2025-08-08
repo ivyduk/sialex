@@ -922,7 +922,7 @@ def formalizar_vista(request, pk):
     except Matricula.DoesNotExist:
         matricula = Matricula.objects.filter(estudiante=preinscripcionhorariocurso.persona, preinscripcion_generada=preinscripcionhorariocurso).first()
         if matricula:
-            cambiado = matricula.grupo.horarioCurso.curso.nivel.nombre
+            cambiado = matricula.grupo.horarioCurso.curso.nombre
 
     comprobantes_banco = ComprobanteBanco.objects.filter(preinscripcion_generada=preinscripcionhorariocurso)
 

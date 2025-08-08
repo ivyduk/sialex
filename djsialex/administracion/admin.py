@@ -120,6 +120,14 @@ class GrupoAcademicoAdmin(admin.ModelAdmin):
 
 admin.site.register(GrupoAcademico, GrupoAcademicoAdmin)
 
+class ReciboPreinscripcionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'preinscripcion', 'estado_recibo', 'fecha_pago', )
+    search_fields = ('id', 'preinscripcion__persona__numero_documento')
+    readonly_fields = ('preinscripcion', 'fecha_pago', 'preinscrito', 'valor_requerido', 'valor_pagado', 'valor_pagado_usuario', 'valor_pagado_beca', 'valor_pagado_descuento', 'valor_pagado_saldo', 'descuento_id', 'valor_materiales', 'migrado')
+    list_filter = ('estado_recibo',)
+
+admin.site.register(ReciboPreinscripcion, ReciboPreinscripcionAdmin)
+
 class DescuentoAplicadoAdmin(admin.ModelAdmin):
     list_display = (
         'id',                # si tienes un campo id
@@ -145,7 +153,7 @@ class ReservasSaldoInline(admin.TabularInline):  # Usa StackedInline si prefiere
     model = ReservasSaldo
     extra = 1  # Número de filas vacías para agregar nuevas reservas
     fields = ('id', 'saldo', 'valor', 'preinscripcion_reserva', 'pagado')  # Campos que deseas mostrar
-    readonly_fields = ('saldo', 'valor', 'pagado',)  # Si quieres que algunos campos sean solo de lectura
+    readonly_fields = ('saldo', 'pagado',)  # Si quieres que algunos campos sean solo de lectura
     can_delete = False
 
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
@@ -165,11 +173,23 @@ class ReservasSaldoInline(admin.TabularInline):  # Usa StackedInline si prefiere
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 class SaldoAFavorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'beneficiario', 'periodo_generado', 'valor',)
-    readonly_fields = ( 'beneficiario','periodo_generado', 'recibo_preinscripcion_generado',  'devuelto', 'valor', )
+    list_display = ('id', 'beneficiario', 'periodo_generado', 'valor', )
+    readonly_fields = ( 'beneficiario','periodo_generado', 'recibo_preinscripcion_generado',  'devuelto', 'valor', 'comprobante_banco_generado', 'get_preinscripcion', )
     search_fields = ('beneficiario__numero_documento',)
     list_filter = ('activo', 'periodo_generado__anio',)
     inlines = [ReservasSaldoInline]
+
+    def get_preinscripcion(self, obj):
+        """
+        Retorna el ID de la preinscripción asociada a través del recibo de preinscripción.
+        """
+        if obj.recibo_preinscripcion_generado:
+            preinscripcion = obj.recibo_preinscripcion_generado.preinscripcion
+            return f"{preinscripcion.id} - {preinscripcion.persona.numero_documento if preinscripcion.persona else 'Sin persona'}"
+        return "Sin preinscripción"
+    
+    get_preinscripcion.short_description = "Preinscripción"
+    get_preinscripcion.admin_order_field = 'recibo_preinscripcion_generado__preinscripcion'
 
 admin.site.register(SaldoAFavor, SaldoAFavorAdmin)
 
@@ -250,6 +270,22 @@ class PreinscripcionCursoAdmin(admin.ModelAdmin):
     readonly_fields = ('valor_preinscripcion', 'codigo_hash', "persona")
 
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+
+        if obj and obj.horario_cupo:
+            # Filtrar los grupos según la preinscripción del objeto
+            form.base_fields['horario_cupo'].queryset = HorarioCurso.objects.filter(
+                curso__oferta_academica__periodo__inicio__gte=obj.horario_cupo.curso.oferta_academica.periodo.inicio,
+                curso__oferta_academica__programa=obj.horario_cupo.curso.oferta_academica.programa,
+            ).order_by('curso__nivel__orden', 'curso__oferta_academica__programa__periodo__nombre')
+        else:
+            # Comportamiento por defecto si no hay objeto
+            form.base_fields['horario_cupo'].queryset = HorarioCurso.objects.none()
+
+        return form
+
+
 @admin.register(PreinscripcionExamen)
 class PreinscripcionExamenAdmin(admin.ModelAdmin):
     list_display = ('id', 'fecha_preinscripcion', 'persona',
@@ -265,7 +301,7 @@ class PeriodoAdmin(admin.ModelAdmin):
 
 @admin.register(Matricula)
 class MatriculaAdmin(admin.ModelAdmin):
-    list_display = ('estudiante', 'estado_matricula', 'calificacionFinal')
+    list_display = ('estudiante', 'estado_matricula', 'codigo_grupo', 'calificacionFinal')
     search_fields = ('estudiante__numero_documento', )
     readonly_fields = ('calificacionFinal', "estudiante")
 
@@ -280,12 +316,27 @@ class MatriculaAdmin(admin.ModelAdmin):
             form.base_fields['preinscripcion_generada'].queryset = Preinscripcion.objects.filter(
                 persona=obj.preinscripcion_generada.persona
             )
+        elif obj:
+            form.base_fields['grupo'].queryset = GrupoAcademico.objects.filter(
+                horarioCurso__curso__oferta_academica__periodo__inicio__gte=obj.grupo.horarioCurso.curso.oferta_academica.periodo.inicio,
+            )
+            form.base_fields['preinscripcion_generada'].queryset = Preinscripcion.objects.filter(
+                persona=obj.estudiante
+            )
         else:
             # Comportamiento por defecto si no hay objeto
             form.base_fields['grupo'].queryset = GrupoAcademico.objects.none()
             form.base_fields['preinscripcion_generada'].queryset = Preinscripcion.objects.none()
 
         return form
+
+    def codigo_grupo(self, obj):
+        """
+        Retorna el código del grupo académico asociado a la matrícula.
+        """
+        if obj.grupo:
+            return obj.grupo.codigo
+        return None
 
 
 @admin.register(Horario)
