@@ -134,13 +134,24 @@ WSGI_APPLICATION = 'djsialex.wsgi.application'
 #    }
 #}
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sialex',
         'USER': 'sialex',
         'PASSWORD': 'sialex',
         'HOST': 'localhost',
+        'PORT': '5432',
+    },
+}"""
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'LpSVfGaASXXDSAdF',
+        'HOST': 'db.jausmvbkakyfeifvfmwl.supabase.co',
         'PORT': '5432',
     },
 }
