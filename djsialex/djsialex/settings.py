@@ -23,26 +23,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '-plag545x0!5y9&v7jclhy@o!&ekam7_!lt38736c8-e84c(34'
+SECRET_KEY = os.getenv('SECRET_KEY', '-plag545x0!5y9&v7jclhy@o!&ekam7_!lt38736c8-e84c(34')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-""" # Prod
-DEBUG = False 
-"""
-ALLOWED_HOSTS = [
-    '168.176.18.33',
-    '127.0.0.1',
-    'localhost',
-    '168.176.84.35',
-    '168.176.18.15',
-    'http://www.extensionidiomas.unal.edu.co',
-    'www.extensionidiomas.unal.edu.co',
-    'extensionidiomas.unal.edu.co',
-    '3.89.102.66',
-    'ec2-3-89-102-66.compute-1.amazonaws.com'
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
+
 DJANGO_EASY_AUDIT_WATCH_REQUEST_EVENTS = False
 
 
@@ -137,11 +124,11 @@ WSGI_APPLICATION = 'djsialex.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sialex',
-        'USER': 'sialex',
-        'PASSWORD': 'sialex',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME', 'sialex'),
+        'USER': os.getenv('DB_USER', 'sialex'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'sialex'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     },
 }
 
@@ -179,7 +166,7 @@ LOCALE_PATHS = (
 )
 
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 """ #dev
 TIME_ZONE = 'America/Bogota'
 """
@@ -219,22 +206,14 @@ MAX_IMAGE_SIZE = '20971520'
 
 SESSION_COOKIE_AGE = 60*60
 
-""" # prod
-EMAIL_HOST = 'smtp-relay.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'sialex_fchbog@unal.edu.co'
-EMAIL_HOST_PASSWORD = 'Unal2021'
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'sialex_fchbog@unal.edu.co'
-"""
 
-EMAIL_HOST = 'smtp-relay.sendinblue.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'iaduquea@unal.edu.co'
-EMAIL_HOST_PASSWORD = '4z0aWsSwUVKj3bqt'
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-DEFAULT_FROM_EMA ='sialex_fchbog@unal.edu.co'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp-relay.sendinblue.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'iaduquea@unal.edu.co')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '4z0aWsSwUVKj3bqt')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'sialex_fchbog@unal.edu.co')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 

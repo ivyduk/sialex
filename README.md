@@ -1,47 +1,61 @@
-rebase
+# SIALEX - Sistema de Información para Gestión de Cursos de Lenguas Extranjeras
 
-Manual de despligue entorno de desarrollo.
+SIALEX es un sistema de información diseñado para administrar, gestionar y controlar los cursos dictados en el departamento de lenguas extranjeras.
 
-1. Instalar Python 3.6 > 
-2. Instalar programa Virtualenv
-3. Instalar getText (Fedora)
-4. Clonar el proyecto: ssh git@168.176.84.61:idioma/sialex.git
-5. Crear entorno virtual 
-   Comando: virtualenv -p python3.6 ve-sialex
-6. Activar entorno virtual
-   Comando: source ve-sialex/bin/activate
-7. En el entorno virtual, instalar dependencias:
+## Arquitectura (Modelo-Vista-Controlador / MVT en Django)
+
+El proyecto se estructura con una arquitectura basada en componentes, equivalente al patrón Modelo-Vista-Controlador (MVC/MVP), adaptado al estilo Modelo-Vista-Template (MVT) natural de Django. Esta arquitectura fomenta la separación de responsabilidades y facilita la escalabilidad.
+
+### Estructura de Carpetas Asociada
+```text
+sialex/
+ ├── djsialex/                # Core principal y configuraciones de Django
+ │    ├── administracion/     # Aplicación principal del sistema
+ │    │    ├── models.py      # [MODELO]: Definición de datos y ORM asociado a la base de datos
+ │    │    ├── views/         # [PRESENTADOR/CONTROLADOR]: Lógica de negocio y manejo de peticiones
+ │    │    ├── templates/     # [VISTA]: (Ubicado en ../templates) Archivos HTML renderizados
+ │    │    ├── forms/         # Validaciones y manejo de formularios
+ │    │    ├── tests/         # Pruebas unitarias y de integración
+ │    │    └── urls.py        # Enrutamiento de URLs a las Vistas/Presentadores
+ │    ├── settings.py         # Configuraciones globales
+ │    └── wsgi.py             # Entrypoint para servidores de producción (Gunicorn)
+ ├── requirements.txt         # Dependencias del proyecto
+ ├── Dockerfile               # Configuración para contenerización de la app
+ └── docker-compose.yml       # Orquestador local con Nginx + Gunicorn
+```
+
+## Manual de Despliegue - Entorno de Desarrollo (Linux/Windows)
+
+### Prerrequisitos
+1. Python 3.6 o superior
+2. Gestor de base de datos local (ej. PgAdmin4 o DataGrip)
+3. `virtualenv` instalado
+
+### Instrucciones paso a paso
+1. **Configurar Base de Datos:**
+   Verificar nombre de BD y datos de acceso en el archivo `settings.py`.
+2. **Clonar proyecto:**
+   ```bash
+   git clone https://github.com/ivyduk/sialex.git
+   ```
+3. **Crear entorno virtual:**
+   ```bash
+   virtualenv -p python3.6 ve-sialex
+   ```
+4. **Activar entorno virtual:**
+   * **Linux/Mac:** `source ve-sialex/bin/activate`
+   * **Windows/VS Code PowerShell:** `.\ve-sialex\Scripts\activate` (Nota: Si hay problemas de permisos ejecutar `Set-ExecutionPolicy Unrestricted -Scope CurrentUser` como administrador).
+5. **Instalar dependencias:**
+   ```bash
    pip install -r sialex/requirements.txt
-8. Corre aplicación por consola en directorio sialex/djsialex/
-   Comando: python manage.py makemigrations
-   Comando: python manage.py migrate
-   Comando: python manage.py createsuperuser
-   Comando: python manage.py runserver
-  
-   
-  Despliegue en Windows + VS CODE
-1. Instalar Python 3.6 > 
-2. Instalar PgAdmin4 o DataGrip: Recomendado tener la base de datos local para ambiente de desarrollo
-3. Verificar nombre de base de datos y datos de acceso en archivo settings.py que coincidan con la configuracion ![image](https://user-images.githubusercontent.com/84890580/130123437-6659c3f9-a6ce-4f81-b192-60fc7895fc3c.png)
-4. Instalar programa Virtualenv (verificar que la version sea para Python 3.6 o compatible)
-5. Instalar Visual Studio Code
-   Para poder ejecutar en consola de VS Code, seguir https://es.stackoverflow.com/questions/321611/problema-con-scripts-en-visual-studio-code con permisos de Administrador
-4. Clonar el proyecto: ssh https://github.com/desarrollofchbog/sialex.git
-5. Crear entorno virtual 
-   Comando: virtualenv -p python3.6 ve-sialex
-6. Activar entorno virtual
-   ir a la ruta ve-sialex/Scritps
-   Ejecutar: ./activate
-   Ejemplo
-   -> PS C:\Users\CompuGamer\Documents\ve-sialex\Scripts> ./activate
-7. En el entorno virtual, instalar dependencias:
-   pip install -r sialex/requirements.txt
-8. Corre aplicación por consola en directorio sialex/djsialex/
-   Comando: python manage.py makemigrations
-   Comando: python manage.py migrate
-   Comando: python manage.py createsuperuser
-   Comando: python manage.py runserver
-   
-   Ejemplo: python .\manage.py runserver
+   ```
+6. **Ejecutar migraciones y servidor local:**
+   *Ir al directorio `sialex/djsialex/`*
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   python manage.py createsuperuser
+   python manage.py runserver
+   ```
 
   

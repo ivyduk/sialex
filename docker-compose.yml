@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: gunicorn djsialex.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes:
+      - ./sialex:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=djsialex.settings
+      - DEBUG=0
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./sialex/static_deployed:/app/static
+      - ./sialex/media:/app/media
+    depends_on:
+      - web
